@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro / Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container" id="container">
+        <!-- Formulário de Cadastro -->
+        <div class="form-container sign-up-container">
+            <form action="#">
+                <h1>Crie sua Conta</h1>
+                <div class="social-container">
+                    <a href="#" class="social"><img src="./facebook (1).png" alt=""></a>
+                    <a href="#" class="social"><img src="./google-plus.png" alt=""></a>
+                    <a href="#" class="social"><img src="./linkedin.png" alt=""></a>
+                </div>
+                <span>ou use sua conta para registrar</span>
+                <input id="nome" type="text" placeholder="Nome" />
+                <input id="email" type="email" placeholder="Email" />
+                <input id="senha" type="password" placeholder="Senha" />
+                <button onclick="salvar(event)" type="button">Criar Conta</button>
+            </form>
+        </div>
+
+        <!-- Formulário de Login -->
+        <div class="form-container sign-in-container">
+            <form action="#">
+                <h1>Realize seu Login</h1>
+                <div class="social-container">
+                    <a href="#" class="social"><img src="./facebook (1).png" alt=""></a>
+                    <a href="#" class="social"><img src="./google-plus.png" alt=""></a>
+                    <a href="#" class="social"><img src="./linkedin.png" alt=""></a>
+                </div>
+                <span>ou use sua conta</span>
+                <input id="login-email" type="email" placeholder="Email" />
+                <input id="login-senha" type="password" placeholder="Senha" />
+                <a href="#">Esqueceu sua senha?</a>
+                <button onclick="login(event)" type="button">Login</button>
+            </form>
+        </div>
+
+        <!-- Elementos decorativos -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Bem-vindo novamente!</h1>
+                    <p>Para manter-se conectado conosco, por favor, faça login com suas informações pessoais.</p>
+                    <button class="ghost" id="signIn" onclick="alternarModo('login')">Faça seu Login</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Olá, amigo!</h1>
+                    <p>Coloque seus dados e inicie sua jornada conosco!</p>
+                    <button class="ghost" id="signUp" onclick="alternarModo('cadastro')">Criar conta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const container = document.getElementById('container');
+
+        // Função para alternar entre o modo de login e cadastro
+        function alternarModo(modo) {
+            if (!container) {
+                console.error('Contêiner não encontrado!');
+                return;
+            }
+
+            if (modo === 'login') {
+                container.classList.remove('right-panel-active');
+            } else if (modo === 'cadastro') {
+                container.classList.add('right-panel-active');
+            }
+        }
+
+        // Valida os campos antes de envio
+        function validarCampos(campos) {
+            for (let campo of campos) {
+                if (!campo.value.trim()) {
+                    alert(`O campo "${campo.placeholder}" é obrigatório.`);
+                    campo.focus();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Função para salvar o cadastro
+        async function salvar(event) {
+            event.preventDefault(); // Evitar envio do formulário
+
+            const nome = document.getElementById('nome');
+            const email = document.getElementById('email');
+            const senha = document.getElementById('senha');
+
+            // Valida os campos antes de enviar
+            if (!validarCampos([nome, email, senha])) return;
+
+            const data = {
+                nome: nome.value,
+                email: email.value,
+                senha: senha.value
+            };
+
+            console.log("Enviando dados para cadastro:", data); // Depuração
+
+            try {
+                const response = await fetch('http://localhost:3000/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                console.log("Resposta do servidor:", result); // Depuração
+
+                if (response.ok) {
+                    alert('Conta criada com sucesso!');
+                } else {
+                    alert(result.message || 'Erro ao criar conta.');
+                }
+            } catch (error) {
+                console.error('Erro ao salvar usuário:', error);
+                alert('Erro na comunicação com o servidor. Verifique sua conexão.');
+            }
+        }
+
+        // Função para realizar o login
+        async function login(event) {
+            event.preventDefault(); // Evitar envio do formulário
+
+            const email = document.getElementById('login-email');
+            const senha = document.getElementById('login-senha');
+
+            // Valida os campos de login
+            if (!validarCampos([email, senha])) return;
+
+            const data = { email: email.value, senha: senha.value };
+
+            console.log("Tentando login com dados:", data); // Depuração
+
+            try {
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                console.log("Resposta do servidor:", result); // Depuração
+
+                if (response.ok) {
+                    alert('Login realizado com sucesso!');
+                    window.location.href = '../index.html'; // Ou a URL para o painel do usuário
+                } else {
+                    alert(result.message || 'Falha no login. Verifique suas credenciais.');
+                    window.location.href = 'index.html';
+                }
+
+            } catch (error) {
+                console.error('Erro ao fazer login:', error);
+                alert('Erro na comunicação com o servidor. Verifique sua conexão.');
+            }
+        }
+    </script>
+</body>
+
+</html>
