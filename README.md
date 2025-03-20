@@ -27,7 +27,7 @@ O projeto não é um marketplace, mas uma plataforma para conexão entre freelan
 
 ## Tecnologias utilizadas
 - **Front-end**: HTML, CSS, JavaScript
-- **Back-end**: SpringBoot ou Django (A decidir)
+- **Back-end**: Python
 - **Banco de Dados**: MySQL
 
 ## Estruturas a serem implementadas
