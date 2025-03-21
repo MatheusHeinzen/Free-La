@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
             valid = false;
         }
         
-        if (senha.length < 8) {
-            alert("A senha deve ter pelo menos 8 caracteres.");
+        if (!validateSenha(senha)) {
+            alert("A senha não atende os requisitos de SENHA FORTE.");
             valid = false;
         }
         
@@ -43,10 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function validateEmail(email) {
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const re = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i
         return re.test(String(email).toLowerCase());
     }
 });
+
+    function validateSenha(senha) {
+        const re = /^(?=.*[A-Z])(?=.*[!#@$%&])(?=.*[0-9])(?=.*[a-z]).{6,15}$/i
+        return re.test(String(senha));
+    }
 
 async function verificarSessao() {
     try {
