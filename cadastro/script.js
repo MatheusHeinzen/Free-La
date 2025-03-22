@@ -1,75 +1,75 @@
-const signUpButton = document.getElementById('signUp');
-const signInButton = document.getElementById('signIn');
-const container = document.getElementById('container');
-
-signUpButton.addEventListener('click', () => {
-    container.classList.add('right-panel-active');
-});
-
-signInButton.addEventListener('click', () => {
-    container.classList.remove('right-panel-active');
-});
-
+//Máscaras
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('.sign-up-container form');
-    
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        const nome = document.getElementById('nome').value;
-        const email = document.getElementById('email').value;
-        const senha = document.getElementById('senha').value;
-        
-        let valid = true;
+    $("#telefone").mask("(00) 00000-0000");
+    $("#cpf").mask("000.000.000-00");
+    $("#cep").mask("00000-000");
 
-        if (nome.trim() === "") {
-            alert("O nome é obrigatório.");
-            valid = false;
-        }
-        
-        if (!validateEmail(email)) {
-            alert("Por favor, insira um email válido.");
-            valid = false;
-        }
-        
-        if (!validateSenha(senha)) {
-            alert("A senha não atende os requisitos de SENHA FORTE.");
-            valid = false;
-        }
-        
-        if (valid) {
-            alert("Formulário enviado com sucesso!");
-            form.submit();
-        }
-    });
-
-    function validateEmail(email) {
-        const re = /^[a-z0-9.]+@[a-z0-9]+\.[a-z]+\.([a-z]+)?$/i
-        return re.test(String(email).toLowerCase());
-    }
+    // Evento para validar senha em tempo real
+    document.getElementById("senha").addEventListener("input", validarSenha);
 });
 
-    function validateSenha(senha) {
-        const re = /^(?=.*[A-Z])(?=.*[!#@$%&])(?=.*[0-9])(?=.*[a-z]).{6,15}$/i
-        return re.test(String(senha));
+//Alternar entre login e cadastro
+function alternarModo(modo) {
+    const container = document.getElementById("container");
+    if (modo === "login") {
+        container.classList.remove("right-panel-active");
+    } else {
+        container.classList.add("right-panel-active");
+    }
+}
+
+//Visualizar/ocultar senha
+function toggleSenha(id) {
+    const campo = document.getElementById(id);
+    campo.type = campo.type === "password" ? "text" : "password";
+}
+
+//Validar senha
+function validarSenha() {
+    const senha = document.getElementById("senha").value;
+    const erro = document.getElementById("senha-erro");
+    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+    if (!regex.test(senha)) {
+        erro.innerText = "A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial.";
+    } else {
+        erro.innerText = "";
+    }
+}
+
+
+//Função para salvar o cadastro
+async function salvar(event) {
+    event.preventDefault();
+
+    const nome = document.getElementById("nome").value;
+    const email = document.getElementById("email").value;
+    const telefone = document.getElementById("telefone").value;
+    const cpf = document.getElementById("cpf").value;
+    const cep = document.getElementById("cep").value;
+    const senha = document.getElementById("senha").value;
+    const confirmaSenha = document.getElementById("confirma-senha").value;
+
+    if (senha !== confirmaSenha) {
+        alert("As senhas não coincidem.");
+        return;
     }
 
-async function verificarSessao() {
+    const data = { nome, email, telefone, cpf, cep, senha };
+
     try {
-        const response = await fetch('http://localhost:3000/api/me', {
-            method: 'GET',
-            credentials: 'include'
+        const response = await fetch('http://localhost:3000/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
         });
 
-        if (!response.ok) {
-            console.log('erro na autentificação')
-            return;
+        if (response.ok) {
+            alert("Conta criada com sucesso!");
+        } else {
+            alert("Erro ao criar conta.");
         }
-
-        const data = await response.json();
-        alert(data.message);
-        console.log("autentificado com sucesso")
-
-    } catch (err) {
-        console.error('Erro ao verificar sessão:', err);
+    } catch (error) {
+        console.error("Erro ao salvar usuário:", error);
     }
 }

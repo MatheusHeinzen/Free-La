@@ -81,7 +81,7 @@ input {
     overflow: hidden;
     width: 768px;
     max-width: 100%;
-    min-height: 480px;
+    min-height: 600px;
 }
 
 .form-container {
@@ -194,4 +194,25 @@ input {
     margin: 0 5px;
     height: 40px;
     width: 40px;
+}
+
+.senha-container {
+    position: relative;
+    width: 100%;
+}
+
+.senha-container input {
+    width: 100%;
+    padding-right: 40px; /* Espaço para o botão de olho */
+}
+
+.toggle-senha {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
 }
