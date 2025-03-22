@@ -22,3 +22,9 @@
     color: rgb(255, 255, 255);
     border-radius: 25px;
 }
+
+/* Elementos para responsividade: */
+img{
+    max-width: 510px;
+    max-height: 150px;
+}
