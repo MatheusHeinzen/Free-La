@@ -1,0 +1,24 @@
+/* Barra de pesquisa */
+.pesquisa {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border-radius: 25px;
+    border: 1px solid black;
+    width: 250px;
+    text-align: left;
+    padding-left: 18px;
+    padding-right: 15px;
+    height: 40px;
+}
+.pesquisa:focus{
+    text-decoration: none;
+    border-radius: 1px solid silver;
+}
+.pesquisar_btn {
+    height: 40px;
+    width: 70px;
+    border: 0px;
+    background-color: rgb(175, 88, 179);
+    color: rgb(255, 255, 255);
+    border-radius: 25px;
+}
