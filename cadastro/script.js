@@ -19,9 +19,18 @@ function alternarModo(modo) {
 }
 
 //Visualizar/ocultar senha
-function toggleSenha(id) {
-    const campo = document.getElementById(id);
-    campo.type = campo.type === "password" ? "text" : "password";
+function toggleSenha(id,btn) {
+    var inputPass = document.getElementById(id)
+    var btnShowPass = document.getElementById(btn)
+
+    if(inputPass.type === 'password'){
+        inputPass.setAttribute('type','text')
+        btnShowPass.classList.replace('bi-eye-fill','bi-eye-slash-fill')
+    }
+    else{
+        inputPass.setAttribute('type','password')
+        btnShowPass.classList.replace('bi-eye-slash-fill','bi-eye-fill')
+    }
 }
 
 //Validar senha
@@ -58,19 +67,29 @@ async function salvar(event) {
 
     const data = { nome, email, telefone, cpf, cep, senha };
 
-    try {
-        const response = await fetch('http://localhost:3000/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
+    // Salva os dados no localStorage como JSON
+    localStorage.setItem("usuario", JSON.stringify(data));
+    
+    // Redireciona para a outra tela
+    window.location.href = "../HomePage/homepage.html";
 
-        if (response.ok) {
-            alert("Conta criada com sucesso!");
-        } else {
-            alert("Erro ao criar conta.");
-        }
-    } catch (error) {
-        console.error("Erro ao salvar usuário:", error);
-    }
+
 }
+
+//     try {
+//         const response = await fetch('http://localhost:3000/api/register', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify(data),
+//         });
+
+//         if (response.ok) {
+//             alert("Conta criada com sucesso!");
+//         } else {
+//             alert("Erro ao criar conta.");
+//         }
+//     } catch (error) {
+//         console.error("Erro ao salvar usuário:", error);
+//     }
+
+

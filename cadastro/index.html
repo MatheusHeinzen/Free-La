@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro / Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -19,20 +20,45 @@
                     <a href="#" class="social"><img src="../imgs/google.png" alt="Google"></a>
                     <a href="#" class="social"><img src="../imgs/linkedin.png" alt="LinkedIn"></a>
                 </div>
-                <span>ou use sua conta para registrar</span>
-                <input id="nome" type="text" placeholder="Nome*" required />
-                <input id="email" type="email" placeholder="Email*" required/>
-                <input id="telefone" type="text" placeholder="Telefone" />
-                <input id="cpf" type="text" placeholder="CPF*" required />
-                <input id="cep" type="text" placeholder="CEP*" required />
-                <div class="senha-container">
-                    <input id="senha" type="password" placeholder="Senha*" required />
-                    <button type="button" class="toggle-senha" onclick="toggleSenha('senha')">👁️</button>
+                <span>Ou use sua conta para registrar</span>
+                <div class="input-container">
+                    <input id="nome" type="text" placeholder="Nome*" required />
+                    <i data-tooltip="Digite seu nome completo." data-position="top" class="bi bi-question-circle-fill"></i>
                 </div>
-                <div class="senha-container">
-                    <input id="confirma-senha" type="password" placeholder="Confirmar Senha*" required />
-                    <button type="button" class="toggle-senha" onclick="toggleSenha('confirma-senha')">👁️</button>
+                
+                <div class="input-container">
+                    <input id="email" type="email" placeholder="Email*" required/>
+                    <i data-tooltip="Digite seu melhor e-mail." data-position="top" class="bi bi-question-circle-fill"></i>
                 </div>
+
+                <div class="input-container">
+                    <input id="telefone" type="text" placeholder="Telefone" />
+                    <i data-tooltip="Informe o seu telefone, apenas números." data-position="top" class="bi bi-question-circle-fill"></i>
+                </div>
+
+                <div class="input-container">
+                    <input id="cpf" type="text" placeholder="CPF*" required />
+                    <i data-tooltip="Informe o seu CPF, apenas números" data-position="top" class="bi bi-question-circle-fill"></i>
+                </div>
+
+                <div class="input-container">
+                    <input id="cep" type="text" placeholder="CEP*" required />
+                    <i data-tooltip="Informe o seu CEP, apenas números" data-position="top" class="bi bi-question-circle-fill"></i>
+                </div>
+
+                <div class="input-container">
+                    <i data-tooltip="A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial." data-position="top" class="bi bi-question-circle-fill"></i>
+                        <div class="senha-container">
+                            <input type="password" id="senha" placeholder="Senha*" required/>
+                            <i class="bi bi-eye-fill" id="btn-senha1" onclick="toggleSenha('senha','btn-senha1')"></i>
+                        </div>
+                </div>
+
+                <div class="senha-container">
+                    <input type="password" id="confirma-senha" placeholder="Confirmar Senha*" required />
+                    <i class="bi bi-eye-fill" id="btn-senha2" onclick="toggleSenha('confirma-senha','btn-senha2')"></i>
+                </div>
+                
                 <span id="senha-erro" class="erro"></span>
                 <button onclick="salvar(event)" type="button">Criar Conta</button>
             </form>
@@ -51,7 +77,7 @@
                 <input id="login-email" type="email" placeholder="Email" required />
                 <div class="senha-container">
                     <input id="login-senha" type="password" placeholder="Senha" required />
-                    <button type="button" class="toggle-senha" onclick="toggleSenha('login-senha')">👁️</button>
+                    <i class="bi bi-eye-fill" id="btn-senha3" onclick="toggleSenha('login-senha','btn-senha3')"></i>
                 </div>
                 <a href="#">Esqueceu sua senha?</a>
                 <button onclick="login(event)" type="button">Login</button>
