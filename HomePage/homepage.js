@@ -45,6 +45,13 @@ const trabalhosFreelancers = [
         descricao: "Design de sites e landing pages, identidade visual de empresas.",
         imagem: "../imgs/designer2.jpg",
         link: "../Cadastro/index.html"
+    },
+    {
+        nome: "Jorge Rasmussen",
+        especialidade: "Encanador",
+        descricao: "Reparo e planejamento de encanamentos, pias, privadas de forma profissional.",
+        imagem: "../imgs/encanador.jpg",
+        link: "../Cadastro/index.html"
     }
 ];
 
