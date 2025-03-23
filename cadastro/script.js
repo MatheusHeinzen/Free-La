@@ -38,6 +38,7 @@ function validarSenha() {
 }
 
 
+
 //Função para salvar o cadastro
 async function salvar(event) {
     event.preventDefault();

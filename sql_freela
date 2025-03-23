@@ -1,0 +1,52 @@
+/* Lógico_1: */
+DROP DATABASE IF EXISTS freela;
+CREATE DATABASE freela;
+USE freela;
+
+CREATE TABLE Usuario (
+    IdUsuario INT PRIMARY KEY AUTO_INCREMENT,
+    Nome VARCHAR50 NOT NULL,
+    Email VARCHAR50 NOT NULL,
+    Telefone VARCHAR11,
+    Senha VARCHAR50 NOT NULL,
+    TipoUsuario BOOLEAN NOT NULL
+);
+
+CREATE TABLE Perfil (
+    IdPerfil INT PRIMARY KEY AUTO_INCREMENT,
+    Foto BLOB DEFAULT ,
+    Categoria_Especificacao_ VARCHAR50,
+    Bio VARCHAR250,
+    fk_Usuario_IdUsuario INT
+);
+
+CREATE TABLE Endereco (
+    IdCidade INT PRIMARY KEY AUTO_INCREMENT,
+    Cidade VARCHAR50,
+    Estado VARCHAR2,
+    Logradouro VARCHAR50,
+    CEP INT
+);
+
+CREATE TABLE Atua_em (
+    fk_Cidade_IdCidade INT,
+    fk_Usuario_IdUsuario INT
+);
+ 
+ALTER TABLE Perfil ADD CONSTRAINT FK_Perfil_2
+    FOREIGN KEY (fk_Usuario_IdUsuario)
+    REFERENCES Usuario (IdUsuario)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE;
+ 
+ALTER TABLE Atua_em ADD CONSTRAINT FK_Atua_em_1
+    FOREIGN KEY (fk_Cidade_IdCidade)
+    REFERENCES Cidade (IdCidade)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE;
+ 
+ALTER TABLE Atua_em ADD CONSTRAINT FK_Atua_em_2
+    FOREIGN KEY (fk_Usuario_IdUsuario)
+    REFERENCES Usuario (IdUsuario)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE;
