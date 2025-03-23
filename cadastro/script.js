@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
     $("#cpf").mask("000.000.000-00");
     $("#cep").mask("00000-000");
 
-    // Evento para validar senha em tempo real
     document.getElementById("senha").addEventListener("input", validarSenha);
 });
 
@@ -18,18 +17,17 @@ function alternarModo(modo) {
     }
 }
 
-//Visualizar/ocultar senha
-function toggleSenha(id,btn) {
-    var inputPass = document.getElementById(id)
-    var btnShowPass = document.getElementById(btn)
+//Visualizar/ocultar senha sem alterar a posição do botão
+function toggleSenha(id, btn) {
+    var inputPass = document.getElementById(id);
+    var btnShowPass = document.getElementById(btn);
 
-    if(inputPass.type === 'password'){
-        inputPass.setAttribute('type','text')
-        btnShowPass.classList.replace('bi-eye-fill','bi-eye-slash-fill')
-    }
-    else{
-        inputPass.setAttribute('type','password')
-        btnShowPass.classList.replace('bi-eye-slash-fill','bi-eye-fill')
+    if (inputPass.type === 'password') {
+        inputPass.setAttribute('type', 'text');
+        btnShowPass.classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
+    } else {
+        inputPass.setAttribute('type', 'password');
+        btnShowPass.classList.replace('bi-eye-slash-fill', 'bi-eye-fill');
     }
 }
 
@@ -37,7 +35,7 @@ function toggleSenha(id,btn) {
 function validarSenha() {
     const senha = document.getElementById("senha").value;
     const erro = document.getElementById("senha-erro");
-    const regex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/;
 
     if (!regex.test(senha)) {
         erro.innerText = "A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial.";
@@ -46,7 +44,10 @@ function validarSenha() {
     }
 }
 
-
+function validarEmail(email) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+}
 
 //Função para salvar o cadastro
 async function salvar(event) {
@@ -60,6 +61,16 @@ async function salvar(event) {
     const senha = document.getElementById("senha").value;
     const confirmaSenha = document.getElementById("confirma-senha").value;
 
+    if (!validarEmail(email)) {
+        alert("Por favor, insira um e-mail válido.");
+        return;
+    }
+
+    if (!validarSenha(senha)) {
+        alert("Por favor, insira uma senha válida.");
+        return;
+    }
+
     if (senha !== confirmaSenha) {
         alert("As senhas não coincidem.");
         return;
@@ -67,13 +78,9 @@ async function salvar(event) {
 
     const data = { nome, email, telefone, cpf, cep, senha };
 
-    // Salva os dados no localStorage como JSON
     localStorage.setItem("usuario", JSON.stringify(data));
-    
-    // Redireciona para a outra tela
+
     window.location.href = "../HomePage/homepage.html";
-
-
 }
 
 //     try {
@@ -91,5 +98,4 @@ async function salvar(event) {
 //     } catch (error) {
 //         console.error("Erro ao salvar usuário:", error);
 //     }
-
-
+//}

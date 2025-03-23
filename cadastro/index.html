@@ -23,42 +23,48 @@
                 <span>Ou use sua conta para registrar</span>
                 <div class="input-container">
                     <input id="nome" type="text" placeholder="Nome*" required />
-                    <i data-tooltip="Digite seu nome completo." data-position="top" class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="Digite seu nome completo." data-position="top"
+                        class="bi bi-question-circle-fill"></i>
                 </div>
-                
+
                 <div class="input-container">
-                    <input id="email" type="email" placeholder="Email*" required/>
-                    <i data-tooltip="Digite seu melhor e-mail." data-position="top" class="bi bi-question-circle-fill"></i>
+                    <input id="email" type="email" placeholder="Email*" required />
+                    <i data-tooltip="Digite seu melhor e-mail." data-position="top"
+                        class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
                     <input id="telefone" type="text" placeholder="Telefone" />
-                    <i data-tooltip="Informe o seu telefone, apenas números." data-position="top" class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="Informe o seu telefone, apenas números." data-position="top"
+                        class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
                     <input id="cpf" type="text" placeholder="CPF*" required />
-                    <i data-tooltip="Informe o seu CPF, apenas números" data-position="top" class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="Informe o seu CPF, apenas números" data-position="top"
+                        class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
                     <input id="cep" type="text" placeholder="CEP*" required />
-                    <i data-tooltip="Informe o seu CEP, apenas números" data-position="top" class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="Informe o seu CEP, apenas números" data-position="top"
+                        class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
-                    <i data-tooltip="A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial." data-position="top" class="bi bi-question-circle-fill"></i>
-                        <div class="senha-container">
-                            <input type="password" id="senha" placeholder="Senha*" required/>
-                            <i class="bi bi-eye-fill" id="btn-senha1" onclick="toggleSenha('senha','btn-senha1')"></i>
-                        </div>
+                    <i data-tooltip="A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial."
+                        data-position="top" class="bi bi-question-circle-fill"></i>
+                    <div class="senha-container">
+                        <input type="password" id="senha" placeholder="Senha*" required />
+                        <i class="bi bi-eye-fill" id="btn-senha1" onclick="toggleSenha('senha','btn-senha1')"></i>
+                    </div>
                 </div>
 
                 <div class="senha-container">
                     <input type="password" id="confirma-senha" placeholder="Confirmar Senha*" required />
                     <i class="bi bi-eye-fill" id="btn-senha2" onclick="toggleSenha('confirma-senha','btn-senha2')"></i>
                 </div>
-                
+
                 <span id="senha-erro" class="erro"></span>
                 <button onclick="salvar(event)" type="button">Criar Conta</button>
             </form>
