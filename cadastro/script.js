@@ -80,19 +80,3 @@ async function salvar(event) {
     window.location.href = "../HomePage/homepage.html";
 }
 
-//     try {
-//         const response = await fetch('http://localhost:3000/api/register', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify(data),
-//         });
-
-//         if (response.ok) {
-//             alert("Conta criada com sucesso!");
-//         } else {
-//             alert("Erro ao criar conta.");
-//         }
-//     } catch (error) {
-//         console.error("Erro ao salvar usuário:", error);
-//     }
-//}

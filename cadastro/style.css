@@ -256,7 +256,7 @@ input {
 .senha-container input {
     width: 100%;
     outline:0;
-    padding-right: 40px; /* Espaço para o botão de olho */
+    padding-right: 40px; 
 }
 
 .senha-container i {
@@ -274,17 +274,35 @@ input {
         width: 95%;
         min-height: 450px;
     }
+    h1{
+        font-size: 21px;
+    }
     
     .sign-in-container{
         width: 90%;
     }
     .sign-up-container{
         width: 90%;
-        z-index: 0;
     }
-    .sign-up-container button .ghost{
-        order: -1;
+    .overlay-container{
+        display: none;
     }
+    button.botao{
+        display: block;
+        position: fixed;
+        margin-bottom: 250px;
+        z-index: 1000000;
+        position: absolute;
+        background:  -webkit-linear-gradient(to right, #5218bd, #c414fa);
+        border-color: #ffffff;
+        
+    }
+    .container.right-panel-active .sign-up-container {
+        transform: translateX(11%);
+        opacity: 1;
+        z-index: 5;
+    }
+    
 }
 @media screen and (max-width: 1024px) and (max-height: 600px){
     
@@ -298,6 +316,6 @@ input {
         margin-left: 20px;
     }
     h1{
-        font-size: 15px;
+        font-size: 30px;
     }
 }

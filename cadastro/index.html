@@ -10,6 +10,7 @@
 </head>
 
 <body>
+
     <div class="container" id="container">
         <!-- Formulário de Cadastro -->
         <div class="form-container sign-up-container">
@@ -67,6 +68,9 @@
 
                 <span id="senha-erro" class="erro"></span>
                 <button onclick="salvar(event)" type="button">Criar Conta</button>
+                <!-- Botão extra -->
+                <button class="botao" id="signIn" onclick="alternarModo('login')" style="display: none;">Faça seu
+                    Login</button>
             </form>
         </div>
 
@@ -87,6 +91,9 @@
                 </div>
                 <a href="#">Esqueceu sua senha?</a>
                 <button onclick="login(event)" type="button">Login</button>
+                <!-- Botão extra -->
+                <button class="botao" id="signUp" onclick="alternarModo('cadastro')" style="display: none;">Criar conta</button>
+
             </form>
         </div>
 
