@@ -22,6 +22,10 @@
     color: rgb(255, 255, 255);
     border-radius: 25px;
 }
+.jumbotron {
+    margin-bottom: 0rem;
+}
+
 
 /* Elementos para responsividade: */
 img{

@@ -17,11 +17,11 @@
             <form action="#">
                 <h1>Crie sua Conta</h1>
                 <div class="social-container">
-                    <a href="#" class="social"><img src="../imgs/facebook.png" alt="Facebook"></a>
+                    <a href="#" class="social"><img src="../imgs/facebook.png" alt="Facebook" ></a>
                     <a href="#" class="social"><img src="../imgs/google.png" alt="Google"></a>
                     <a href="#" class="social"><img src="../imgs/linkedin.png" alt="LinkedIn"></a>
                 </div>
-                <span>Ou use sua conta para registrar</span>
+                <span>Se já possui cadastro <a onclick="alternarModo('login')" href="#">Clique Aqui!</a></span>
                 <div class="input-container">
                     <input id="nome" type="text" placeholder="Nome*" required />
                     <i data-tooltip="Digite seu nome completo." data-position="top"
@@ -68,9 +68,7 @@
 
                 <span id="senha-erro" class="erro"></span>
                 <button onclick="salvar(event)" type="button">Criar Conta</button>
-                <!-- Botão extra -->
-                <button class="botao" id="signIn" onclick="alternarModo('login')" style="display: none;">Faça seu
-                    Login</button>
+
             </form>
         </div>
 
@@ -83,7 +81,7 @@
                     <a href="#" class="social"><img src="../imgs/google.png" alt="Google"></a>
                     <a href="#" class="social"><img src="../imgs/linkedin.png" alt="LinkedIn"></a>
                 </div>
-                <span>ou use sua conta</span>
+                <span>Ou se não possui uma conta <a href="#" onclick="alternarModo('cadastro')">Clique Aqui!</a></span>
                 <input id="login-email" type="email" placeholder="Email" required />
                 <div class="senha-container">
                     <input id="login-senha" type="password" placeholder="Senha" required />
@@ -91,8 +89,7 @@
                 </div>
                 <a href="#">Esqueceu sua senha?</a>
                 <button onclick="login(event)" type="button">Login</button>
-                <!-- Botão extra -->
-                <button class="botao" id="signUp" onclick="alternarModo('cadastro')" style="display: none;">Criar conta</button>
+
 
             </form>
         </div>
@@ -113,6 +110,8 @@
             </div>
         </div>
     </div>
+    
+
 
     <script src="script.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
