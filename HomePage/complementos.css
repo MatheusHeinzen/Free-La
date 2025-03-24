@@ -4,7 +4,7 @@
     margin-bottom: 15px;
     border-radius: 25px;
     border: 1px solid black;
-    width: 250px;
+    width: 300px;
     text-align: left;
     padding-left: 18px;
     padding-right: 15px;
@@ -26,5 +26,16 @@
 /* Elementos para responsividade: */
 img{
     max-width: 510px;
-    max-height: 150px;
+    
+}
+
+@media(max-width: 328px){
+    .pesquisa{
+        width: 90%;
+    }
+}
+@media(max-width: 590px){
+    img .logo{
+        margin: auto;
+    }
 }

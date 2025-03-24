@@ -8,7 +8,7 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    margin: -20px 0 50px;
+    margin: 0;
     background: #f6f5f7;
 }
 
@@ -80,7 +80,7 @@ input {
     box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
     position: relative;
     overflow: hidden;
-    width: 768px;
+    width: 800px;
     max-width: 100%;
     min-height: 600px;
 }
@@ -268,3 +268,36 @@ input {
     margin-top: 18px;
 }
 
+@media (max-width: 755px){
+    .container{
+        height: 90%;
+        width: 95%;
+        min-height: 450px;
+    }
+    
+    .sign-in-container{
+        width: 90%;
+    }
+    .sign-up-container{
+        width: 90%;
+        z-index: 0;
+    }
+    .sign-up-container button .ghost{
+        order: -1;
+    }
+}
+@media screen and (max-width: 1024px) and (max-height: 600px){
+    
+    .container{
+        min-height: 550px;
+        max-width: 80%;
+        max-height: 80%;
+    }
+    form{
+        padding: 35px;
+        margin-left: 20px;
+    }
+    h1{
+        font-size: 15px;
+    }
+}
