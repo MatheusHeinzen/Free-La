@@ -17,7 +17,7 @@ function alternarModo(modo) {
     }
 }
 
-//Visualizar/ocultar senha sem alterar a posição do botão
+//Visualizar/ocultar senha
 function toggleSenha(id, btn) {
     var inputPass = document.getElementById(id);
     var btnShowPass = document.getElementById(btn);
@@ -32,18 +32,12 @@ function toggleSenha(id, btn) {
 }
 
 //Validar senha
-function validarSenha() {
-    const senha = document.getElementById("senha").value;
-    const erro = document.getElementById("senha-erro");
+function validarSenha(senha) {
     const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/;
-
-    if (!regex.test(senha)) {
-        erro.innerText = "A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial.";
-    } else {
-        erro.innerText = "";
-    }
+    return regex.test(senha);
 }
 
+//Validar email
 function validarEmail(email) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
@@ -60,6 +54,7 @@ async function salvar(event) {
     const cep = document.getElementById("cep").value;
     const senha = document.getElementById("senha").value;
     const confirmaSenha = document.getElementById("confirma-senha").value;
+    const erroSenha = document.getElementById("senha-erro");
 
     if (!validarEmail(email)) {
         alert("Por favor, insira um e-mail válido.");
@@ -67,8 +62,10 @@ async function salvar(event) {
     }
 
     if (!validarSenha(senha)) {
-        alert("Por favor, insira uma senha válida.");
+        erroSenha.innerText = "A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial.";
         return;
+    } else {
+        erroSenha.innerText = "";
     }
 
     if (senha !== confirmaSenha) {
