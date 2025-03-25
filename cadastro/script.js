@@ -49,15 +49,30 @@ async function salvar(event) {
 
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
-    const telefone = document.getElementById("telefone").value;
     const cpf = document.getElementById("cpf").value;
     const cep = document.getElementById("cep").value;
+    const telefone = document.getElementById("telefone").value;
     const senha = document.getElementById("senha").value;
     const confirmaSenha = document.getElementById("confirma-senha").value;
     const erroSenha = document.getElementById("senha-erro");
 
+    if (!nome) {
+        alert("Por favor, insira seu nome completo.");
+        return;
+    }
+
     if (!validarEmail(email)) {
         alert("Por favor, insira um e-mail válido.");
+        return;
+    }
+
+    if (!cpf) {
+        alert("Por favor, insira um CPF válido.");
+        return;
+    }
+
+    if (!cep) {
+        alert("Por favor, insira um CEP válido.");
         return;
     }
 
@@ -73,10 +88,9 @@ async function salvar(event) {
         return;
     }
 
-    const data = { nome, email, telefone, cpf, cep, senha };
+    const data = { nome, email, cpf, cep, telefone, senha };
 
     localStorage.setItem("usuario", JSON.stringify(data));
 
     window.location.href = "../HomePage/homepage.html";
 }
-
