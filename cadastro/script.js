@@ -43,6 +43,11 @@ function validarEmail(email) {
     return regex.test(email);
 }
 
+//Validar CPF completo (000.000.000-00)
+function validarCPF(cpf) {
+    return cpf.length === 14; 
+}
+
 //Função para salvar o cadastro
 async function salvar(event) {
     event.preventDefault();
@@ -66,8 +71,8 @@ async function salvar(event) {
         return;
     }
 
-    if (!cpf) {
-        alert("Por favor, insira um CPF válido.");
+    if (!validarCPF(cpf)) {
+        alert("Por favor, insira um CPF completo.");
         return;
     }
 
