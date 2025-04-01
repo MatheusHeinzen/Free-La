@@ -26,8 +26,8 @@ O projeto não é um marketplace, mas uma plataforma para conexão entre freelan
 - **Segurança**: Armazenamento criptografado de dados sensíveis.
 
 ## Tecnologias utilizadas
-- **Front-end**: HTML, CSS, JavaScript
-- **Back-end**: Python
+- **Front-end**: HTML, CSS, JavaScript/React
+- **Back-end**: Node.JS
 - **Banco de Dados**: MySQL
 
 ## Estruturas a serem implementadas
