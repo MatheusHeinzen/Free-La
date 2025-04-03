@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     $("#telefone").mask("(00) 00000-0000");
     $("#cpf").mask("000.000.000-00");
-    $("#cep").mask("00000-000");
 
     document.getElementById("senha").addEventListener("input", validarSenha);
 });
@@ -45,8 +44,32 @@ function validarEmail(email) {
 
 //Validar CPF completo (000.000.000-00)
 function validarCPF(cpf) {
-    return cpf.length === 14; 
+    cpf = cpf.replace(/[^\d]/g, ""); // Remove pontos e traços
+
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false; // Verifica tamanho e CPFs inválidos
+
+    let Soma = 0, Resto;
+
+    for (let i = 1; i <= 9; i++) {
+        Soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    }
+    Resto = (Soma * 10) % 11;
+
+    if (Resto === 10 || Resto === 11) Resto = 0;
+    if (Resto !== parseInt(cpf.substring(9, 10))) return false;
+
+    Soma = 0;
+    for (let i = 1; i <= 10; i++) {
+        Soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    }
+    Resto = (Soma * 10) % 11;
+
+    if (Resto === 10 || Resto === 11) Resto = 0;
+    if (Resto !== parseInt(cpf.substring(10, 11))) return false;
+
+    return true;
 }
+
 
 //Função para salvar o cadastro
 async function salvar(event) {
@@ -55,7 +78,6 @@ async function salvar(event) {
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
     const cpf = document.getElementById("cpf").value;
-    const cep = document.getElementById("cep").value;
     const telefone = document.getElementById("telefone").value;
     const senha = document.getElementById("senha").value;
     const confirmaSenha = document.getElementById("confirma-senha").value;
@@ -76,11 +98,6 @@ async function salvar(event) {
         return;
     }
 
-    if (!cep) {
-        alert("Por favor, insira um CEP válido.");
-        return;
-    }
-
     if (!validarSenha(senha)) {
         erroSenha.innerText = "A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial.";
         return;
@@ -93,7 +110,7 @@ async function salvar(event) {
         return;
     }
 
-    const data = { nome, email, cpf, cep, telefone, senha };
+    const data = { nome, email, cpf, telefone, senha };
 
     localStorage.setItem("usuario", JSON.stringify(data));
 
