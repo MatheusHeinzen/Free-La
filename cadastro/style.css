@@ -241,8 +241,8 @@ input {
     visibility: visible;
     position: relative;
     z-index: 6;
-   
 }
+
     [data-position="top"]::after {
         top: -50px;
         right: -103%;
