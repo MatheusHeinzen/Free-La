@@ -112,7 +112,19 @@ async function salvar(event) {
 
     const data = { nome, email, cpf, telefone, senha };
 
-    localStorage.setItem("usuario", JSON.stringify(data));
-
-    window.location.href = "../HomePage/homepage.html";
+    await fetch("http://localhost:5000/cadastrar", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(data),
+})
+.then(res => res.json())
+.then(response => {
+  if (response.sucesso) {
+    window.location.href = "/homepage";
+  } else {
+    alert(response.erro);
+  }
+});
 }

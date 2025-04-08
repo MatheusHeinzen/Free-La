@@ -49,6 +49,7 @@ CREATE TABLE Usuario (
     Email VARCHAR(50) NOT NULL UNIQUE,
     Senha VARCHAR(50) NOT NULL,
     DataNasc DATE NOT NULL,
+    Telefone VARCHAR((15)),
     ImagemPerfil BLOB,
     TipoUsuario VARCHAR(20) CHECK (TipoUsuario IN ('freelancer', 'cliente')) NOT NULL,
     fk_Endereco_ID_Endereco INT,
