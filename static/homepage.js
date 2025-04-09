@@ -22,36 +22,36 @@ const trabalhosFreelancers = [
         nome: "Rogério Silva",
         especialidade: "Designer Gráfico",
         descricao: "Criação de logos, banners e identidade visual.",
-        imagem: "../imgs/designer.jpg",
-        link: "../Cadastro/index.html"
+        imagem: "/static/imgs/designer.jpg",
+        link: "/"
     },
     {
         nome: "Antônio Mendes",
         especialidade: "Desenvolvedor Web",
         descricao: "Sites responsivos, landing pages e sistemas personalizados.",
-        imagem: "../imgs/dev.jpg",
-        link: "../Cadastro/index.html"
+        imagem: "/static/imgs/dev.jpg",
+        link: "/"
     },
     {
         nome: "Valentina Lima",
         especialidade: "Pintora",
         descricao: "Pinturas realistas em interior e exterior de casas e empresas.",
-        imagem: "../imgs/pintora.jpg",
-        link: "../Cadastro/index.html"
+        imagem: "/static/imgs/pintora.jpg",
+        link: "/"
     },
     {
         nome: "Fernanda Santana",
         especialidade: "Designer Gráfico",
         descricao: "Design de sites e landing pages, identidade visual de empresas.",
-        imagem: "../imgs/designer2.jpg",
-        link: "../Cadastro/index.html"
+        imagem: "/static/imgs/designer2.jpg",
+        link: "/"
     },
     {
         nome: "Jorge Rasmussen",
         especialidade: "Encanador",
         descricao: "Reparo e planejamento de encanamentos, pias, privadas de forma profissional.",
-        imagem: "../imgs/encanador.jpg",
-        link: "../Cadastro/index.html"
+        imagem: "/static/imgs/encanador.jpg",
+        link: "/"
     }
 ];
 

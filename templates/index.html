@@ -14,7 +14,7 @@
     <div class="container" id="container">
         <!-- Formulário de Cadastro -->
         <div class="form-container sign-up-container">
-            <form action="#">
+            <form id="form-cadastro">
                 <h1>Crie sua Conta</h1>
                 <div class="social-container">
                     <a href="#" class="social"><img src="/static/imgs/facebook.png" alt="Facebook" ></a>
@@ -68,7 +68,7 @@
 
         <!-- Formulário de Login -->
         <div class="form-container sign-in-container">
-            <form action="#">
+            <form id="form-login">
                 <h1>Realize seu Login</h1>
                 <div class="social-container">
                     <a href="#" class="social"><img src="/static/imgs/facebook.png" alt="Facebook"></a>
@@ -82,7 +82,7 @@
                     <i class="bi bi-eye-fill" id="btn-senha3" onclick="toggleSenha('login-senha','btn-senha3')"></i>
                 </div>
                 <a href="#">Esqueceu sua senha?</a>
-                <button onclick="login(event)" type="button">Login</button>
+                <button onclick="logar(event)" type="button">Login</button>
 
 
             </form>

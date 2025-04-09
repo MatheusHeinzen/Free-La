@@ -7,8 +7,8 @@
   <title>Free'La HomePage</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
     integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-  <link rel="stylesheet" href="sidebar.css">
-  <link rel="stylesheet" href="complementos.css">
+  <link rel="stylesheet" href="/static/sidebar.css">
+  <link rel="stylesheet" href="/static/complementos.css">
 
 </head>
 
@@ -20,9 +20,9 @@
           <i class="bi bi-list"></i>
         </div>
         <ul>
-          <span class="icon"><img src="../imgs/perfil.png" width="140px" style="margin-left: 20px;"></span>
+          <span class="icon"><img src="/static/imgs/perfil.png" width="140px" style="margin-left: 20px;"></span>
           <li class="item_menu">
-            <a href="../Perfil/perfil.html">
+            <a href="/perfil">
               <span class="icon"></span>
               <span class="link">Perfil</span>
             </a>
@@ -51,7 +51,7 @@
 
     <div class="navbar navbar-dark bg-dark shadow-sm">
       <div class="container d-flex justify-content-between">
-        <a href="../Cadastro/index.html" class="navbar-brand d-flex align-items-center">
+        <a href="/" class="navbar-brand d-flex align-items-center">
           Login/Cadastro
         </a>
         <button id="toggleSidebar" style="font-size: 20px;">☰</button>
@@ -64,7 +64,7 @@
     <!-- Centro do site -->
     <section class="jumbotron text-center">
       <div class="container">
-        <img class="logo" src="../imgs/free'la.png" width="110%" height="100%">
+        <img class="logo" src="/static/imgs/free'la.png" width="110%" height="100%">
         <br><br>
         <p class="lead text-muted">O Free'la é a plataforma ideal para conectar talentos a oportunidades! Seja você um
           freelancer em busca de novos projetos, uma empresa precisando de especialistas ou apenas alguém precisando de
@@ -73,7 +73,7 @@
           qualidade para todos. Encontre, contrate e colabore com os melhores do mercado em um só lugar!</p>
         <input class="pesquisa" type="text" placeholder="Pesquise aqui!" id="campo-pesquisa">
         <button class="pesquisar_btn" onclick="pesquisar()">
-          <img src="../imgs/pesquisa-de-lupa.png" width="20px">
+          <img src="/static/imgs/pesquisa-de-lupa.png" width="20px">
         </button>
       </div>
     </section>
@@ -142,7 +142,7 @@
 
   </main>
 </body>
-<script src="homepage.js"></script>
+<script src="/static/homepage.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
   integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"

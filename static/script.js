@@ -134,3 +134,34 @@ async function salvar(event) {
     }
 }
 
+async function logar(event) {
+    event.preventDefault();
+
+    const email = document.getElementById("login-email").value;
+    const senha = document.getElementById("login-senha").value;
+
+    if (!email || !senha) {
+        alert("Por favor, preencha o e-mail e a senha.");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:5000/autenticar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, senha })
+        });
+
+        const resposta = await res.json();
+
+        if (resposta.sucesso) {
+            window.location.href = "/homepage"; // Redireciona se der bom
+        } else {
+            alert(resposta.erro || "Email ou senha inválidos.");
+        }
+    } catch (err) {
+        alert("Erro ao conectar com o servidor: " + err.message);
+    }
+}

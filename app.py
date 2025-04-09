@@ -1,9 +1,10 @@
 from flask import Flask, request, render_template, redirect, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import mysql.connector
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Configurações de conexão com o MySQL
 db_config = {
@@ -27,13 +28,13 @@ def autenticar():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM Usuario WHERE Email = %s AND Senha = %s", (email, senha))
+        cursor.execute("SELECT * FROM Usuario WHERE Email = %s", (email,))
         usuario = cursor.fetchone()
 
         cursor.close()
         conn.close()
 
-        if usuario:
+        if usuario and check_password_hash(usuario['Senha'], senha):
             return jsonify({"sucesso": True})
         else:
             return jsonify({"sucesso": False, "erro": "Email ou senha incorretos."})
@@ -50,7 +51,7 @@ def cadastrar():
     email = data.get('email')
     cpf = data.get('cpf')
     telefone = data.get('telefone')
-    senha = data.get('senha')
+    senha = generate_password_hash(data.get('senha'))
 
     try:
         conn = mysql.connector.connect(**db_config)
@@ -71,6 +72,10 @@ def cadastrar():
 @app.route('/homepage')
 def homepage():
     return render_template('homepage.html')
+
+@app.route('/perfil')
+def perfil():
+    return render_template('perfil.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
