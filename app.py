@@ -1,8 +1,9 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, jsonify
+from flask_cors import CORS
 import mysql.connector
-import os
 
 app = Flask(__name__)
+CORS(app)
 
 # Configurações de conexão com o MySQL
 db_config = {
@@ -12,47 +13,64 @@ db_config = {
     'database': 'freela'
 }
 
-# Rota para exibir o formulário
 @app.route('/')
 def index():
-    return render_template('index.html')  # Certifique-se de ter esse arquivo dentro da pasta /templates
+    return render_template('index.html')
 
-# Rota para receber e salvar os dados do cadastro
-@app.route('/salvar', methods=['POST'])
-def salvar():
-    nome = request.form['nome']
-    email = request.form['email']
-    cpf = request.form['cpf']
-    telefone = request.form['telefone']
-    senha = request.form['senha']
+@app.route('/autenticar', methods=['POST'])
+def autenticar():
+    data = request.get_json()
+    email = data.get('email')
+    senha = data.get('senha')
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM Usuario WHERE Email = %s AND Senha = %s", (email, senha))
+        usuario = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if usuario:
+            return jsonify({"sucesso": True})
+        else:
+            return jsonify({"sucesso": False, "erro": "Email ou senha incorretos."})
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"})
+
+@app.route('/cadastrar', methods=['POST'])
+def cadastrar():
+    if request.method == 'OPTIONS':
+        return '', 200
+    data = request.get_json()
+
+    nome = data.get('nome')
+    email = data.get('email')
+    cpf = data.get('cpf')
+    telefone = data.get('telefone')
+    senha = data.get('senha')
 
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
 
-        sql = """
-            INSERT INTO Usuario (Nome, Email, CPF, Senha)
-            VALUES (%s, %s, %s, %s)
-        """
-        valores = (nome, email, cpf, senha)
-        cursor.execute(sql, valores)
+        sql = "INSERT INTO Usuario (Nome, Email, CPF, Telefone, Senha) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(sql, (nome, email, cpf, telefone, senha))
         conn.commit()
 
         cursor.close()
         conn.close()
-        return redirect('/sucesso')  # cria uma rota simples pra sucesso se quiser
-    except mysql.connector.Error as err:
-        return f"Erro ao salvar no banco: {err}"
 
-# Rota de sucesso (opcional)
-@app.route('/sucesso')
-def sucesso():
-    return "<h1>Cadastro realizado com sucesso!</h1>"
+        return jsonify({"sucesso": True})
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": str(err)})
+
 
 @app.route('/homepage')
 def homepage():
-    return "/HomePage/homepage.html"
+    return render_template('homepage.html')
 
-# Rodar app
 if __name__ == '__main__':
     app.run(debug=True)

@@ -83,6 +83,7 @@ async function salvar(event) {
     const confirmaSenha = document.getElementById("confirma-senha").value;
     const erroSenha = document.getElementById("senha-erro");
 
+    // Validações
     if (!nome) {
         alert("Por favor, insira seu nome completo.");
         return;
@@ -112,19 +113,24 @@ async function salvar(event) {
 
     const data = { nome, email, cpf, telefone, senha };
 
-    await fetch("http://localhost:5000/cadastrar", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(data),
-})
-.then(res => res.json())
-.then(response => {
-  if (response.sucesso) {
-    window.location.href = "/homepage";
-  } else {
-    alert(response.erro);
-  }
-});
+    try {
+        const res = await fetch("http://localhost:5000/cadastrar", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+
+        const response = await res.json();
+
+        if (response.sucesso) {
+            window.location.href = "/homepage"; // Redireciona pra Home se cadastro for OK
+        } else {
+            alert(response.erro || "Erro ao cadastrar usuário.");
+        }
+    } catch (err) {
+        alert("Erro de conexão com o servidor: " + err.message);
+    }
 }
+
