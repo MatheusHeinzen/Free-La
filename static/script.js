@@ -44,9 +44,9 @@ function validarEmail(email) {
 
 //Validar CPF completo (000.000.000-00)
 function validarCPF(cpf) {
-    cpf = cpf.replace(/[^\d]/g, ""); // Remove pontos e traços
+    cpf = cpf.replace(/[^\d]/g, "");
 
-    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false; // Verifica tamanho e CPFs inválidos
+    if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
 
     let Soma = 0, Resto;
 
@@ -83,7 +83,7 @@ async function salvar(event) {
     const confirmaSenha = document.getElementById("confirma-senha").value;
     const erroSenha = document.getElementById("senha-erro");
 
-    // Validações
+    //Validações
     if (!nome) {
         alert("Por favor, insira seu nome completo.");
         return;
