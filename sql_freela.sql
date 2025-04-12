@@ -2,7 +2,6 @@ DROP DATABASE IF EXISTS freela;
 CREATE DATABASE freela;
 USE freela;
 
-
 /*CREATE TABLE Perfil (
     IdPerfil INT PRIMARY KEY AUTO_INCREMENT,
     Foto BLOB DEFAULT ,
@@ -26,6 +25,18 @@ CREATE TABLE Categoria (
     NomeCategoria VARCHAR(50) NOT NULL
 );
 
+CREATE TABLE Usuario (
+    ID_User INT AUTO_INCREMENT PRIMARY KEY,
+    CPF VARCHAR(14) NOT NULL UNIQUE,
+    Nome VARCHAR(50) NOT NULL,
+    Email VARCHAR(50) NOT NULL UNIQUE,
+    Senha VARCHAR(200) NOT NULL,
+    DataNasc DATE,
+    Telefone VARCHAR(15),
+    ImagemPerfil BLOB,
+    TipoUsuario VARCHAR(20) CHECK (TipoUsuario IN ('freelancer', 'cliente')) NOT NULL DEFAULT('cliente')
+);
+
 CREATE TABLE Endereco (
     ID_Endereco INT AUTO_INCREMENT PRIMARY KEY,
     CEP VARCHAR(10) NOT NULL,
@@ -37,24 +48,14 @@ CREATE TABLE Endereco (
     Numero INT NOT NULL,
     Complemento VARCHAR(50),
     fk_Servico_ID_Servico INT,
+    fk_Usuario_ID_User INT,
     CONSTRAINT FK_Endereco_Servico FOREIGN KEY (fk_Servico_ID_Servico)
         REFERENCES Servico(ID_Servico)
-        ON DELETE CASCADE
-);
-
-CREATE TABLE Usuario (
-    ID_User INT AUTO_INCREMENT PRIMARY KEY,
-    CPF VARCHAR(14) NOT NULL UNIQUE,
-    Nome VARCHAR(50) NOT NULL,
-    Email VARCHAR(50) NOT NULL UNIQUE,
-    Senha VARCHAR(200) NOT NULL,
-    DataNasc DATE,
-    Telefone VARCHAR(15),
-    ImagemPerfil BLOB,
-    TipoUsuario VARCHAR(20) CHECK (TipoUsuario IN ('freelancer', 'cliente')) NOT NULL DEFAULT('cliente'),
-    fk_Endereco_ID_Endereco INT,
-    CONSTRAINT FK_Usuario_Endereco FOREIGN KEY (fk_Endereco_ID_Endereco)
-        REFERENCES Endereco(ID_Endereco)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+	CONSTRAINT FK_Endereco_Usuario FOREIGN KEY (fk_Usuario_ID_User)
+        REFERENCES Usuario(ID_User)
+        ON UPDATE CASCADE
         ON DELETE CASCADE
 );
 
@@ -65,9 +66,11 @@ CREATE TABLE Atua (
     PRIMARY KEY (fk_Categoria_ID_Categoria, fk_Usuario_ID_User),
     CONSTRAINT FK_Atua_Categoria FOREIGN KEY (fk_Categoria_ID_Categoria)
         REFERENCES Categoria(ID_Categoria)
+        ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT FK_Atua_Usuario FOREIGN KEY (fk_Usuario_ID_User)
         REFERENCES Usuario(ID_User)
+        ON UPDATE CASCADE
         ON DELETE CASCADE
 );
 
@@ -80,9 +83,11 @@ CREATE TABLE Faz (
     PRIMARY KEY (fk_Servico_ID_Servico, fk_Usuario_ID_User),
     CONSTRAINT FK_Faz_Servico FOREIGN KEY (fk_Servico_ID_Servico)
         REFERENCES Servico(ID_Servico)
+        ON UPDATE CASCADE
         ON DELETE CASCADE,
     CONSTRAINT FK_Faz_Usuario FOREIGN KEY (fk_Usuario_ID_User)
         REFERENCES Usuario(ID_User)
+        ON UPDATE CASCADE
         ON DELETE CASCADE
 );
 

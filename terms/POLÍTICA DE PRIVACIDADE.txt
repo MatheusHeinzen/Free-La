@@ -16,7 +16,7 @@ Os dados pessoais do usuário e visitante são recolhidos pela plataforma da seg
 
 - Quando um usuário e visitante acessa páginas do site free'la: as informações sobre interação e acesso são coletadas pela empresa para garantir uma melhor experiência ao usuário e visitante. Estes dados podem tratar sobre as palavras-chaves utilizadas em uma busca, o compartilhamento de um documento específico, comentários, visualizações de páginas, perfis, a URL de onde o usuário e visitante provêm, o navegador que utilizam e seus IPs de acesso, dentre outras que poderão ser armazenadas e retidas.
 
-- Por intermédio de terceiro: a plataforma free'la recebe dados de terceiros, como Facebook Instagram e Google, quando um usuário faz login com o seu perfil de um desses sites. A utilização desses dados é autorizada previamente pelos usuários junto ao terceiro em questão.
+- Por intermédio de terceiro: a plataforma free'la recebe dados de terceiros, como Facebook, LinkedIn e Google, quando um usuário faz login com o seu perfil de um desses sites. A utilização desses dados é autorizada previamente pelos usuários junto ao terceiro em questão.
 
 
 SEÇÃO 3 - QUAIS DADOS PESSOAIS RECOLHEMOS SOBRE O USUÁRIO E VISITANTE?
