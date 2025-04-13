@@ -10,7 +10,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root#963',
+    'password': '',
     'database': 'freela'
 }
 
