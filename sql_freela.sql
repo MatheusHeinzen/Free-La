@@ -39,12 +39,12 @@ CREATE TABLE Usuario (
 
 CREATE TABLE Endereco (
     ID_Endereco INT AUTO_INCREMENT PRIMARY KEY,
+    Pais VARCHAR(20) DEFAULT 'Brasil',
     CEP VARCHAR(10) NOT NULL,
-    Pais VARCHAR(20) NOT NULL,
-    Estado VARCHAR(20) NOT NULL,
+    Logradouro VARCHAR(50) NOT NULL,
     Cidade VARCHAR(50) NOT NULL,
     Bairro VARCHAR(50) NOT NULL,
-    Rua VARCHAR(50) NOT NULL,
+    Estado CHAR(2) NOT NULL,
     Numero INT NOT NULL,
     Complemento VARCHAR(50),
     fk_Servico_ID_Servico INT,

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +8,22 @@
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Alterar Dados</title>
     <style>
-        body{
-            margin: 150px ;
+        body {
+            margin: 150px;
+        }
+        form{
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+        p{
+            color: rgba(161, 0, 0, 0.897);
+        }
+        @media screen and (max-width: 768px) {
+            body {
+                margin: 20px;
+            }
+            
         }
     </style>
 </head>
@@ -25,46 +38,56 @@
                         <input class="form-control" type="text" value="">
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Sobrenome</label>
                     <div class="col-lg-9">
                         <input class="form-control" type="text" value="">
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">E-mail</label>
                     <div class="col-lg-9">
                         <input class="form-control" type="email" value="nome@dominio.com">
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Endereço</label>
                     <div class="col-lg-4">
-                        <input class="form-control" type="text" value="" placeholder="CEP">
+                        <input id="cep" class="form-control" type="text" name="cep" maxlength="10" placeholder="CEP">
+                        <p style="display: none;">CEP inválido!</p>
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"> </label>
-                    <div class="col-lg-4"></div>
-                        <input class="form-control" type="text" value="" placeholder="Logradouro">
+                    <div class="col-lg-9">
+                        <input class="form-control" type="text" name="logradouro" placeholder="Logradouro">
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label"></label>
-                    <div class="col-lg-6">
-                        <input class="form-control" type="text" value="" placeholder="Cidade">
-                    </div>
-                    <div class="col-lg-3">
-                        <input class="form-control" type="text" value="" placeholder="Número">
-                    </div>
-                </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-4">
-                        <input class="form-control" type="text" value="" placeholder="Estado">
+                        <input class="form-control" type="text" name="cidade" placeholder="Cidade">
                     </div>
-                    
                     <div class="col-lg-3">
+                        <input class="form-control" type="text" name="bairro" placeholder="Bairro">
+                    </div>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" name="estado" placeholder="Estado">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label"></label>
+                    <div class="col-lg-2">
+                        <input class="form-control" type="text" value="" placeholder="Número">
+                    </div>
+
+                    <div class="col-lg-4">
                         <input class="form-control" type="text" value="" placeholder="Complemento">
                     </div>
                 </div>
@@ -75,12 +98,14 @@
                         <input class="form-control" type="text" value="jhonsanmark">
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Password</label>
                     <div class="col-lg-9">
                         <input class="form-control" type="password" value="11111122333">
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Confirm
                         password</label>
@@ -88,16 +113,19 @@
                         <input class="form-control" type="password" value="11111122333">
                     </div>
                 </div>
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-9">
-                        <input type="reset" class="btn btn-secondary" value="Cancel">
-                        <input type="button" class="btn btn-primary" value="Save Changes">
+                        <input type="reset" class="btn btn-secondary" value="Cancelar">
+                        <input type="button" class="btn btn-primary" value="Salvar ALterações">
                     </div>
                 </div>
             </form>
         </div>
     </main>
+    <script src="../static/dados.js"></script>
 </body>
+
 
 </html>

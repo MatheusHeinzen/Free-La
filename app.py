@@ -10,7 +10,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '',
+    'password': 'Root#963',
     'database': 'freela'
 }
 
@@ -67,6 +67,50 @@ def cadastrar():
         return jsonify({"sucesso": True})
     except mysql.connector.Error as err:
         return jsonify({"sucesso": False, "erro": str(err)})
+
+##############################
+@app.route('/logado', methods=['GET'])
+def logado():
+    
+    data = request.get_json()
+    id = data.get('id')
+    nome = data.get('nome')
+    email = data.get('email')
+    cpf = data.get('cpf')
+    telefone = data.get('telefone')
+   
+    return jsonify({"sucesso": True})
+
+
+@app.route('/atualizarCadastro', methods=['PUT'])
+def atualizarCadastro(id):
+    data = request.get_json()
+    nome = data.get('nome')
+    email = data.get('email')
+    cpf = data.get('cpf')
+    telefone = data.get('telefone')
+   
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+
+        query = "UPDATE Usuario SET (Nome, Email, CPF, Telefone) VALUES (%s, %s, %s, %s, %s) WHERE ID_User = %s"
+        cursor.execute(query, (nome, email, cpf, telefone, id))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        if cursor.rowcount == 0:
+            return jsonify({"erro": "Usuário não encontrado."}), 404
+
+        return jsonify({"mensagem": "Usuário atualizado com sucesso!"})
+    except mysql.connector.Error as err:
+        return jsonify({"erro": f"Erro no banco de dados: {err}"}), 500
+
+
+@app.route('/cadastrar', methods=['DELETE'])
+##############################
 
 
 @app.route('/homepage')
