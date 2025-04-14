@@ -125,7 +125,7 @@ async function salvar(event) {
         const response = await res.json();
 
         if (response.sucesso) {
-            window.location.href = "/homepage"; // Redireciona pra Home se cadastro for OK
+            window.location.href = "/termos"; //Redireciona pra Home se cadastro for OK
         } else {
             alert(response.erro || "Erro ao cadastrar usuário.");
         }
@@ -156,8 +156,8 @@ async function logar(event) {
 
         const resposta = await res.json();
 
-        if (resposta.sucesso) {
-            window.location.href = "/homepage"; // Redireciona se der bom
+        if (resposta.sucesso) {e
+            window.location.href = "/homepage";
         } else {
             alert(resposta.erro || "Email ou senha inválidos.");
         }

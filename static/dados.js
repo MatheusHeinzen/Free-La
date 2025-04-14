@@ -1,3 +1,8 @@
+//Máscaras
+document.addEventListener('DOMContentLoaded', () => {
+    $("#cep").mask("00000-000");
+});
+
 const cep = document.querySelector("input[name=cep]");
 
 // document.addEventListener('DOMContentLoaded', () => {
@@ -9,7 +14,6 @@ const cep = document.querySelector("input[name=cep]");
 
     cep.addEventListener('blur', e => {
         const url = `https://viacep.com.br/ws/${cep.value}/json/`;
-
         fetch(url)
             .then(response => response.json())
             .then(json => {
@@ -24,7 +28,6 @@ const cep = document.querySelector("input[name=cep]");
                 else{
                     
                 }
-    
             });
     });
 

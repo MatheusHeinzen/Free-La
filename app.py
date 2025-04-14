@@ -78,7 +78,6 @@ def logado():
     email = data.get('email')
     cpf = data.get('cpf')
     telefone = data.get('telefone')
-   
     return jsonify({"sucesso": True})
 
 
@@ -120,6 +119,14 @@ def homepage():
 @app.route('/perfil')
 def perfil():
     return render_template('perfil.html')
+
+@app.route('/alterarDados')
+def alterarDados():
+    return render_template('alterarDados.html')
+
+@app.route('/termos')
+def termos():
+    return render_template('termos.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

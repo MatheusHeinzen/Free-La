@@ -58,7 +58,7 @@ const trabalhosFreelancers = [
 //Função para exibir todos os freelancers ao carregar a página
 function exibirTodosFreelancers() {
     let section = document.getElementById("resultados-pesquisa");
-    section.innerHTML = ""; // Limpa a seção
+    section.innerHTML = "";
 
     trabalhosFreelancers.forEach(dado => {
         section.innerHTML += `
@@ -119,9 +119,9 @@ function pesquisar() {
         }
     });
 
-    // Se nenhum resultado for encontrado
+    //Se nenhum resultado for encontrado
     section.innerHTML = resultados || "<p>Nenhum freelancer encontrado.</p>";
 }
 
-// Exibe todos os freelancers ao carregar a página
+//Exibe todos os freelancers ao carregar a página
 window.onload = exibirTodosFreelancers;
