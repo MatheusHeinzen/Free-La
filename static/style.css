@@ -40,7 +40,7 @@ a {
 button {
     border-radius: 20px;
     border: 1px solid #2a5fa5;
-    background-color: #2a5fa5;
+    background: linear-gradient(to right, #5218bd, #c414fa);
     color: #ffffff;
     font-size: 12px;
     font-weight: bold;

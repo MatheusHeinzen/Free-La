@@ -109,6 +109,9 @@ def atualizarCadastro(id):
 
 
 @app.route('/cadastrar', methods=['DELETE'])
+
+
+
 ##############################
 
 
