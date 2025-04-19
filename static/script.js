@@ -1,12 +1,21 @@
-//Máscaras
+// MÁSCARAS E VALIDAÇÕES
 document.addEventListener('DOMContentLoaded', () => {
-    $("#telefone").mask("(00) 00000-0000");
-    $("#cpf").mask("000.000.000-00");
-
-    document.getElementById("senha").addEventListener("input", validarSenha);
+    // Configura máscaras
+    if (document.getElementById("telefone")) {
+        $("#telefone").mask("(00) 00000-0000");
+    }
+    if (document.getElementById("cpf")) {
+        $("#cpf").mask("000.000.000-00");
+    }
+    
+    // Validação em tempo real da senha
+    const senhaInput = document.getElementById("senha");
+    if (senhaInput) {
+        senhaInput.addEventListener("input", validarSenha);
+    }
 });
 
-//Alternar entre login e cadastro
+// FUNÇÕES DE UI
 function alternarModo(modo) {
     const container = document.getElementById("container");
     if (modo === "login") {
@@ -16,10 +25,9 @@ function alternarModo(modo) {
     }
 }
 
-//Visualizar/ocultar senha
 function toggleSenha(id, btn) {
-    var inputPass = document.getElementById(id);
-    var btnShowPass = document.getElementById(btn);
+    const inputPass = document.getElementById(id);
+    const btnShowPass = document.getElementById(btn);
 
     if (inputPass.type === 'password') {
         inputPass.setAttribute('type', 'text');
@@ -30,19 +38,17 @@ function toggleSenha(id, btn) {
     }
 }
 
-//Validar senha
+// FUNÇÕES DE VALIDAÇÃO
 function validarSenha(senha) {
     const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/;
     return regex.test(senha);
 }
 
-//Validar email
 function validarEmail(email) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
 }
 
-//Validar CPF completo (000.000.000-00)
 function validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]/g, "");
 
@@ -70,11 +76,29 @@ function validarCPF(cpf) {
     return true;
 }
 
+// FUNÇÕES DE CADASTRO E LOGIN
+document.addEventListener('DOMContentLoaded', () => {
+    const formCadastro = document.getElementById("form-cadastro");
+    const formLogin = document.getElementById("form-login");
 
-//Função para salvar o cadastro
-async function salvar(event) {
-    event.preventDefault();
+    if (formCadastro) {
+        formCadastro.addEventListener("submit", function(e) {
+            e.preventDefault();
+            salvar();
+        });
+    }
 
+    if (formLogin) {
+        formLogin.addEventListener("submit", function(e) {
+            e.preventDefault();
+            logar();
+        });
+    }
+});
+
+async function salvar() {
+    console.log('[CADASTRO] Iniciando processo de cadastro');
+    
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
     const cpf = document.getElementById("cpf").value;
@@ -83,7 +107,7 @@ async function salvar(event) {
     const confirmaSenha = document.getElementById("confirma-senha").value;
     const erroSenha = document.getElementById("senha-erro");
 
-    //Validações
+    // Validações
     if (!nome) {
         alert("Por favor, insira seu nome completo.");
         return;
@@ -114,6 +138,7 @@ async function salvar(event) {
     const data = { nome, email, cpf, telefone, senha };
 
     try {
+        console.log('[CADASTRO] Enviando dados para o servidor');
         const res = await fetch("http://localhost:5000/cadastrar", {
             method: "POST",
             headers: {
@@ -123,20 +148,23 @@ async function salvar(event) {
         });
 
         const response = await res.json();
+        console.log('[CADASTRO] Resposta do servidor:', response);
 
         if (response.sucesso) {
-            window.location.href = "/termos"; //Redireciona pra Home se cadastro for OK
+            alert("Cadastro realizado com sucesso!");
+            window.location.href = "/termos";
         } else {
             alert(response.erro || "Erro ao cadastrar usuário.");
         }
     } catch (err) {
-        alert("Erro de conexão com o servidor: " + err.message);
+        console.error('[CADASTRO] Erro na requisição:', err);
+        alert("Erro de conexão com o servidor. Por favor, tente novamente.");
     }
 }
 
-async function logar(event) {
-    event.preventDefault();
-
+async function logar() {
+    console.log('[LOGIN] Iniciando processo de login');
+    
     const email = document.getElementById("login-email").value;
     const senha = document.getElementById("login-senha").value;
 
@@ -146,6 +174,7 @@ async function logar(event) {
     }
 
     try {
+        console.log('[LOGIN] Enviando credenciais para autenticação');
         const res = await fetch("http://localhost:5000/autenticar", {
             method: "POST",
             headers: {
@@ -155,13 +184,17 @@ async function logar(event) {
         });
 
         const resposta = await res.json();
+        console.log('[LOGIN] Resposta do servidor:', resposta);
 
-        if (resposta.sucesso) {e
+        if (resposta.sucesso) {
+            console.log('[LOGIN] Autenticação bem-sucedida, armazenando ID do usuário:', resposta.id);
+            localStorage.setItem('userId', resposta.id);
             window.location.href = "/homepage";
         } else {
             alert(resposta.erro || "Email ou senha inválidos.");
         }
     } catch (err) {
-        alert("Erro ao conectar com o servidor: " + err.message);
+        console.error('[LOGIN] Erro na requisição:', err);
+        alert("Erro ao conectar com o servidor. Por favor, tente novamente.");
     }
 }

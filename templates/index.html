@@ -67,7 +67,7 @@
                 </div>
 
                 <span id="senha-erro" class="erro"></span>
-                <button onclick="salvar(event)" type="button" >Criar Conta</button>
+                <button type="submit">Criar Conta</button>
 
             </form>
         </div>
@@ -88,7 +88,7 @@
                     <i class="bi bi-eye-fill" id="btn-senha3" onclick="toggleSenha('login-senha','btn-senha3')"></i>
                 </div>
                 <a href="#">Esqueceu sua senha?</a>
-                <button onclick="logar(event)" type="button">Login</button>
+                <button type="submit">Login</button>
 
 
             </form>
@@ -131,7 +131,7 @@
             document.getElementById('overlay').style.display = 'none';
           }
     
-        function ok() {
+        function validar() {
           if (checkbox.checked) {
             window.location.href = "/homepage";
           } else {
