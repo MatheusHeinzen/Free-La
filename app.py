@@ -10,7 +10,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root#963',
+    'password': 'PUC@1234',
     'database': 'freela'
 }
 
@@ -106,6 +106,29 @@ def atualizarCadastro(id):
         return jsonify({"mensagem": "Usuário atualizado com sucesso!"})
     except mysql.connector.Error as err:
         return jsonify({"erro": f"Erro no banco de dados: {err}"}), 500
+
+
+@app.route('/obterDadosUsuario/<int:id>', methods=['GET'])
+def obter_dados_usuario(id):
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (id,))
+        usuario = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if usuario:
+            # Remove a senha por segurança
+            usuario.pop('Senha', None)
+            return jsonify({"sucesso": True, "usuario": usuario})
+        else:
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
+            
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
 
 
 @app.route('/cadastrar', methods=['DELETE'])

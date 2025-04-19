@@ -62,7 +62,7 @@
                 </div>
 
                 <div id="termosDeServico">
-                    <input type="checkbox" required />
+                    <input type="checkbox" id="checkbox"required />
                     <span>Li e Aceito com os <a href="/termos" target="_blank">termos de uso e a política de privacidade</a>.</span>
                 </div>
 
@@ -113,6 +113,34 @@
     
 
 
+    <script>
+        const checkbox = document.getElementById('checkbox');
+        const botao = document.querySelector('.btn-primary');
+      
+        checkbox.addEventListener('change', function () {
+          botao.disabled = !this.checked;
+        });
+    
+        function mostrarAlerta() {
+            document.getElementById('showAlerta').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+          }
+    
+          function fecharAlerta() {
+            document.getElementById('showAlerta').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+          }
+    
+        function ok() {
+          if (checkbox.checked) {
+            window.location.href = "/homepage";
+          } else {
+            mostrarAlerta();
+          }
+    
+          
+        }
+      </script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
