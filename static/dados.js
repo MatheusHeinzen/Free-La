@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     console.log('[DADOS] Página carregada - Iniciando script');
     
     // Configura máscaras
@@ -17,23 +17,42 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    // Configura o switch Freelancer/Cliente
+    const tipoUsuarioSwitch = document.getElementById('tipoUsuarioSwitch');
+    if (tipoUsuarioSwitch) {
+        tipoUsuarioSwitch.addEventListener('change', function() {
+            document.getElementById('tipoUsuarioLabel').textContent = 
+                this.checked ? 'Freelancer' : 'Cliente';
+        });
+    }
+
     // Carrega os dados do usuário
     carregarDadosUsuario(userId);
 
     // Configura o envio do formulário
-    const form = document.querySelector('form');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        atualizarDadosUsuario(userId);
-    });
+    const form = document.getElementById('form-edicao');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            atualizarDadosUsuario(userId);
+        });
+    }
 
     // Configura busca de CEP
     const cepInput = document.getElementById("cep");
-    cepInput.addEventListener('blur', buscarCEP);
+    if (cepInput) {
+        cepInput.addEventListener('blur', buscarCEP);
+    }
 
-    // Transforma o botão de "Salvar Alterações" em submit
-    const btnSalvar = document.querySelector('.btn-primary');
-    btnSalvar.type = 'submit';
+    // Botão cancelar
+    const btnCancelar = document.getElementById('btnCancelar');
+    if (btnCancelar) {
+        btnCancelar.addEventListener('click', function() {
+            if (confirm('Tem certeza que deseja descartar as alterações?')) {
+                window.location.reload();
+            }
+        });
+    }
 });
 
 // FUNÇÃO PARA CARREGAR DADOS DO USUÁRIO
@@ -42,23 +61,25 @@ async function carregarDadosUsuario(userId) {
     
     try {
         const response = await fetch(`/usuario/${userId}`);
-        console.log('[DADOS] Resposta da API - Status:', response.status);
         
         if (!response.ok) {
-            throw new Error(`Erro HTTP! status: ${response.status}`);
+            const errorData = await response.json().catch(() => null);
+            const errorMsg = errorData?.erro || `Erro HTTP! status: ${response.status}`;
+            throw new Error(errorMsg);
         }
         
         const data = await response.json();
-        console.log('[DADOS] Dados recebidos:', data);
         
         if (data.sucesso) {
+            console.log('[DADOS] Dados recebidos:', data.usuario);
             preencherFormulario(data.usuario);
         } else {
             throw new Error(data.erro || "Erro ao carregar dados");
         }
     } catch (error) {
         console.error('[DADOS ERRO] Falha ao carregar dados:', error);
-        alert('Erro ao carregar dados do usuário. Verifique o console para detalhes.');
+        alert(`Erro ao carregar dados: ${error.message}`);
+        console.error('Detalhes do erro:', error);
     }
 }
 
@@ -67,89 +88,109 @@ function preencherFormulario(usuario) {
     console.log('[DADOS] Preenchendo formulário com dados do usuário');
     
     // Dados básicos
-    document.getElementById('nome').value = usuario.Nome || '';
-    document.getElementById('email').value = usuario.Email || '';
-    
-    // Campos adicionais (verifica existência antes de preencher)
-    if (document.getElementById('cpf')) {
-        document.getElementById('cpf').value = usuario.CPF || '';
-    }
-    
-    if (document.getElementById('telefone')) {
-        document.getElementById('telefone').value = usuario.Telefone || '';
-    }
-    
-    if (document.getElementById('dataNascimento')) {
-        // Formata a data para o input type="date" (YYYY-MM-DD)
-        const dataNasc = usuario.DataNascimento ? new Date(usuario.DataNascimento).toISOString().split('T')[0] : '';
-        document.getElementById('dataNascimento').value = dataNasc;
+    setValue('nome', usuario.Nome);
+    setValue('email', usuario.Email);
+    setValue('telefone', usuario.Telefone);
+    setValue('cpf', usuario.CPF);
+
+    // Switch Freelancer/Cliente
+    const tipoUsuarioSwitch = document.getElementById('tipoUsuarioSwitch');
+    if (tipoUsuarioSwitch) {
+        const isFreelancer = usuario.TipoUsuario === 'freelancer';
+        tipoUsuarioSwitch.checked = isFreelancer;
+        document.getElementById('tipoUsuarioLabel').textContent = 
+            isFreelancer ? 'Freelancer' : 'Cliente';
     }
 
-    // Endereço (preenche apenas se os campos existirem)
+    // Endereço
     if (usuario.Endereco) {
         const endereco = usuario.Endereco;
-        document.querySelector('input[name=cep]').value = endereco.CEP || '';
-        document.querySelector('input[name=logradouro]').value = endereco.Logradouro || '';
-        document.querySelector('input[name=cidade]').value = endereco.Cidade || '';
-        document.querySelector('input[name=bairro]').value = endereco.Bairro || '';
-        document.querySelector('input[name=estado]').value = endereco.Estado || '';
-        
-        // Verifica existência dos campos antes de preencher
-        const numeroInput = document.querySelector('input[placeholder="Número"]');
-        if (numeroInput) numeroInput.value = endereco.Numero || '';
-        
-        const complementoInput = document.querySelector('input[placeholder="Complemento"]');
-        if (complementoInput) complementoInput.value = endereco.Complemento || '';
+        setValue('cep', endereco.CEP, 'name');
+        setValue('logradouro', endereco.Logradouro, 'name');
+        setValue('cidade', endereco.Cidade, 'name');
+        setValue('bairro', endereco.Bairro, 'name');
+        setValue('estado', endereco.Estado, 'name');
+        setValue('numero', endereco.Numero, 'name');
+        setValue('complemento', endereco.Complemento, 'name');
+    }
+}
+
+// FUNÇÃO AUXILIAR PARA PREENCHER CAMPOS
+function setValue(elementId, value, attribute = 'id') {
+    const element = attribute === 'id' 
+        ? document.getElementById(elementId)
+        : document.querySelector(`input[${attribute}="${elementId}"]`);
+    
+    if (element) {
+        element.value = value || '';
+    } else {
+        console.warn(`[DADOS] Elemento não encontrado: ${attribute}="${elementId}"`);
     }
 }
 
 // FUNÇÃO PARA BUSCAR CEP
 async function buscarCEP(event) {
-    const cep = event.target.value.replace(/\D/g, "");
+    const cepInput = event.target;
+    const cep = cepInput.value.replace(/\D/g, "");
+    const cepError = document.getElementById('cep-error');
+    
     console.log('[CEP] Buscando endereço para CEP:', cep);
     
-    if (cep.length !== 8) return;
+    if (cep.length !== 8) {
+        cepError.style.display = 'block';
+        cepError.textContent = 'CEP inválido! Deve conter 8 dígitos.';
+        return;
+    }
 
     try {
+        cepError.style.display = 'none';
         const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
         const data = await response.json();
         console.log('[CEP] Resposta da API:', data);
 
-        if (!data.erro) {
-            document.querySelector('input[name=logradouro]').value = data.logradouro || '';
-            document.querySelector('input[name=cidade]').value = data.localidade || '';
-            document.querySelector('input[name=bairro]').value = data.bairro || '';
-            document.querySelector('input[name=estado]').value = data.uf || '';
+        if (data.erro) {
+            cepError.style.display = 'block';
+            cepError.textContent = 'CEP não encontrado';
         } else {
-            alert('CEP não encontrado');
+            setValue('logradouro', data.logradouro, 'name');
+            setValue('cidade', data.localidade, 'name');
+            setValue('bairro', data.bairro, 'name');
+            setValue('estado', data.uf, 'name');
         }
     } catch (error) {
         console.error('[CEP ERRO] Falha na busca:', error);
-        alert('Erro ao buscar CEP. Verifique o console para detalhes.');
+        cepError.style.display = 'block';
+        cepError.textContent = 'Erro ao buscar CEP. Tente novamente.';
     }
 }
 
 // FUNÇÃO PARA ATUALIZAR DADOS
+// FUNÇÃO PARA ATUALIZAR DADOS
 async function atualizarDadosUsuario(userId) {
     console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
     
-    // Coleta os dados do formulário com os nomes CORRETOS das colunas
+    // Coleta os dados do formulário
     const dadosAtualizacao = {
         nome: document.getElementById('nome').value,
         email: document.getElementById('email').value,
         telefone: document.getElementById('telefone').value,
         cpf: document.getElementById('cpf').value,
-        dataNascimento: document.getElementById('dataNascimento').value,
+        tipoUsuario: document.getElementById('tipoUsuarioSwitch').checked ? 'freelancer' : 'cliente',
         endereco: {
-            CEP: document.querySelector('input[name=cep]').value,
-            Logradouro: document.querySelector('input[name=logradouro]').value,
-            Cidade: document.querySelector('input[name=cidade]').value,
-            Bairro: document.querySelector('input[name=bairro]').value,
-            Estado: document.querySelector('input[name=estado]').value,
-            Numero: document.querySelector('input[placeholder="Número"]').value,
-            Complemento: document.querySelector('input[placeholder="Complemento"]').value
+            CEP: document.querySelector('input[name="cep"]').value,
+            Logradouro: document.querySelector('input[name="logradouro"]').value,
+            Cidade: document.querySelector('input[name="cidade"]').value,
+            Bairro: document.querySelector('input[name="bairro"]').value,
+            Estado: document.querySelector('input[name="estado"]').value,
+            Numero: document.querySelector('input[name="numero"]').value,
+            Complemento: document.querySelector('input[name="complemento"]').value
         }
     };
+
+    // Validações básicas
+    if (!validarDadosAtualizacao(dadosAtualizacao)) {
+        return;
+    }
 
     console.log('[DADOS] Dados para atualização:', dadosAtualizacao);
 
@@ -161,17 +202,149 @@ async function atualizarDadosUsuario(userId) {
             },
             body: JSON.stringify(dadosAtualizacao)
         });
-        
+
         const data = await response.json();
-        
+
         if (data.sucesso) {
             alert('Dados atualizados com sucesso!');
-            carregarDadosUsuario(userId); // Recarrega os dados
+            
+            // Se virou freelancer, oferece para completar perfil
+            if (dadosAtualizacao.tipoUsuario === 'freelancer') {
+                const perfilCompleto = confirm('Você agora é um Freelancer! Deseja completar seu perfil agora?');
+                if (perfilCompleto) {
+                    window.location.href = '/completar-perfil';
+                }
+            }
         } else {
             throw new Error(data.erro || "Erro ao atualizar dados");
         }
     } catch (error) {
         console.error('[DADOS ERRO] Falha na atualização:', error);
-        alert('Erro ao atualizar: ' + error.message);
+        alert('Erro ao atualizar dados: ' + error.message);
     }
 }
+
+// FUNÇÃO DE VALIDAÇÃO
+// FUNÇÃO PARA ATUALIZAR DADOS
+async function atualizarDadosUsuario(userId) {
+    console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
+    
+    // Coleta os dados do formulário
+    const dadosAtualizacao = {
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        cpf: document.getElementById('cpf').value,
+        tipoUsuario: document.getElementById('tipoUsuarioSwitch').checked ? 'freelancer' : 'cliente',
+        endereco: {
+            CEP: document.querySelector('input[name="cep"]').value,
+            Logradouro: document.querySelector('input[name="logradouro"]').value,
+            Cidade: document.querySelector('input[name="cidade"]').value,
+            Bairro: document.querySelector('input[name="bairro"]').value,
+            Estado: document.querySelector('input[name="estado"]').value,
+            Numero: document.querySelector('input[name="numero"]').value,
+            Complemento: document.querySelector('input[name="complemento"]').value
+        }
+    };
+
+    // Valida se está tentando virar freelancer
+    const tentandoVirarFreelancer = document.getElementById('tipoUsuarioSwitch').checked;
+    
+    // Validações
+    if (!validarDadosAtualizacao(dadosAtualizacao, tentandoVirarFreelancer)) {
+        return;
+    }
+
+    console.log('[DADOS] Dados para atualização:', dadosAtualizacao);
+
+    try {
+        const response = await fetch(`/atualizarUsuario/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dadosAtualizacao)
+        });
+
+        const data = await response.json();
+
+        if (data.sucesso) {
+            alert('Dados atualizados com sucesso!');
+            // Recarrega os dados para garantir sincronização
+            carregarDadosUsuario(userId);
+        } else {
+            throw new Error(data.erro || "Erro ao atualizar dados");
+        }
+    } catch (error) {
+        console.error('[DADOS ERRO] Falha na atualização:', error);
+        alert('Erro ao atualizar dados: ' + error.message);
+    }
+}
+
+// FUNÇÃO DE VALIDAÇÃO MELHORADA
+function validarDadosAtualizacao(dados, tentandoVirarFreelancer) {
+    // Campos obrigatórios para todos
+    if (!dados.nome || !dados.email || !dados.telefone) {
+        alert('Por favor, preencha todos os campos obrigatórios (Nome, E-mail e Telefone).');
+        return false;
+    }
+
+    // Validação de e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(dados.email)) {
+        alert('Por favor, insira um e-mail válido.');
+        return false;
+    }
+
+    // Validação de telefone
+    const telefoneLimpo = dados.telefone.replace(/\D/g, '');
+    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
+        alert('Por favor, insira um telefone válido com DDD (10 ou 11 dígitos).');
+        return false;
+    }
+
+    // Se está tentando virar freelancer, valida campos adicionais
+    if (tentandoVirarFreelancer) {
+        // Valida CPF
+        if (!dados.cpf || dados.cpf.replace(/\D/g, '').length !== 11) {
+            alert('Para se tornar Freelancer, informe um CPF válido (11 dígitos).');
+            return false;
+        }
+
+        // Valida endereço completo
+        const endereco = dados.endereco;
+        if (!endereco.CEP || !endereco.Logradouro || !endereco.Cidade || 
+            !endereco.Bairro || !endereco.Estado || !endereco.Numero) {
+            alert('Para se tornar Freelancer, seu endereço deve estar completo (CEP, Logradouro, Número, Bairro, Cidade e Estado).');
+            return false;
+        }
+
+        // Valida CEP
+        if (endereco.CEP.replace(/\D/g, '').length !== 8) {
+            document.getElementById('cep-error').style.display = 'block';
+            document.getElementById('cep-error').textContent = 'CEP inválido! Deve conter 8 dígitos.';
+            return false;
+        }
+    }
+
+    return true;
+}
+
+// Atualize o event listener do switch para validar em tempo real
+document.getElementById('tipoUsuarioSwitch')?.addEventListener('change', function() {
+    const label = document.getElementById('tipoUsuarioLabel');
+    label.textContent = this.checked ? 'Freelancer' : 'Cliente';
+    
+    // Se está tentando virar freelancer, valida os campos
+    if (this.checked) {
+        const telefone = document.getElementById('telefone').value;
+        const cpf = document.getElementById('cpf').value;
+        const cep = document.querySelector('input[name="cep"]').value;
+        
+        if (!telefone || !cpf || !cep) {
+            alert('Para se tornar Freelancer, preencha todos os campos obrigatórios primeiro.');
+            this.checked = false;
+            label.textContent = 'Cliente';
+        }
+    }
+});

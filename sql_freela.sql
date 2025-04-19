@@ -144,3 +144,6 @@ CREATE INDEX idx_service_status ON service(Status);
 CREATE INDEX idx_service_usuario ON service(ID_Usuario);
 CREATE INDEX idx_avaliacao_freelancer ON avaliacao(ID_Freelancer);
 CREATE INDEX idx_avaliacao_data ON avaliacao(DataAvaliacao);
+
+SELECT * FROM Usuario WHERE ID_User = 1;
+SELECT * FROM endereco;

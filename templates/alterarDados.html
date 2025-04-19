@@ -25,49 +25,74 @@
             }
             
         }
+        .form-switch .form-check-input {
+            width: 3em;
+            height: 1.5em;
+            cursor: pointer;
+        }
+
+        .form-switch .form-check-input:checked {
+            background-color: #5218bd;
+            border-color: #5218bd;
+        }
+
+        #tipoUsuarioLabel {
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+        
     </style>
 </head>
 
 <body>
     <main>
         <div class="tab-pane" id="edit">
-            <form>
+            <form id="form-edicao">
+                <!-- Dados Básicos -->
                 <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Primeiro Nome</label>
+                    <label class="col-lg-3 col-form-label form-control-label">Nome Completo</label>
                     <div class="col-lg-9">
-                        <input class="form-control" type="text" id="nome" value="">
+                        <input class="form-control" type="text" id="nome" required>
                     </div>
                 </div>
-
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Sobrenome</label>
-                    <div class="col-lg-9">
-                        <input class="form-control" type="text" value="">
-                    </div>
-                </div>
-
+            
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">E-mail</label>
                     <div class="col-lg-9">
-                        <input class="form-control" type="email" id="email" value="nome@dominio.com">
+                        <input class="form-control" type="email" id="email" required>
                     </div>
                 </div>
-
+            
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label">Telefone</label>
+                    <div class="col-lg-9">
+                        <input class="form-control" type="tel" id="telefone" required>
+                    </div>
+                </div>
+            
+                <div class="form-group row">
+                    <label class="col-lg-3 col-form-label form-control-label">CPF</label>
+                    <div class="col-lg-9">
+                        <input class="form-control" type="text" id="cpf">
+                    </div>
+                </div>
+            
+                <!-- Seção de Endereço -->
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Endereço</label>
                     <div class="col-lg-4">
-                        <input id="cep" class="form-control" type="text" name="cep" maxlength="10" placeholder="CEP">
-                        <p style="display: none;">CEP inválido!</p>
+                        <input class="form-control" type="text" id="cep" name="cep" placeholder="CEP">
+                        <p id="cep-error" class="text-danger small" style="display: none;">CEP inválido!</p>
                     </div>
                 </div>
-
+            
                 <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label"> </label>
+                    <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-9">
                         <input class="form-control" type="text" name="logradouro" placeholder="Logradouro">
                     </div>
                 </div>
-
+            
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-4">
@@ -80,59 +105,35 @@
                         <input class="form-control" type="text" name="estado" placeholder="Estado">
                     </div>
                 </div>
-
+            
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-2">
-                        <input class="form-control" type="text" value="" placeholder="Número">
+                        <input class="form-control" type="text" name="numero" placeholder="Número">
                     </div>
-
                     <div class="col-lg-4">
-                        <input class="form-control" type="text" value="" placeholder="Complemento">
+                        <input class="form-control" type="text" name="complemento" placeholder="Complemento">
                     </div>
                 </div>
-
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Usuário</label>
-                    <div class="col-lg-9">
-                        <input class="form-control" type="text">
-                    </div>
+            
+                <!-- Switch Freelancer/Cliente -->
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="tipoUsuarioSwitch"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="Preencha todos os dados para virar Freelancer">
+                    <label class="form-check-label" for="tipoUsuarioSwitch">
+                        <span id="tipoUsuarioLabel">Cliente</span>
+                    </label>
                 </div>
-
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Data de Nascimento</label>
-                    <div class="col-lg-9">
-                        <input class="form-control" type="date" id="dataNascimento" name="dataNascimento">
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Telefone</label>
-                    <div class="col-lg-9">
-                        <input class="form-control" type="text">
-                    </div>
-                </div>
-
-                <!--<div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Senha</label>
-                    <div class="col-lg-9">
-                        <input class="form-control" type="password" value="11111122333">
-                    </div>
-                </div>
-
-                <div class="form-group row">
-                    <label class="col-lg-3 col-form-label form-control-label">Confirm
-                        password</label>
-                    <div class="col-lg-9">
-                        <input class="form-control" type="password" value="11111122333">
-                    </div>
-                </div>-->
-
+            
+                <!-- Botões -->
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-9">
-                        <input type="reset" class="btn btn-secondary" value="Cancelar">
-                        <input type="button" class="btn btn-primary" value="Salvar Alterações" style="background-color: #5218bd;">
+                        <button type="button" class="btn btn-secondary me-2" id="btnCancelar">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" style="background-color: #5218bd;">
+                            Salvar Alterações
+                        </button>
                     </div>
                 </div>
             </form>

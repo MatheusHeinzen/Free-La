@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Flask, request, render_template, redirect, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
@@ -13,7 +14,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root#963',
+    'password': 'PUC@1234',
     'database': 'freela'
 }
 
@@ -48,28 +49,56 @@ def autenticar():
 def cadastrar():
     if request.method == 'OPTIONS':
         return '', 200
+        
     data = request.get_json()
 
+    # Dados obrigatórios
     nome = data.get('nome')
     email = data.get('email')
     cpf = data.get('cpf')
-    telefone = data.get('telefone')
-    senha = generate_password_hash(data.get('senha'))
+    senha = data.get('senha')
+    data_nascimento = data.get('dataNascimento')
+
+    # Validações básicas
+    if not all([nome, email, cpf, data_nascimento, senha]):
+        return jsonify({"sucesso": False, "erro": "Dados obrigatórios faltando"}), 400
+
+    # Valida formato da data
+    if data_nascimento:
+        try:
+            datetime.strptime(data_nascimento, '%Y-%m-%d').date()
+        except ValueError:
+            return jsonify({"sucesso": False, "erro": "Formato de data inválido. Use YYYY-MM-DD"}), 400
 
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
 
-        sql = "INSERT INTO Usuario (Nome, Email, CPF, Telefone, Senha) VALUES (%s, %s, %s, %s, %s)"
-        cursor.execute(sql, (nome, email, cpf, telefone, senha))
+        sql = """
+            INSERT INTO Usuario 
+                (Nome, Email, CPF, Senha, DataNascimento) 
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(sql, (
+            nome, 
+            email, 
+            cpf, 
+            generate_password_hash(senha),
+            data_nascimento if data_nascimento else None
+        ))
+        
         conn.commit()
-
+        novo_usuario_id = cursor.lastrowid
         cursor.close()
         conn.close()
 
-        return jsonify({"sucesso": True})
+        return jsonify({"sucesso": True, "id": novo_usuario_id})
+
     except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": str(err)})
+        if err.errno == 1062:
+            campo = err.msg.split("'")[1]
+            return jsonify({"sucesso": False, "erro": f"{campo} já está em uso"}), 400
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
 
 ##############################
 @app.route('/logado', methods=['GET'])
@@ -213,21 +242,24 @@ def obter_usuario(id):
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Busca dados básicos do usuário
-        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (id,))
+        # Consulta para obter dados básicos do usuário
+        cursor.execute("""
+            SELECT 
+                u.*,
+                e.CEP, e.Logradouro, e.Cidade, e.Bairro, 
+                e.Estado, e.Numero, e.Complemento
+            FROM Usuario u
+            LEFT JOIN Endereco e ON u.ID_Endereco = e.ID_Endereco
+            WHERE u.ID_User = %s
+        """, (id,))
+        
         usuario = cursor.fetchone()
         
         if not usuario:
             return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
         
-        # Remove a senha por segurança
+        # Remove campos sensíveis
         usuario.pop('Senha', None)
-        
-        # Busca endereço do usuário (se existir na tabela ou relacionamento)
-        cursor.execute("SELECT * FROM Endereco WHERE fk_Usuario_ID_User = %s", (id,))
-        endereco = cursor.fetchone()
-        if endereco:
-            usuario['Endereco'] = endereco
         
         cursor.close()
         conn.close()
@@ -235,7 +267,17 @@ def obter_usuario(id):
         return jsonify({"sucesso": True, "usuario": usuario})
         
     except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+        print(f"Erro no banco de dados: {err}")  # Log para debug
+        return jsonify({
+            "sucesso": False, 
+            "erro": f"Erro no banco de dados: {err}"
+        }), 500
+    except Exception as err:
+        print(f"Erro inesperado: {err}")  # Log para debug
+        return jsonify({
+            "sucesso": False, 
+            "erro": f"Erro interno no servidor: {err}"
+        }), 500
 
 # Rota para obter categorias do usuário
 @app.route('/usuario/<int:id>/categorias', methods=['GET'])
@@ -294,68 +336,103 @@ def atualizar_categorias_usuario(id):
 def atualizar_usuario(id):
     data = request.get_json()
     
+    # Validações básicas
+    if not all(key in data for key in ['nome', 'email', 'telefone', 'tipoUsuario', 'endereco']):
+        return jsonify({"sucesso": False, "erro": "Dados incompletos"}), 400
+    
+    # Validação adicional para freelancer
+    if data['tipoUsuario'] == 'freelancer':
+        if not data.get('cpf') or len(data['cpf'].replace('.', '').replace('-', '')) != 11:
+            return jsonify({"sucesso": False, "erro": "CPF inválido para Freelancer"}), 400
+        
+        endereco = data['endereco']
+        if (not endereco.get('CEP') or not endereco.get('Logradouro') or 
+            not endereco.get('Cidade') or not endereco.get('Bairro') or 
+            not endereco.get('Estado') or not endereco.get('Numero')):
+            return jsonify({"sucesso": False, "erro": "Endereço incompleto para Freelancer"}), 400
+    
     try:
         conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         
-        # Atualiza dados básicos do usuário
-        campos_usuario = []
-        valores_usuario = []
+        # 1. Verifica se o usuário existe e obtém o ID_Endereco atual
+        cursor.execute("SELECT ID_Endereco FROM Usuario WHERE ID_User = %s", (id,))
+        usuario = cursor.fetchone()
         
-        if 'nome' in data:
-            campos_usuario.append("Nome = %s")
-            valores_usuario.append(data['nome'])
-        if 'email' in data:
-            campos_usuario.append("Email = %s")
-            valores_usuario.append(data['email'])
-        if 'telefone' in data:
-            campos_usuario.append("Telefone = %s")
-            valores_usuario.append(data['telefone'])
-        if 'cpf' in data:
-            campos_usuario.append("CPF = %s")
-            valores_usuario.append(data['cpf'])
-        if 'dataNascimento' in data:
-            campos_usuario.append("DataNascimento = %s")
-            valores_usuario.append(data['dataNascimento'])
+        if not usuario:
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado"}), 404
         
-        if campos_usuario:
-            query_usuario = f"UPDATE Usuario SET {', '.join(campos_usuario)} WHERE ID_User = %s"
-            valores_usuario.append(id)
-            cursor.execute(query_usuario, valores_usuario)
+        id_endereco = usuario['ID_Endereco']
+        endereco_data = data['endereco']
         
-        # Atualiza endereço (usando ID_Endereco do usuário)
-        if 'endereco' in data:
-            endereco = data['endereco']
-            # Primeiro obtém o ID_Endereco do usuário
-            cursor.execute("SELECT ID_Endereco FROM Usuario WHERE ID_User = %s", (id,))
-            id_endereco = cursor.fetchone()[0]
+        # 2. Atualiza ou cria o endereço
+        if id_endereco:
+            # Atualiza endereço existente
+            cursor.execute("""
+                UPDATE Endereco SET 
+                    CEP = %s,
+                    Logradouro = %s,
+                    Cidade = %s,
+                    Bairro = %s,
+                    Estado = %s,
+                    Numero = %s,
+                    Complemento = %s
+                WHERE ID_Endereco = %s
+            """, (
+                endereco_data.get('CEP'),
+                endereco_data.get('Logradouro'),
+                endereco_data.get('Cidade'),
+                endereco_data.get('Bairro'),
+                endereco_data.get('Estado'),
+                endereco_data.get('Numero'),
+                endereco_data.get('Complemento'),
+                id_endereco
+            ))
+        else:
+            # Cria novo endereço
+            cursor.execute("""
+                INSERT INTO Endereco (
+                    CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                endereco_data.get('CEP'),
+                endereco_data.get('Logradouro'),
+                endereco_data.get('Cidade'),
+                endereco_data.get('Bairro'),
+                endereco_data.get('Estado'),
+                endereco_data.get('Numero'),
+                endereco_data.get('Complemento')
+            ))
+            id_endereco = cursor.lastrowid
             
-            if id_endereco:
-                cursor.execute("""
-                    UPDATE Endereco SET 
-                        CEP = %s,
-                        Logradouro = %s,
-                        Cidade = %s,
-                        Bairro = %s,
-                        Estado = %s,
-                        Numero = %s,
-                        Complemento = %s
-                    WHERE ID_Endereco = %s
-                """, (
-                    endereco.get('CEP'),
-                    endereco.get('Logradouro'),
-                    endereco.get('Cidade'),
-                    endereco.get('Bairro'),
-                    endereco.get('Estado'),
-                    endereco.get('Numero'),
-                    endereco.get('Complemento'),
-                    id_endereco
-                ))
+            # Atualiza usuário com o novo ID_Endereco
+            cursor.execute("""
+                UPDATE Usuario SET ID_Endereco = %s WHERE ID_User = %s
+            """, (id_endereco, id))
+        
+        # 3. Atualiza dados básicos do usuário
+        cursor.execute("""
+            UPDATE Usuario SET 
+                Nome = %s,
+                Email = %s,
+                Telefone = %s,
+                CPF = %s,
+                TipoUsuario = %s
+            WHERE ID_User = %s
+        """, (
+            data['nome'],
+            data['email'],
+            data['telefone'],
+            data.get('cpf'),
+            data['tipoUsuario'],
+            id
+        ))
         
         conn.commit()
-        return jsonify({"sucesso": True, "mensagem": "Dados atualizados com sucesso!"})
+        return jsonify({"sucesso": True, "mensagem": "Dados atualizados com sucesso"})
         
     except mysql.connector.Error as err:
+        conn.rollback()
         return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
