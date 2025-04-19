@@ -1,21 +1,31 @@
-// MÁSCARAS E VALIDAÇÕES
 document.addEventListener('DOMContentLoaded', () => {
-    // Configura máscaras
-    if (document.getElementById("telefone")) {
-        $("#telefone").mask("(00) 00000-0000");
-    }
     if (document.getElementById("cpf")) {
         $("#cpf").mask("000.000.000-00");
     }
-    
-    // Validação em tempo real da senha
+
     const senhaInput = document.getElementById("senha");
     if (senhaInput) {
         senhaInput.addEventListener("input", validarSenha);
     }
+
+    const formCadastro = document.getElementById("form-cadastro");
+    const formLogin = document.getElementById("form-login");
+
+    if (formCadastro) {
+        formCadastro.addEventListener("submit", function (e) {
+            e.preventDefault();
+            salvar();
+        });
+    }
+
+    if (formLogin) {
+        formLogin.addEventListener("submit", function (e) {
+            e.preventDefault();
+            logar();
+        });
+    }
 });
 
-// FUNÇÕES DE UI
 function alternarModo(modo) {
     const container = document.getElementById("container");
     if (modo === "login") {
@@ -28,7 +38,6 @@ function alternarModo(modo) {
 function toggleSenha(id, btn) {
     const inputPass = document.getElementById(id);
     const btnShowPass = document.getElementById(btn);
-
     if (inputPass.type === 'password') {
         inputPass.setAttribute('type', 'text');
         btnShowPass.classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
@@ -38,7 +47,6 @@ function toggleSenha(id, btn) {
     }
 }
 
-// FUNÇÕES DE VALIDAÇÃO
 function validarSenha(senha) {
     const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/;
     return regex.test(senha);
@@ -51,16 +59,13 @@ function validarEmail(email) {
 
 function validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]/g, "");
-
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
 
     let Soma = 0, Resto;
-
     for (let i = 1; i <= 9; i++) {
         Soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
     }
     Resto = (Soma * 10) % 11;
-
     if (Resto === 10 || Resto === 11) Resto = 0;
     if (Resto !== parseInt(cpf.substring(9, 10))) return false;
 
@@ -69,45 +74,36 @@ function validarCPF(cpf) {
         Soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
     }
     Resto = (Soma * 10) % 11;
-
     if (Resto === 10 || Resto === 11) Resto = 0;
     if (Resto !== parseInt(cpf.substring(10, 11))) return false;
 
     return true;
 }
 
-// FUNÇÕES DE CADASTRO E LOGIN
-document.addEventListener('DOMContentLoaded', () => {
-    const formCadastro = document.getElementById("form-cadastro");
-    const formLogin = document.getElementById("form-login");
+function validarIdade(dataNascimento) {
+    const hoje = new Date();
+    const nascimento = new Date(dataNascimento);
+    if (nascimento > hoje) return false;
 
-    if (formCadastro) {
-        formCadastro.addEventListener("submit", function(e) {
-            e.preventDefault();
-            salvar();
-        });
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+    const m = hoje.getMonth() - nascimento.getMonth();
+    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) {
+        idade--;
     }
-
-    if (formLogin) {
-        formLogin.addEventListener("submit", function(e) {
-            e.preventDefault();
-            logar();
-        });
-    }
-});
+    return idade >= 18 && idade <= 100;
+}
 
 async function salvar() {
     console.log('[CADASTRO] Iniciando processo de cadastro');
-    
+
     const nome = document.getElementById("nome").value;
     const email = document.getElementById("email").value;
     const cpf = document.getElementById("cpf").value;
-    const telefone = document.getElementById("telefone").value;
+    const dataNascimento = document.getElementById("dataNascimento").value;
     const senha = document.getElementById("senha").value;
     const confirmaSenha = document.getElementById("confirma-senha").value;
     const erroSenha = document.getElementById("senha-erro");
 
-    // Validações
     if (!nome) {
         alert("Por favor, insira seu nome completo.");
         return;
@@ -119,7 +115,12 @@ async function salvar() {
     }
 
     if (!validarCPF(cpf)) {
-        alert("Por favor, insira um CPF completo.");
+        alert("Por favor, insira um CPF válido.");
+        return;
+    }
+
+    if (!validarIdade(dataNascimento)) {
+        alert("Você precisa ter entre 18 e 100 anos para se cadastrar.");
         return;
     }
 
@@ -135,7 +136,7 @@ async function salvar() {
         return;
     }
 
-    const data = { nome, email, cpf, telefone, senha };
+    const data = { nome, email, cpf, dataNascimento, senha };
 
     try {
         console.log('[CADASTRO] Enviando dados para o servidor');
@@ -163,8 +164,6 @@ async function salvar() {
 }
 
 async function logar() {
-    console.log('[LOGIN] Iniciando processo de login');
-    
     const email = document.getElementById("login-email").value;
     const senha = document.getElementById("login-senha").value;
 
@@ -174,7 +173,6 @@ async function logar() {
     }
 
     try {
-        console.log('[LOGIN] Enviando credenciais para autenticação');
         const res = await fetch("http://localhost:5000/autenticar", {
             method: "POST",
             headers: {
@@ -184,10 +182,8 @@ async function logar() {
         });
 
         const resposta = await res.json();
-        console.log('[LOGIN] Resposta do servidor:', resposta);
 
         if (resposta.sucesso) {
-            console.log('[LOGIN] Autenticação bem-sucedida, armazenando ID do usuário:', resposta.id);
             localStorage.setItem('userId', resposta.id);
             window.location.href = "/homepage";
         } else {
