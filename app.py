@@ -2,6 +2,9 @@ from flask import Flask, request, render_template, redirect, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import mysql.connector
+import json
+import os
+
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -10,7 +13,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'PUC@1234',
+    'password': 'Root#963',
     'database': 'freela'
 }
 
@@ -395,6 +398,44 @@ def obter_usuario_completo(id):
 
 
 ##############################
+
+
+# Para Habilidades -> templates/perfil.html
+CAMINHO_JSON = 'habilidades.json'
+
+def ler_habilidades():
+    if os.path.exists(CAMINHO_JSON):
+        with open(CAMINHO_JSON, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return []
+
+def salvar_habilidades(habilidades):
+    with open(CAMINHO_JSON, 'w', encoding='utf-8') as f:
+        json.dump(habilidades, f, ensure_ascii=False, indent=2)
+
+@app.route('/habilidades/perfil')
+def skills():
+    return render_template('index.html')
+
+@app.route('/habilidades')
+def get_habilidades():
+    habilidades = ler_habilidades()
+    return jsonify(habilidades)
+
+@app.route('/adicionar', methods=['POST'])
+def adicionar_habilidade():
+    nova = request.json.get('novaHabilidade', '').strip()
+    if not nova:
+        return jsonify({'erro': 'Nome inválido'}), 400
+
+    habilidades = ler_habilidades()
+    if nova not in habilidades:
+        habilidades.append(nova)
+        salvar_habilidades(habilidades)
+        return jsonify({'mensagem': 'Adicionado com sucesso'}), 200
+    else:
+        return jsonify({'erro': 'Habilidade já existe'}), 400
+
 
 
 @app.route('/homepage')

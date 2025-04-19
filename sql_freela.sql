@@ -18,7 +18,7 @@ CREATE TABLE endereco (
     Complemento VARCHAR(50),
     CONSTRAINT chk_cep_format CHECK (CEP REGEXP '^[0-9]{5}-?[0-9]{3}$'),
     CONSTRAINT chk_estado_format CHECK (Estado REGEXP '^[A-Z]{2}$')
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ;
 
 -- =============================================
 -- Tabela: usuario
@@ -40,8 +40,8 @@ CREATE TABLE usuario (
         ON DELETE SET NULL
         ON UPDATE CASCADE,
     CONSTRAINT chk_cpf_validacao CHECK (LENGTH(CPF) = 11 OR LENGTH(CPF) = 14),
-    CONSTRAINT chk_email_valido CHECK (Email LIKE '%@%.%'),
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    CONSTRAINT chk_email_valido CHECK (Email LIKE '%@%.%')
+    );
 
 -- =============================================
 -- Tabela: categoria
@@ -70,7 +70,7 @@ CREATE TABLE perfil (
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT chk_bio_tamanho CHECK (LENGTH(Bio) <= 500)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 -- =============================================
 -- Tabela: service
@@ -89,7 +89,7 @@ CREATE TABLE service (
         ON UPDATE CASCADE,
     CONSTRAINT chk_nome_service_valido CHECK (LENGTH(NomeService) >= 5),
     CONSTRAINT chk_data_conclusao_valida CHECK (DataConclusao IS NULL OR DataConclusao >= DataCriacao)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 -- =============================================
 -- Tabela: usuario_categoria
@@ -106,7 +106,7 @@ CREATE TABLE usuario_categoria (
     FOREIGN KEY (ID_Categoria) REFERENCES categoria(ID_Categoria)
         ON DELETE CASCADE
         ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 -- =============================================
 -- Tabela: avaliacao
@@ -134,7 +134,7 @@ CREATE TABLE avaliacao (
     CONSTRAINT chk_nota_valida CHECK (Nota BETWEEN 1 AND 5),
     CONSTRAINT uc_avaliacao_unica UNIQUE (ID_Service, ID_Cliente),
     CONSTRAINT chk_data_resposta_valida CHECK (DataResposta IS NULL OR DataResposta >= DataAvaliacao)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
 
 -- =============================================
 -- Índices adicionais para melhor performance
