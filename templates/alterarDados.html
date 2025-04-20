@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,25 +8,28 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Alterar Dados</title>
+    <link rel="stylesheet" href="/static/sidebar.css">
     <style>
-        body {
-            margin: 150px;
-        }
-        form{
+
+        form {
             display: flex;
             flex-direction: column;
             padding: 15px;
         }
-        p{
+
+        p {
             color: rgba(161, 0, 0, 0.897);
         }
+
         @media screen and (max-width: 768px) {
             body {
                 margin: 20px;
             }
-            
+
         }
-        .form-switch, .form-check-input {
+
+        .form-switch,
+        .form-check-input {
             cursor: pointer;
             position: relative;
             display: flex;
@@ -43,11 +47,56 @@
             font-weight: 500;
             margin-left: 0.5rem;
         }
-        
     </style>
 </head>
 
 <body>
+    <header>
+        <div class="container">
+            <nav class="menu_lateral" id="menu_lateral">
+                <div class="expandir">
+                    <i class="bi bi-list"></i>
+                </div>
+                <ul>
+                    <span class="icon"><img src="/static/imgs/perfil.png" width="140px"
+                            style="margin-left: 20px;"></span>
+                    <li class="item_menu">
+                        <a href="/perfil">
+                            <span class="icon"></span>
+                            <span class="link">Perfil</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="#">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Sobre</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="#">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Contato</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="/alterarDados">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Configurações</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+                <a href="/" class="navbar-brand d-flex align-items-center">
+                    Home
+                </a>
+                <button id="toggleSidebar" style="font-size: 20px;">☰</button>
+            </div>
+        </div>
+    </header>
     <main>
         <div class="tab-pane" id="edit">
             <form id="form-edicao">
@@ -58,28 +107,28 @@
                         <input class="form-control" type="text" id="nome" required>
                     </div>
                 </div>
-            
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">E-mail</label>
                     <div class="col-lg-9">
                         <input class="form-control" type="email" id="email" required>
                     </div>
                 </div>
-            
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Telefone</label>
                     <div class="col-lg-9">
                         <input class="form-control" type="tel" id="telefone" required>
                     </div>
                 </div>
-            
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">CPF</label>
                     <div class="col-lg-9">
                         <input class="form-control" type="text" id="cpf">
                     </div>
                 </div>
-            
+
                 <!-- Seção de Endereço -->
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Endereço</label>
@@ -88,14 +137,14 @@
                         <p id="cep-error" class="text-danger small" style="display: none;">CEP inválido!</p>
                     </div>
                 </div>
-            
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-9">
                         <input class="form-control" type="text" name="logradouro" placeholder="Logradouro">
                     </div>
                 </div>
-            
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-4">
@@ -108,7 +157,7 @@
                         <input class="form-control" type="text" name="estado" placeholder="Estado">
                     </div>
                 </div>
-            
+
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-2">
@@ -118,17 +167,16 @@
                         <input class="form-control" type="text" name="complemento" placeholder="Complemento">
                     </div>
                 </div>
-            
+
                 <!-- Switch Freelancer/Cliente -->
                 <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="tipoUsuarioSwitch"
-                        data-bs-toggle="tooltip" data-bs-placement="top"
-                        title="Preencha todos os dados para virar Freelancer">
+                    <input class="form-check-input" type="checkbox" id="tipoUsuarioSwitch" data-bs-toggle="tooltip"
+                        data-bs-placement="top" title="Preencha todos os dados para virar Freelancer">
                     <label class="form-check-label" for="tipoUsuarioSwitch">
                         <span id="tipoUsuarioLabel">Cliente</span>
                     </label>
                 </div>
-            
+
                 <!-- Botões -->
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
