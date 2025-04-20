@@ -137,13 +137,21 @@ CREATE TABLE avaliacao (
 );
 
 -- =============================================
--- Índices adicionais para melhor performance
+-- Inserts e Selects
 -- =============================================
-CREATE INDEX idx_usuario_tipo ON usuario(TipoUsuario);
-CREATE INDEX idx_service_status ON service(Status);
-CREATE INDEX idx_service_usuario ON service(ID_Usuario);
-CREATE INDEX idx_avaliacao_freelancer ON avaliacao(ID_Freelancer);
-CREATE INDEX idx_avaliacao_data ON avaliacao(DataAvaliacao);
+
+INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
+VALUES
+('123.456.789-00', 'Ana Souza', 'ana.souza@email.com', 'Senha@1234', '1995-04-20');
+
+INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
+VALUES
+('987.654.321-11', 'Bruno Lima', 'bruno.lima@email.com', 'Senha@4321', '1988-10-10');
+
+INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
+VALUES
+('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
+
 
 SELECT * FROM Usuario WHERE ID_User = 1;
 SELECT * FROM endereco;

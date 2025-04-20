@@ -39,7 +39,7 @@ a {
 
 button {
     border-radius: 20px;
-    border: 1px solid #2a5fa5;
+    border: 1px solid #f3f3f3;
     background: linear-gradient(to right, #5218bd, #c414fa);
     color: #ffffff;
     font-size: 12px;
@@ -51,9 +51,18 @@ button {
     margin-top: 5px;
 }
 
-button.ghost {
+button .ghost {
     background-color: transparent;
     border-color: #ffffff;
+}
+
+.ghost{
+    position: relative;
+    border-radius: 20px;
+}
+
+input[type="checkbox"]{
+    width: 10%;
 }
 
 form {
@@ -226,7 +235,7 @@ input {
     position: absolute;
     border-radius: 8px;
     z-index: 6;
-    width: 275px;
+    width: 276px;
     height: 23px;
     font-size: 9px;
     display: flex;
@@ -236,10 +245,15 @@ input {
     transition: opacity .25s ease-in-out;
 }
 
+#btn-senha1:after, #btn-senha2:after{
+    width: 20px;
+}
+
+
 .input-container i:hover:after{
     opacity: 1;
     visibility: visible;
-    position: relative;
+    position: absolute;
     z-index: 6;
 }
 

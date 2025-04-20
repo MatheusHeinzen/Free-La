@@ -35,7 +35,8 @@
 
                 <div class="input-container">
                     <input id="dataNascimento" type="date" placeholder="Data de Nascimento*" required />
-                    <i data-tooltip="Informe sua data de nascimento. Apenas maiores de 18 anos podem se cadastrar." class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="Informe sua data de nascimento. Apenas maiores de 18 anos podem se cadastrar."
+                        class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
@@ -44,21 +45,24 @@
                 </div>
 
                 <div class="input-container">
-                    <i data-tooltip="A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial." class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial."
+                        class="bi bi-question-circle-fill"></i>
                     <div class="senha-container">
                         <input type="password" id="senha" placeholder="Senha*" required />
                         <i class="bi bi-eye-fill" id="btn-senha1" onclick="toggleSenha('senha','btn-senha1')"></i>
                     </div>
-                </div>
 
-                <div class="senha-container">
-                    <input type="password" id="confirma-senha" placeholder="Confirmar Senha*" required />
-                    <i class="bi bi-eye-fill" id="btn-senha2" onclick="toggleSenha('confirma-senha','btn-senha2')"></i>
+                    <div class="senha-container">
+                        <input type="password" id="confirma-senha" placeholder="Confirmar Senha*" required />
+                        <i class="bi bi-eye-fill" id="btn-senha2"
+                            onclick="toggleSenha('confirma-senha','btn-senha2')"></i>
+                    </div>
                 </div>
 
                 <div id="termosDeServico">
                     <input type="checkbox" id="checkbox" required />
-                    <span>Li e Aceito com os <a href="/termos" target="_blank">termos de uso e a política de privacidade</a>.</span>
+                    <span>Li e Aceito com os <a href="/termos" target="_blank">termos de uso e a política de
+                            privacidade</a>.</span>
                 </div>
 
                 <span id="senha-erro" class="erro"></span>
