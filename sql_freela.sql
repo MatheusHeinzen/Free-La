@@ -153,5 +153,5 @@ VALUES
 ('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
 
 
-SELECT * FROM Usuario WHERE ID_User = 1;
+SELECT * FROM Usuario;
 SELECT * FROM endereco;

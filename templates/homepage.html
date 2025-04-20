@@ -40,12 +40,29 @@
               <span class="link">Contato</span>
             </a>
           </li>
-          <li class="item_menu">
-            <a href="/alterarDados">
+          <li class="item_menu has-submenu">
+            <a href="#" onclick="toggleSubmenu(event)">
               <span class="icon"><i class="#"></i></span>
               <span class="link">Configurações</span>
             </a>
+
+            <ul class="submenu">
+              <li class="item_menu" id="submenu">
+                <a href="/templates/alterarDados.html">
+                  <span class="icon"><i class="#"></i></span>
+                  <span class="link">Atualizar Dados</span>
+                </a>
+              </li>
+              <li class="item_menu" id="submenu">
+                <a href="#">
+                  <span class="icon"><i class="#"></i></span>
+                  <span class="link">Deletar Perfil</span>
+                </a>
+              </li>
+            </ul>
           </li>
+
+
         </ul>
       </nav>
     </div>
@@ -143,6 +160,13 @@
 
   </main>
 </body>
+<script>
+  function toggleSubmenu(event) {
+    event.preventDefault();
+    const item = event.currentTarget.closest('.has-submenu');
+    item.classList.toggle('active');
+  }
+</script>
 <script src="/static/homepage.js"></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
   integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

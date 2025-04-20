@@ -1,23 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const lista = document.getElementById("dados-usuario");
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+  const lista = document.getElementById("dados-usuario");
+  const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    if (usuario) {
-        for (const chave in usuario) {
-            const item = document.createElement("li");
-            item.textContent = `${chave}: ${usuario[chave]}`;
-            lista.appendChild(item);
-        }
+  if (usuario) {
+    for (const chave in usuario) {
+      const item = document.createElement("li");
+      item.textContent = `${chave}: ${usuario[chave]}`;
+      lista.appendChild(item);
     }
+  }
 });
 
 function adicionarContatos() {
-    const contato = document.getElementById("contatos")
-    const tipo = document.getElementById("")
+  const contato = document.getElementById("contatos")
+  const tipo = document.getElementById("")
 
 
 
-    contato.innerHTML = `<li class="list-group-item">
+  contato.innerHTML = `<li class="list-group-item">
                             <div class="list-icon">
                                 <i class="fa fa-envelope"></i>
                             </div>
@@ -29,21 +29,21 @@ function adicionarContatos() {
 }
 
 function mostrarOpcoesHabilidades() {
-    document.getElementById('showOpcoesHabilidades').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
+  document.getElementById('showOpcoesHabilidades').style.display = 'block';
+  document.getElementById('overlay').style.display = 'block';
 }
 
 function fecharOpcoes() {
-    document.getElementById('showOpcoesHabilidades').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
+  document.getElementById('showOpcoesHabilidades').style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
 }
 
 function validar() {
-    if (checkbox.checked) {
-        window.location.href = "/homepage";
-    } else {
-        mostrarAlerta();
-    }
+  if (checkbox.checked) {
+    window.location.href = "/homepage";
+  } else {
+    mostrarAlerta();
+  }
 
 
 }
@@ -51,48 +51,81 @@ function validar() {
 
 // Habilidades -> Perfil
 async function carregarHabilidades() {
-    const resposta = await fetch('./habilidades.json');
-    const habilidades = await resposta.json();
-    renderizarCheckboxes(habilidades);
+  const resposta = await fetch('./habilidades');
+  const habilidades = await resposta.json();
+  renderizarCheckboxes(habilidades);
+}
+
+function renderizarCheckboxes(habilidades) {
+  const container = document.getElementById("checkboxContainer");
+  container.innerHTML = "";
+  habilidades.forEach(habilidade => {
+    const label = document.createElement("label");
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = habilidade;
+    label.appendChild(checkbox);
+    label.appendChild(document.createTextNode(" " + habilidade));
+    container.appendChild(label);
+  });
+}
+
+async function adicionarHabilidade() {
+  const input = document.getElementById("novaHabilidade");
+  const nova = input.value.trim();
+
+  if (nova === "") {
+    alert("Digite uma habilidade!");
+    return;
   }
 
-  function renderizarCheckboxes(habilidades) {
-    const container = document.getElementById("checkboxContainer");
-    container.innerHTML = "";
-    habilidades.forEach(habilidade => {
-      const label = document.createElement("label");
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.value = habilidade;
-      label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(" " + habilidade));
-      container.appendChild(label);
-    });
+  const resposta = await fetch('/adicionarHabilidade', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ novaHabilidade: nova })
+  });
+
+  const resultado = await resposta.json();
+
+  if (resposta.ok) {
+    input.value = "";
+    carregarHabilidades();
+  } else {
+    alert(resultado.erro);
   }
+}
 
-  async function adicionarHabilidade() {
-    const input = document.getElementById("novaHabilidade");
-    const nova = input.value.trim();
+carregarHabilidades();
 
-    if (nova === "") {
-      alert("Digite uma habilidade!");
-      return;
+
+// FUNÇÃO PARA CARREGAR DADOS DO USUÁRIO
+async function carregarDadosUsuario(userId) {
+  console.log('[DADOS] Carregando dados do usuário ID:', userId);
+
+  try {
+    const response = await fetch(`/usuario/${userId}`);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      const errorMsg = errorData?.erro || `Erro HTTP! status: ${response.status}`;
+      throw new Error(errorMsg);
     }
 
-    const resposta = await fetch('/adicionar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ novaHabilidade: nova })
-    });
+    const data = await response.json();
 
-    const resultado = await resposta.json();
-
-    if (resposta.ok) {
-      input.value = "";
-      carregarHabilidades();
+    if (data.sucesso) {
+      console.log('[DADOS] Dados recebidos:', data.usuario);
+      preencherFormulario(data.usuario);
     } else {
-      alert(resultado.erro);
+      throw new Error(data.erro || "Erro ao carregar dados");
     }
+  } catch (error) {
+    console.error('[DADOS ERRO] Falha ao carregar dados:', error);
+    alert(`Erro ao carregar dados: ${error.message}`);
+    console.error('Detalhes do erro:', error);
   }
 
-  carregarHabilidades();
+  console.log('[DADOS] Preenchendo formulário com dados do usuário');
+    
+    setValue('nome', usuario.Nome);
+}
