@@ -91,7 +91,7 @@ def cadastrar():
 
         cursor.execute("""
             INSERT INTO Usuario (Nome, Email, CPF, Senha, DataNascimento) 
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s);
         """, (
             data['nome'],
             data['email'],

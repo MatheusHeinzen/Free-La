@@ -68,6 +68,7 @@ CREATE TABLE categoria (
 -- =============================================
 CREATE TABLE perfil (
     IdPerfil INT AUTO_INCREMENT PRIMARY KEY,
+    Username VARCHAR(50),
     Foto VARCHAR(255),
     Categoria_Especificacao VARCHAR(50),
     Bio TEXT,
@@ -143,6 +144,20 @@ CREATE TABLE avaliacao (
     CONSTRAINT chk_data_resposta_valida CHECK (DataResposta IS NULL OR DataResposta >= DataAvaliacao)
 );
 
+
+-- =============================================
+-- Triggers
+-- =============================================
+
+DELIMITER //
+CREATE TRIGGER criar_perfil_apos_criar_usuario
+AFTER INSERT ON Usuario
+FOR EACH ROW
+BEGIN
+  INSERT INTO Perfil (ID_Usuario, Username) VALUES (NEW.ID_User, NEW.Nome);
+END//
+DELIMITER ;
+
 -- =============================================
 -- Inserts e Selects
 -- =============================================
@@ -157,9 +172,13 @@ VALUES
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
 VALUES
-('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
+('111.222.555-44', 'Beatriz Soares', 'soares.beatriz@email.com', 'Senha@789012', '2000-06-15');
 
+INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
+VALUES
+('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
 
 SELECT * FROM Usuario;
 SELECT * FROM endereco;
 select * from preferenciacontato;
+select * from perfil;
