@@ -1,15 +1,15 @@
 
 //SideBar (Entra e sai da tela)
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.querySelector(".menu_lateral");
     const toggleButton = document.getElementById("toggleSidebar");
 
-    toggleButton.addEventListener("click", function(event) {
+    toggleButton.addEventListener("click", function (event) {
         sidebar.classList.toggle("ativo");
-        event.stopPropagation(); 
+        event.stopPropagation();
     });
 
-    document.addEventListener("click", function(event) {
+    document.addEventListener("click", function (event) {
         if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
             sidebar.classList.remove("ativo");
         }
@@ -125,3 +125,39 @@ function pesquisar() {
 
 //Exibe todos os freelancers ao carregar a página
 window.onload = exibirTodosFreelancers;
+
+
+// Para deletar Usuario:
+
+function showPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'block';
+    // document.getElementById("")
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function fecharPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function confirmarDelecao() {
+    fetch('/DeletarUsuario', {
+        method: 'DELETE'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                alert("Perfil deletado com sucesso.");
+                window.location.href = "/"; // ou /login
+            } else {
+                alert(data.erro || "Erro ao deletar.");
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            alert("Erro interno.");
+        });
+}
+
+
+

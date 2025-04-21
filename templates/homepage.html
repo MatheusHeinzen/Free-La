@@ -54,7 +54,7 @@
                 </a>
               </li>
               <li class="item_menu" id="submenu">
-                <a href="#">
+                <a href="#" onclick="showPopUpDeletar()">
                   <span class="icon"><i class="#"></i></span>
                   <span class="link">Deletar Perfil</span>
                 </a>
@@ -65,6 +65,14 @@
 
         </ul>
       </nav>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="pop-up-deletar" id="pop-up-deletar">
+      <p>Tem certeza que deseja excluir seu perfil? </p>
+      <p>Você perderá todos seus dados e não poderá executar todas as funcionalidades do Site</p>
+      <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR A HOMEPAGE</button>
+      <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
     </div>
 
     <div class="navbar navbar-dark bg-dark shadow-sm">

@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, request, render_template, redirect, jsonify
+from flask import Flask, request, render_template, redirect, jsonify, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import mysql.connector
@@ -17,6 +17,9 @@ db_config = {
     'password': 'PUC@1234',
     'database': 'freela'
 }
+
+# Sessão
+app.secret_key = 'senha_da_sessao'
 
 @app.route('/')
 def index():
@@ -39,7 +42,8 @@ def autenticar():
         conn.close()
 
         if usuario and check_password_hash(usuario['Senha'], senha):
-            return jsonify({"sucesso": True, "id": usuario['ID_User']})
+            session['user_id'] = usuario['ID_User']
+            return jsonify({"sucesso": True, "id": usuario['ID_User'], "session": session['user_id']})
         else:
             return jsonify({"sucesso": False, "erro": "Email ou senha incorretos."})
     except mysql.connector.Error as err:
@@ -215,8 +219,43 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
 
+# Deletar Usuario
+@app.route('/DeletarUsuario', methods=['DELETE'])
+def deletar_usuario_logado():
+    user_id = session.get('user_id')
+    
+    if not user_id:
+        return jsonify({"sucesso": False, "erro": "Usuário não está logado."}), 401
 
-@app.route('/cadastrar', methods=['DELETE'])
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Verifica se o usuário existe
+        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (user_id,))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            cursor.close()
+            conn.close()
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
+
+        # Deleta o usuário
+        cursor.execute("DELETE FROM Usuario WHERE ID_User = %s", (user_id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        # Remove a sessão
+        session.pop('user_id', None)
+
+        return jsonify({"sucesso": True, "mensagem": "Usuário deletado com sucesso."}), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+
+
 
 # Rota para obter todas as categorias
 @app.route('/categorias', methods=['GET'])
