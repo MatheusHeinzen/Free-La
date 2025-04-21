@@ -13,7 +13,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'PUC@1234',
+    'password': 'Root#963',
     'database': 'freela'
 }
 
@@ -47,7 +47,6 @@ def termos():
 # autenticação e cadastro
 @app.route('/autenticar', methods=['POST'])
 def autenticar():
-    """Autentica um usuário com email e senha"""
     data = request.get_json()
     email = data.get('email')
     senha = data.get('senha')
@@ -73,7 +72,6 @@ def autenticar():
 
 @app.route('/cadastrar', methods=['POST'])
 def cadastrar():
-    """cadastra um novo usuário no sistema"""
     data = request.get_json()
     
     # valida dados obrigatórios
@@ -118,7 +116,6 @@ def cadastrar():
 # operações com usuários
 @app.route('/usuario/<int:user_id>', methods=['GET'])
 def obter_usuario(user_id):
-    """obtém os dados completos de um usuário"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
@@ -147,7 +144,6 @@ def obter_usuario(user_id):
 
 @app.route('/usuario/<int:user_id>/dados', methods=['GET'])
 def obter_dados_basicos(user_id):
-    """obtém apenas os dados básicos do usuário (nome, email, telefone)"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
@@ -167,9 +163,10 @@ def obter_dados_basicos(user_id):
             cursor.close()
             conn.close()
 
+
+# Atualizar cadastro do usuario
 @app.route('/atualizarUsuario/<int:user_id>', methods=['PUT'])
 def atualizar_usuario(user_id):
-    """atualiza os dados de um usuário"""
     data = request.get_json()
     
     # validações básicas
@@ -246,7 +243,6 @@ def atualizar_usuario(user_id):
 # categorias
 @app.route('/categorias', methods=['GET'])
 def obter_categorias():
-    """obtém todas as categorias disponíveis"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
@@ -322,6 +318,7 @@ def gerenciar_preferencias(user_id):
             cursor.close()
             conn.close()
 
+# Deletar usuario logado (Falta tratamento de sessão porém foi inicializado)
 @app.route('/DeletarUsuario', methods=['DELETE'])
 def deletar_usuario_logado():
     user_id = session.get('user_id')
@@ -348,14 +345,13 @@ def deletar_usuario_logado():
 
         cursor.close()
         conn.close()
-
-        # Remove a sessão
         session.pop('user_id', None)
 
         return jsonify({"sucesso": True, "mensagem": "Usuário deletado com sucesso."}), 200
 
     except mysql.connector.Error as err:
         return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+
 
 @app.route('/usuario/<int:user_id>/preferencias', methods=['PUT'])
 def salvar_preferencias(user_id):
@@ -394,9 +390,9 @@ def salvar_preferencias(user_id):
             cursor.close()
             conn.close()
 
+# Gerenciador de Categorias
 @app.route('/usuario/<int:user_id>/categorias', methods=['GET', 'PUT'])
 def gerenciar_categorias_usuario(user_id):
-    """gerencia as categorias de um usuário"""
     if request.method == 'GET':
         try:
             conn = mysql.connector.connect(**db_config)
@@ -451,26 +447,22 @@ def gerenciar_categorias_usuario(user_id):
 
 # habilidades
 def ler_habilidades():
-    """lê as habilidades do arquivo JSON"""
     if os.path.exists(CAMINHO_JSON):
         with open(CAMINHO_JSON, 'r', encoding='utf-8') as f:
             return json.load(f)
     return []
 
 def salvar_habilidades(habilidades):
-    """salva as habilidades no arquivo JSON"""
     with open(CAMINHO_JSON, 'w', encoding='utf-8') as f:
         json.dump(habilidades, f, ensure_ascii=False, indent=2)
 
 @app.route('/habilidades', methods=['GET'])
 def get_habilidades():
-    """obtém todas as habilidades disponíveis"""
     habilidades = ler_habilidades()
     return jsonify(habilidades)
 
-@app.route('/adicionar', methods=['POST'])
+@app.route('/habilidades/adicionar', methods=['POST'])
 def adicionar_habilidade():
-    """adiciona uma nova habilidade"""
     nova = request.json.get('novaHabilidade', '').strip()
     
     if not nova:
@@ -483,6 +475,29 @@ def adicionar_habilidade():
         return jsonify({'mensagem': 'adicionado com sucesso'}), 200
     
     return jsonify({'erro': 'habilidade já existe'}), 400
+
+# @app.route('/habilidades/salvar', methods=['POST'])
+# def salvar_habilidades_perfil(user_id):
+#      data = 1234
+#      try:
+#         conn = mysql.connector.connect(**db_config)
+#         cursor = conn.cursor()
+        
+#         # remove categorias atuais
+#         cursor.execute("DELETE FROM Usuario_Categoria WHERE fk_Usuario_ID_User = %s", (user_id,))
+        
+#         # adiciona novas categorias
+#         for categoria_id in data['']:
+#             cursor.execute("""
+#                 INSERT INTO  (fk_Usuario_ID_User, fk_Categoria_ID_Categoria)
+#                 VALUES (%s, %s)
+#             """, (user_id, categoria_id))
+        
+#         conn.commit()
+#         return jsonify({"sucesso": True, "mensagem": "categorias atualizadas com sucesso"})
+#      except:
+#         return data
+
 
 # configuração CORS
 @app.after_request

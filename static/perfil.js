@@ -209,14 +209,36 @@ function renderizarHabilidades(habilidades) {
   `).join('');
 }
 
+const checkbox = document.getElementById('checkbox');
+
 function mostrarOpcoesHabilidades() {
     document.getElementById('showOpcoesHabilidades').style.display = 'block';
     document.getElementById('overlay').style.display = 'block';
+    carregarHabilidades();
 }
 
 function fecharOpcoes() {
     document.getElementById('showOpcoesHabilidades').style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
+    // pensar futuramente -> criação de tabela sql para salvar as habilidades selecionadas
+    // try {
+    //     checkbox.addEventListener('change', function () {
+    //         this.checked;
+    //     });
+    // } catch (error){
+
+    // }
+
+}
+
+function salvarHabilidades() {
+    
+    const botao = document.querySelector('.btn-primary');
+
+    checkbox.addEventListener('change', function () {
+        botao.disabled = !this.checked;
+    });
+
 }
 
 async function adicionarHabilidade() {
@@ -229,7 +251,7 @@ async function adicionarHabilidade() {
     }
 
     try {
-        const response = await fetch('/adicionar', {
+        const response = await fetch('/habilidades/adicionar', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ novaHabilidade: habilidade })
