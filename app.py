@@ -6,7 +6,6 @@ import mysql.connector
 import json
 import os
 
-
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -62,7 +61,7 @@ def autenticar():
 
         if usuario and check_password_hash(usuario['Senha'], senha):
             session['user_id'] = usuario['ID_User']
-            return jsonify({"sucesso": True, "id": usuario['ID_User'], "session":session['user_id']})
+            return jsonify({"sucesso": True, "id": usuario['ID_User'], "session": session['user_id']})
         else:
             return jsonify({"sucesso": False, "erro": "Email ou senha incorretos."})
     except mysql.connector.Error as err:
@@ -128,10 +127,9 @@ def cadastrar():
             return jsonify({"sucesso": False, "erro": f"{campo} já está em uso"}), 400
         return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
 
-############################## FUTURO SESSAO
 @app.route('/logado', methods=['GET'])
 def logado():
-    
+    """Verifica se o usuário está logado"""
     data = request.get_json()
     id = data.get('id')
     nome = data.get('nome')
@@ -192,6 +190,28 @@ def obter_dados_basicos(user_id):
             cursor.close()
             conn.close()
 
+@app.route('/obterDadosUsuario/<int:id>', methods=['GET'])
+def obter_dados_usuario(id):
+    """Obtém dados básicos do usuário (alternativa)"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (id,))
+        usuario = cursor.fetchone()
+        
+        cursor.close()
+        conn.close()
+        
+        if usuario:
+            usuario.pop('Senha', None)
+            return jsonify({"sucesso": True, "usuario": usuario})
+        else:
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
+            
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+
 @app.route('/atualizarUsuario/<int:user_id>', methods=['PUT'])
 def atualizar_usuario(user_id):
     """Atualiza os dados de um usuário"""
@@ -215,246 +235,8 @@ def atualizar_usuario(user_id):
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Atualiza endereço
-        endereco_data = data['endereco']
-        cursor.execute("""
-            INSERT INTO Endereco (
-                CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                CEP = VALUES(CEP),
-                Logradouro = VALUES(Logradouro),
-                Cidade = VALUES(Cidade),
-                Bairro = VALUES(Bairro),
-                Estado = VALUES(Estado),
-                Numero = VALUES(Numero),
-                Complemento = VALUES(Complemento)
-        """, (
-            endereco_data.get('CEP'),
-            endereco_data.get('Logradouro'),
-            endereco_data.get('Cidade'),
-            endereco_data.get('Bairro'),
-            endereco_data.get('Estado'),
-            endereco_data.get('Numero'),
-            endereco_data.get('Complemento')
-        ))
-        
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
-        return jsonify({"sucesso": True, "mensagem": "Dados atualizados com sucesso!"})
-        
-    except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
-
-
-@app.route('/obterDadosUsuario/<int:id>', methods=['GET'])
-def obter_dados_usuario(id):
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (id,))
-        usuario = cursor.fetchone()
-        
-        cursor.close()
-        conn.close()
-        
-        if usuario:
-            # Remove a senha por segurança
-            usuario.pop('Senha', None)
-            return jsonify({"sucesso": True, "usuario": usuario})
-        else:
-            return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
-            
-    except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
-    return response
-
-# Deletar Usuario
-@app.route('/DeletarUsuario', methods=['DELETE'])
-def deletar_usuario_logado():
-    user_id = session.get('user_id')
-    
-    if not user_id:
-        return jsonify({"sucesso": False, "erro": "Usuário não está logado."}), 401
-
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-
-        # Verifica se o usuário existe
-        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (user_id,))
-        usuario = cursor.fetchone()
-
-        if not usuario:
-            cursor.close()
-            conn.close()
-            return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
-
-        # Deleta o usuário
-        cursor.execute("DELETE FROM Usuario WHERE ID_User = %s", (user_id,))
-        conn.commit()
-
-        cursor.close()
-        conn.close()
-
-        # Remove a sessão
-        session.pop('user_id', None)
-
-        return jsonify({"sucesso": True, "mensagem": "Usuário deletado com sucesso."}), 200
-
-    except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
-
-
-
-# Rota para obter todas as categorias
-@app.route('/categorias', methods=['GET'])
-def obter_categorias():
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        cursor.execute("SELECT * FROM Categoria")
-        categorias = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-        
-        return jsonify({"sucesso": True, "categorias": categorias})
-        
-    except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
-    
-@app.route('/usuario/<int:id>', methods=['GET'])
-def obter_usuario(id):
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        # Consulta para obter dados básicos do usuário
-        cursor.execute("""
-            SELECT 
-                u.*,
-                e.CEP, e.Logradouro, e.Cidade, e.Bairro, 
-                e.Estado, e.Numero, e.Complemento
-            FROM Usuario u
-            LEFT JOIN Endereco e ON u.ID_Endereco = e.ID_Endereco
-            WHERE u.ID_User = %s
-        """, (id,))
-        
-        usuario = cursor.fetchone()
-        
-        if not usuario:
-            return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
-        
-        # Remove campos sensíveis
-        usuario.pop('Senha', None)
-        
-        cursor.close()
-        conn.close()
-        
-        return jsonify({"sucesso": True, "usuario": usuario})
-        
-    except mysql.connector.Error as err:
-        print(f"Erro no banco de dados: {err}")  # Log para debug
-        return jsonify({
-            "sucesso": False, 
-            "erro": f"Erro no banco de dados: {err}"
-        }), 500
-    except Exception as err:
-        print(f"Erro inesperado: {err}")  # Log para debug
-        return jsonify({
-            "sucesso": False, 
-            "erro": f"Erro interno no servidor: {err}"
-        }), 500
-
-# Rota para obter categorias do usuário
-@app.route('/usuario/<int:id>/categorias', methods=['GET'])
-def obter_categorias_usuario(id):
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        cursor.execute("""
-            SELECT c.* FROM Categoria c
-            JOIN Usuario_Categoria uc ON c.ID_Categoria = uc.fk_Categoria_ID_Categoria
-            WHERE uc.fk_Usuario_ID_User = %s
-        """, (id,))
-        categorias = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-        
-        return jsonify({"sucesso": True, "categorias": categorias})
-        
-    except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
-
-# Rota para atualizar categorias do usuário
-@app.route('/usuario/<int:id>/categorias', methods=['PUT'])
-def atualizar_categorias_usuario(id):
-    data = request.get_json()
-    
-    if not data.get('categorias'):
-        return jsonify({"sucesso": False, "erro": "Nenhuma categoria fornecida."}), 400
-    
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-        
-        # Remove todas as categorias atuais do usuário
-        cursor.execute("DELETE FROM Usuario_Categoria WHERE fk_Usuario_ID_User = %s", (id,))
-        
-        # Adiciona as novas categorias
-        for categoria_id in data['categorias']:
-            cursor.execute(
-                "INSERT INTO Usuario_Categoria (fk_Usuario_ID_User, fk_Categoria_ID_Categoria) VALUES (%s, %s)",
-                (id, categoria_id)
-            )
-        
-        conn.commit()
-        cursor.close()
-        conn.close()
-        
-        return jsonify({"sucesso": True, "mensagem": "Categorias atualizadas com sucesso!"})
-        
-    except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
-
-@app.route('/atualizarUsuario/<int:id>', methods=['PUT'])
-def atualizar_usuario(id):
-    data = request.get_json()
-    
-    # Validações básicas
-    if not all(key in data for key in ['nome', 'email', 'telefone', 'tipoUsuario', 'endereco']):
-        return jsonify({"sucesso": False, "erro": "Dados incompletos"}), 400
-    
-    # Validação adicional para freelancer
-    if data['tipoUsuario'] == 'freelancer':
-        if not data.get('cpf') or len(data['cpf'].replace('.', '').replace('-', '')) != 11:
-            return jsonify({"sucesso": False, "erro": "CPF inválido para Freelancer"}), 400
-        
-        endereco = data['endereco']
-        if (not endereco.get('CEP') or not endereco.get('Logradouro') or 
-            not endereco.get('Cidade') or not endereco.get('Bairro') or 
-            not endereco.get('Estado') or not endereco.get('Numero')):
-            return jsonify({"sucesso": False, "erro": "Endereço incompleto para Freelancer"}), 400
-    
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
         # 1. Verifica se o usuário existe e obtém o ID_Endereco atual
-        cursor.execute("SELECT ID_Endereco FROM Usuario WHERE ID_User = %s", (id,))
+        cursor.execute("SELECT ID_Endereco FROM Usuario WHERE ID_User = %s", (user_id,))
         usuario = cursor.fetchone()
         
         if not usuario:
@@ -506,7 +288,7 @@ def atualizar_usuario(id):
             # Atualiza usuário com o novo ID_Endereco
             cursor.execute("""
                 UPDATE Usuario SET ID_Endereco = %s WHERE ID_User = %s
-            """, (id_endereco, id))
+            """, (id_endereco, user_id))
         
         # 3. Atualiza dados básicos do usuário
         cursor.execute("""
@@ -523,7 +305,7 @@ def atualizar_usuario(id):
             data['telefone'],
             data.get('cpf'),
             data['tipoUsuario'],
-            id
+            user_id
         ))
         
         conn.commit()
@@ -536,6 +318,112 @@ def atualizar_usuario(id):
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+# Deletar Usuario
+@app.route('/DeletarUsuario', methods=['DELETE'])
+def deletar_usuario_logado():
+    user_id = session.get('user_id')
+    
+    if not user_id:
+        return jsonify({"sucesso": False, "erro": "Usuário não está logado."}), 401
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+
+        # Verifica se o usuário existe
+        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (user_id,))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            cursor.close()
+            conn.close()
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado."}), 404
+
+        # Deleta o usuário
+        cursor.execute("DELETE FROM Usuario WHERE ID_User = %s", (user_id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        # Remove a sessão
+        session.pop('user_id', None)
+
+        return jsonify({"sucesso": True, "mensagem": "Usuário deletado com sucesso."}), 200
+
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+
+# Categorias
+@app.route('/categorias', methods=['GET'])
+def obter_categorias():
+    """Obtém todas as categorias disponíveis"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("SELECT * FROM Categoria")
+        categorias = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"sucesso": True, "categorias": categorias})
+        
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+
+@app.route('/usuario/<int:id>/categorias', methods=['GET'])
+def obter_categorias_usuario(id):
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT c.* FROM Categoria c
+            JOIN Usuario_Categoria uc ON c.ID_Categoria = uc.fk_Categoria_ID_Categoria
+            WHERE uc.fk_Usuario_ID_User = %s
+        """, (id,))
+        categorias = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"sucesso": True, "categorias": categorias})
+        
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+
+@app.route('/usuario/<int:id>/categorias', methods=['PUT'])
+def atualizar_categorias_usuario(id):
+    data = request.get_json()
+    
+    if not data.get('categorias'):
+        return jsonify({"sucesso": False, "erro": "Nenhuma categoria fornecida."}), 400
+    
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Remove todas as categorias atuais do usuário
+        cursor.execute("DELETE FROM Usuario_Categoria WHERE fk_Usuario_ID_User = %s", (id,))
+        
+        # Adiciona as novas categorias
+        for categoria_id in data['categorias']:
+            cursor.execute(
+                "INSERT INTO Usuario_Categoria (fk_Usuario_ID_User, fk_Categoria_ID_Categoria) VALUES (%s, %s)",
+                (id, categoria_id)
+            )
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({"sucesso": True, "mensagem": "Categorias atualizadas com sucesso!"})
+        
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
 
 # Rota para obter dados completos do usuário (incluindo perfil)
 @app.route('/usuario/<int:id>/completo', methods=['GET'])
@@ -570,14 +458,7 @@ def obter_usuario_completo(id):
     except mysql.connector.Error as err:
         return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
 
-
-
-##############################
-
-
-# Para Habilidades -> templates/perfil.html
-CAMINHO_JSON = 'habilidades.json'
-
+# Habilidades
 def ler_habilidades():
     if os.path.exists(CAMINHO_JSON):
         with open(CAMINHO_JSON, 'r', encoding='utf-8') as f:
@@ -611,23 +492,13 @@ def adicionar_habilidade():
     else:
         return jsonify({'erro': 'Habilidade já existe'}), 400
 
-
-
-@app.route('/homepage')
-def homepage():
-    return render_template('homepage.html')
-
-@app.route('/perfil')
-def perfil():
-    return render_template('perfil.html')
-
-@app.route('/alterarDados')
-def alterarDados():
-    return render_template('alterarDados.html')
-
-@app.route('/termos')
-def termos():
-    return render_template('termos.html')
+# Configuração CORS
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
