@@ -57,16 +57,72 @@ document.addEventListener('DOMContentLoaded', function() {
         cepInput.addEventListener('blur', buscarCEP);
     }
 
-    // Botão cancelar
+    // Botão cancelar - MODIFICADO para redirecionar para homepage
     const btnCancelar = document.getElementById('btnCancelar');
     if (btnCancelar) {
         btnCancelar.addEventListener('click', function() {
             if (confirm('Tem certeza que deseja descartar as alterações?')) {
-                window.location.reload();
+                window.location.href = '/homepage'; // Redireciona para homepage
             }
         });
     }
 });
+
+// FUNÇÃO PARA ATUALIZAR DADOS - MODIFICADA para redirecionar após salvar
+async function atualizarDadosUsuario(userId) {
+    console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
+    
+    // Coleta os dados do formulário
+    const dadosAtualizacao = {
+        nome: document.getElementById('nome').value,
+        email: document.getElementById('email').value,
+        telefone: document.getElementById('telefone').value,
+        cpf: document.getElementById('cpf').value,
+        tipoUsuario: document.getElementById('tipoUsuarioSwitch').checked ? 'freelancer' : 'cliente',
+        endereco: {
+            CEP: document.querySelector('input[name="cep"]').value,
+            Logradouro: document.querySelector('input[name="logradouro"]').value,
+            Cidade: document.querySelector('input[name="cidade"]').value,
+            Bairro: document.querySelector('input[name="bairro"]').value,
+            Estado: document.querySelector('input[name="estado"]').value,
+            Numero: document.querySelector('input[name="numero"]').value,
+            Complemento: document.querySelector('input[name="complemento"]').value
+        }
+    };
+
+    // Valida se está tentando virar freelancer
+    const tentandoVirarFreelancer = document.getElementById('tipoUsuarioSwitch').checked;
+    
+    // Validações
+    if (!validarDadosAtualizacao(dadosAtualizacao, tentandoVirarFreelancer)) {
+        return;
+    }
+
+    console.log('[DADOS] Dados para atualização:', dadosAtualizacao);
+
+    try {
+        const response = await fetch(`/atualizarUsuario/${userId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dadosAtualizacao)
+        });
+
+        const data = await response.json();
+
+        if (data.sucesso) {
+            alert('Dados atualizados com sucesso!');
+            // MODIFICADO: Redireciona para homepage após salvar
+            window.location.href = '/homepage';
+        } else {
+            throw new Error(data.erro || "Erro ao atualizar dados");
+        }
+    } catch (error) {
+        console.error('[DADOS ERRO] Falha na atualização:', error);
+        alert('Erro ao atualizar dados: ' + error.message);
+    }
+}
 
 // FUNÇÃO PARA CARREGAR DADOS DO USUÁRIO
 async function carregarDadosUsuario(userId) {
@@ -177,121 +233,6 @@ async function buscarCEP(event) {
     }
 }
 
-// FUNÇÃO PARA ATUALIZAR DADOS
-async function atualizarDadosUsuario(userId) {
-    console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
-    
-    // Coleta os dados do formulário
-    const dadosAtualizacao = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        telefone: document.getElementById('telefone').value,
-        cpf: document.getElementById('cpf').value,
-        tipoUsuario: document.getElementById('tipoUsuarioSwitch').checked ? 'freelancer' : 'cliente',
-        endereco: {
-            CEP: document.querySelector('input[name="cep"]').value,
-            Logradouro: document.querySelector('input[name="logradouro"]').value,
-            Cidade: document.querySelector('input[name="cidade"]').value,
-            Bairro: document.querySelector('input[name="bairro"]').value,
-            Estado: document.querySelector('input[name="estado"]').value,
-            Numero: document.querySelector('input[name="numero"]').value,
-            Complemento: document.querySelector('input[name="complemento"]').value
-        }
-    };
-
-    // Validações básicas
-    if (!validarDadosAtualizacao(dadosAtualizacao)) {
-        return;
-    }
-
-    console.log('[DADOS] Dados para atualização:', dadosAtualizacao);
-
-    try {
-        const response = await fetch(`/atualizarUsuario/${userId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dadosAtualizacao)
-        });
-
-        const data = await response.json();
-
-        if (data.sucesso) {
-            alert('Dados atualizados com sucesso!');
-            
-            // Se virou freelancer, oferece para completar perfil
-            if (dadosAtualizacao.tipoUsuario === 'freelancer') {
-                const perfilCompleto = confirm('Você agora é um Freelancer! Deseja completar seu perfil agora?');
-                if (perfilCompleto) {
-                    window.location.href = '/completar-perfil';
-                }
-            }
-        } else {
-            throw new Error(data.erro || "Erro ao atualizar dados");
-        }
-    } catch (error) {
-        console.error('[DADOS ERRO] Falha na atualização:', error);
-        alert('Erro ao atualizar dados: ' + error.message);
-    }
-}
-
-// FUNÇÃO PARA ATUALIZAR DADOS
-async function atualizarDadosUsuario(userId) {
-    console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
-    
-    // Coleta os dados do formulário
-    const dadosAtualizacao = {
-        nome: document.getElementById('nome').value,
-        email: document.getElementById('email').value,
-        telefone: document.getElementById('telefone').value,
-        cpf: document.getElementById('cpf').value,
-        tipoUsuario: document.getElementById('tipoUsuarioSwitch').checked ? 'freelancer' : 'cliente',
-        endereco: {
-            CEP: document.querySelector('input[name="cep"]').value,
-            Logradouro: document.querySelector('input[name="logradouro"]').value,
-            Cidade: document.querySelector('input[name="cidade"]').value,
-            Bairro: document.querySelector('input[name="bairro"]').value,
-            Estado: document.querySelector('input[name="estado"]').value,
-            Numero: document.querySelector('input[name="numero"]').value,
-            Complemento: document.querySelector('input[name="complemento"]').value
-        }
-    };
-
-    // Valida se está tentando virar freelancer
-    const tentandoVirarFreelancer = document.getElementById('tipoUsuarioSwitch').checked;
-    
-    // Validações
-    if (!validarDadosAtualizacao(dadosAtualizacao, tentandoVirarFreelancer)) {
-        return;
-    }
-
-    console.log('[DADOS] Dados para atualização:', dadosAtualizacao);
-
-    try {
-        const response = await fetch(`/atualizarUsuario/${userId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dadosAtualizacao)
-        });
-
-        const data = await response.json();
-
-        if (data.sucesso) {
-            alert('Dados atualizados com sucesso!');
-            // Recarrega os dados para garantir sincronização
-            carregarDadosUsuario(userId);
-        } else {
-            throw new Error(data.erro || "Erro ao atualizar dados");
-        }
-    } catch (error) {
-        console.error('[DADOS ERRO] Falha na atualização:', error);
-        alert('Erro ao atualizar dados: ' + error.message);
-    }
-}
-
 // FUNÇÃO DE VALIDAÇÃO MELHORADA
 function validarDadosAtualizacao(dados, tentandoVirarFreelancer) {
     // Campos obrigatórios para todos
@@ -340,22 +281,3 @@ function validarDadosAtualizacao(dados, tentandoVirarFreelancer) {
 
     return true;
 }
-
-// Atualize o event listener do switch para validar em tempo real
-document.getElementById('tipoUsuarioSwitch')?.addEventListener('change', function() {
-    const label = document.getElementById('tipoUsuarioLabel');
-    label.textContent = this.checked ? 'Freelancer' : 'Cliente';
-    
-    // Se está tentando virar freelancer, valida os campos
-    if (this.checked) {
-        const telefone = document.getElementById('telefone').value;
-        const cpf = document.getElementById('cpf').value;
-        const cep = document.querySelector('input[name="cep"]').value;
-        
-        if (!telefone || !cpf || !cep) {
-            alert('Para se tornar Freelancer, preencha todos os campos obrigatórios primeiro.');
-            this.checked = false;
-            label.textContent = 'Cliente';
-        }
-    }
-});
