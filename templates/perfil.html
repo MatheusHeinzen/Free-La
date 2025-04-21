@@ -41,7 +41,9 @@
                                         class="bi bi-pencil-square"></i></h6>
                             </div>
                             <div id="contatos">
-                                <button onclick="adicionarContatos()">Adicionar Meio de Contato</button>
+                                <button id="btnAdicionarContatos" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle"></i> Adicionar Meio de Contato
+                                </button>
                                 <div class="card-body">
                                     <ul class="list-group shadow-none">
                                         <li class="list-group-item">
@@ -49,8 +51,8 @@
                                                 <i class="fa fa-phone-square"></i>
                                             </div>
                                             <div class="list-details">
-                                                <span>9910XXXXXX</span>
-                                                <small>Mobile Number</small>
+                                                <span></span>
+                                                <small></small>
                                             </div>
                                         </li>
                                         <li class="list-group-item">
@@ -58,8 +60,8 @@
                                                 <i class="fa fa-envelope"></i>
                                             </div>
                                             <div class="list-details">
-                                                <span>info@example.com</span>
-                                                <small>Email Address</small>
+                                                <span></span>
+                                                <small></small>
                                             </div>
                                         </li>
                                     </ul>
@@ -165,9 +167,6 @@
         </div>
     </main>
 
-
-
-    <ul id="dados-usuario"></ul>
 </body>
 <script src="/static/perfil.js"></script>
 
