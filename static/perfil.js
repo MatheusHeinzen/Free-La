@@ -232,7 +232,7 @@ function fecharOpcoes() {
 }
 
 function salvarHabilidades() {
-    
+
     const botao = document.querySelector('.btn-primary');
 
     checkbox.addEventListener('change', function () {
@@ -276,3 +276,28 @@ async function adicionarHabilidade() {
 function mostrarAlerta(mensagem) {
     alert(mensagem || 'operação não permitida');
 }
+
+
+// Para modo edição
+const modal = document.getElementById("editModal");
+const btn = document.getElementById("editBtn");
+const span = document.getElementsByClassName("close")[0];
+
+btn.onclick = () => modal.style.display = "block";
+span.onclick = () => modal.style.display = "none";
+window.onclick = (event) => {
+    if (event.target == modal) modal.style.display = "none";
+}
+
+document.getElementById("editForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const categoria = document.getElementById("categoria").value;
+    const descricao = document.getElementById("descricao").value;
+
+    console.log("Categoria:", categoria);
+    console.log("Descrição:", descricao);
+
+    // Aqui você pode atualizar o DOM ou enviar para o backend via fetch/AJAX
+
+    modal.style.display = "none"; // Fecha o modal após salvar
+});

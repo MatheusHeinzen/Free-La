@@ -37,8 +37,7 @@
                                     <img src="../static/imgs/perfil.png" alt="user avatar">
                                 </div>
                                 <h5 class="mb-1 text-white" value="nome"></h5>
-                                <h6 class="text-light">Palavra-Chave/Profissão/Categoria <i
-                                        class="bi bi-pencil-square"></i></h6>
+                                <h6 class="text-light">Palavra-Chave/Profissão/Categoria</h6>
                             </div>
                             <div id="contatos">
                                 <button id="btnAdicionarContatos" class="btn btn-primary">
@@ -81,8 +80,8 @@
                                             class="hidden-xs">Profile</span></a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#;" data-target="#edit" data-toggle="pill" class="nav-link">
-                                        <i class="icon-note"></i> <span class="hidden-xs">Edit</span></a>
+                                    <a href="#;" data-toggle="pill" class="nav-link" id="editBtn">
+                                        <i class="bi bi-pencil-square"></i> <span class="hidden-xs">Edit</span></a>
                                 </li>
                             </ul>
 
@@ -93,8 +92,8 @@
                                     <h5 class="mb-3">Perfil de Usuário</h5>
 
                                     <div class="col-md-6">
-                                        <h6>Descrição: <i class="bi bi-pencil-square" onclick="showAlterarDescricao()"></i></h6>
-                                        <p >
+                                        <h6>Descrição: </h6>
+                                        <p>
                                             <!-- Categoria e Profissão com uma pequena descrição -->
                                         </p>
 
@@ -116,10 +115,11 @@
                                             <div id="checkboxContainer"></div>
 
                                             <h6>Outro:</h6>
-                                            <input type="text" id="novaHabilidade"
-                                                placeholder="Digite uma nova habilidade">
-                                            <button onclick="adicionarHabilidade()">Adicionar</button>
-
+                                            <div style="display: flex;">
+                                                <input type="text" id="novaHabilidade"
+                                                    placeholder="Digite uma nova habilidade">
+                                                <button onclick="adicionarHabilidade()">Adicionar</button>
+                                            </div>
                                             <br>
                                             <button onclick="fecharOpcoes()">OK</button>
                                         </div>
@@ -142,7 +142,27 @@
 
                                     <!-- Editar dados -->
 
-                                    <!-- <div> colocar aq provavelmente javaScript</div> -->
+                                    <div class="editar-dados-perfil" id="editar-dados">
+                                        <div id="editModal" class="modal">
+                                            <div class="modal-content-editar-perfil">
+                                                <span class="close">&times;</span>
+                                                <h3>Editar Perfil</h3>
+                                                <form id="editForm">
+                                                    <label for="categoria">Palavra-chave / Profissão /
+                                                        Categoria:</label>
+                                                    <input type="text" id="categoria" name="categoria"
+                                                        placeholder="Ex: Desenvolvedora Frontend">
+
+                                                    <label for="descricao">Descrição:</label>
+                                                    <textarea id="descricao" name="descricao" rows="3"
+                                                        placeholder="Escreva sua descrição..."></textarea>
+
+                                                    <button type="submit">Salvar</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>

@@ -6,8 +6,80 @@
 
 }
 
-input[type="text"] { margin-right: 10px; }
-input[type="checkbox"] {margin-left: 25px;}
+/* Modal -Edit */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content-editar-perfil {
+    background-color: #fff;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 10px;
+    width: 600px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: #9c27b0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #7b1fa2;
+}
+
+input[type="text"] {
+    margin-right: 10px;
+}
+
+/* PopUp para Habilidades */
+
+input[type="checkbox"] {
+    margin-left: 25px;
+}
+
+#checkboxContainer{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-gap: 20px
+}
 
 .custom-alert {
     display: none;
@@ -19,8 +91,8 @@ input[type="checkbox"] {margin-left: 25px;}
     border: 1px solid #70058683;
     border-radius: 10px;
     padding: 20px;
-    width: 70vw;
-    height: 60vh;
+    width: 60vw;
+    height: auto;
     box-shadow: 1 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 1000;
     text-align: center;
@@ -202,7 +274,7 @@ input[type="checkbox"] {margin-left: 25px;}
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;

@@ -70,7 +70,6 @@ CREATE TABLE perfil (
     IdPerfil INT AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(50),
     Foto VARCHAR(255),
-    Categoria_Especificacao VARCHAR(50),
     Bio TEXT,
     ID_Usuario INT NOT NULL UNIQUE,
     DataAtualizacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -100,15 +99,15 @@ CREATE TABLE service (
 );
 
 -- =============================================
--- Tabela: usuario_categoria
+-- Tabela: perfil_categoria
 -- Relacionamento N:N entre usuários e categorias
 -- =============================================
-CREATE TABLE usuario_categoria (
-    ID_Usuario INT NOT NULL,
+CREATE TABLE perfil_categoria (
+    ID_Perfil INT NOT NULL,
     ID_Categoria INT NOT NULL,
     DataAssociacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (ID_Usuario, ID_Categoria),
-    FOREIGN KEY (ID_Usuario) REFERENCES usuario(ID_User)
+    PRIMARY KEY (ID_Perfil, ID_Categoria),
+    FOREIGN KEY (ID_Perfil) REFERENCES Perfil(IdPerfil)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     FOREIGN KEY (ID_Categoria) REFERENCES categoria(ID_Categoria)
@@ -122,7 +121,6 @@ CREATE TABLE usuario_categoria (
 -- =============================================
 CREATE TABLE avaliacao (
     ID_Avaliacao INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Service INT NOT NULL,
     ID_Cliente INT NOT NULL,
     ID_Freelancer INT NOT NULL,
     Nota TINYINT NOT NULL,
@@ -130,9 +128,6 @@ CREATE TABLE avaliacao (
     DataAvaliacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Resposta TEXT,
     DataResposta DATETIME,
-    FOREIGN KEY (ID_Service) REFERENCES service(ID_Service)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
     FOREIGN KEY (ID_Cliente) REFERENCES usuario(ID_User)
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
@@ -140,7 +135,7 @@ CREATE TABLE avaliacao (
         ON DELETE RESTRICT
         ON UPDATE CASCADE,
     CONSTRAINT chk_nota_valida CHECK (Nota BETWEEN 1 AND 5),
-    CONSTRAINT uc_avaliacao_unica UNIQUE (ID_Service, ID_Cliente),
+    CONSTRAINT uc_avaliacao_unica UNIQUE (ID_Cliente),
     CONSTRAINT chk_data_resposta_valida CHECK (DataResposta IS NULL OR DataResposta >= DataAvaliacao)
 );
 

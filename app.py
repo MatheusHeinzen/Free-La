@@ -154,6 +154,9 @@ def obter_dados_basicos(user_id):
         if not usuario:
             return jsonify({"sucesso": False, "erro": "usuário não encontrado"}), 404
         
+        cursor.execute("SELECT Bio FROM Perfil WHERE ID_Usuario = %s", (user_id,))
+        usuario = cursor.fetchone()
+
         return jsonify({"sucesso": True, "usuario": usuario})
 
     except mysql.connector.Error as err:
