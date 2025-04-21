@@ -43,6 +43,13 @@ CREATE TABLE usuario (
     CONSTRAINT chk_email_valido CHECK (Email LIKE '%@%.%')
     );
 
+CREATE TABLE preferenciacontato (
+    fk_Usuario_ID_User INT PRIMARY KEY,
+    MostrarTelefone BOOLEAN DEFAULT TRUE,
+    MostrarEmail BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (fk_Usuario_ID_User) REFERENCES Usuario(ID_User)
+);
+
 -- =============================================
 -- Tabela: categoria
 -- Armazena as categorias de serviços disponíveis
@@ -155,3 +162,4 @@ VALUES
 
 SELECT * FROM Usuario;
 SELECT * FROM endereco;
+select * from preferenciacontato;

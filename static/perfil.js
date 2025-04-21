@@ -1,31 +1,187 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const lista = document.getElementById("dados-usuario");
-  const usuario = JSON.parse(localStorage.getItem("usuario"));
+document.addEventListener("DOMContentLoaded", async () => {
+  console.log('[perfil] inicializando...');
+  
+  try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+          window.location.href = '/';
+          return;
+      }
 
-  if (usuario) {
-    for (const chave in usuario) {
-      const item = document.createElement("li");
-      item.textContent = `${chave}: ${usuario[chave]}`;
-      lista.appendChild(item);
-    }
+      // 1. Carrega dados do usuário
+      const usuario = await carregarUsuario(userId);
+      
+      // 2. Carrega preferências ou usa padrão
+      const preferencias = await carregarPreferencias(userId) || {
+          mostrarTelefone: true,
+          mostrarEmail: true
+      };
+
+      // 3. Atualiza a interface
+      atualizarInterface(usuario, preferencias);
+
+      // 4. Configura eventos
+      document.getElementById('btnAdicionarContatos').addEventListener('click', () => {
+          mostrarModalContatos(preferencias);
+      });
+
+      // Carrega habilidades
+      await carregarHabilidades();
+
+  } catch (error) {
+      console.error('[perfil] erro crítico:', error);
+      alert('Erro ao carregar perfil. Recarregue a página.');
   }
 });
 
-function adicionarContatos() {
-  const contato = document.getElementById("contatos")
-  const tipo = document.getElementById("")
+// Funções principais
+async function carregarUsuario(userId) {
+  const response = await fetch(`/usuario/${userId}/dados`);
+  if (!response.ok) throw new Error('Erro ao carregar usuário');
+  
+  const data = await response.json();
+  localStorage.setItem('usuario', JSON.stringify(data.usuario));
+  
+  // Mostra dados do usuário na lista de debug (da versão anterior)
+  const lista = document.getElementById("dados-usuario");
+  if (lista) {
+    lista.innerHTML = '';
+    for (const chave in data.usuario) {
+      const item = document.createElement("li");
+      item.textContent = `${chave}: ${data.usuario[chave]}`;
+      lista.appendChild(item);
+    }
+  }
+  
+  return data.usuario;
+}
 
+async function carregarPreferencias(userId) {
+  try {
+      const response = await fetch(`/usuario/${userId}/preferencias`);
+      if (!response.ok) throw new Error('Erro ao carregar preferências');
+      
+      const data = await response.json();
+      localStorage.setItem('preferenciasContato', JSON.stringify(data));
+      return data;
+  } catch (error) {
+      console.warn('[perfil] usando preferências padrão');
+      return null;
+  }
+}
 
+function atualizarInterface(usuario, preferencias) {
+  // Atualiza cabeçalho
+  document.querySelector('.profile-card-4 h5').textContent = usuario.Nome || 'Nome não informado';
+  document.querySelector('.profile-card-4 h6').textContent = 
+      usuario.Profissao || usuario.Categoria || 'Perfil do Usuário';
 
-  contato.innerHTML = `<li class="list-group-item">
-                            <div class="list-icon">
-                                <i class="fa fa-envelope"></i>
-                            </div>
-                            <div class="list-details">
-                                <span>${contato}</span>
-                                <small>${tipo}</small>
-                            </div>
-                        </li>`
+  // Atualiza contatos
+  const listaContatos = document.querySelector('#contatos .list-group');
+  listaContatos.innerHTML = '';
+
+  if (preferencias.mostrarTelefone && usuario.Telefone) {
+      listaContatos.innerHTML += `
+          <li class="list-group-item">
+              <div class="list-icon">
+                  <i class="bi bi-telephone"></i>
+              </div>
+              <div class="list-details">
+                  <span>${formatarTelefone(usuario.Telefone)}</span>
+                  <small>Telefone</small>
+              </div>
+          </li>
+      `;
+  }
+
+  if (preferencias.mostrarEmail && usuario.Email) {
+      listaContatos.innerHTML += `
+          <li class="list-group-item">
+              <div class="list-icon">
+                  <i class="bi bi-envelope"></i>
+              </div>
+              <div class="list-details">
+                  <span>${usuario.Email}</span>
+                  <small>Email</small>
+              </div>
+          </li>
+      `;
+  }
+}
+
+// Modal de contatos
+function mostrarModalContatos(preferenciasAtuais) {
+  const modalHTML = `
+      <div class="modal-contatos" id="modalContatos">
+          <div class="modal-content">
+              <h3>Exibir contatos</h3>
+              <label>
+                  <input type="checkbox" id="opt-telefone" ${preferenciasAtuais.mostrarTelefone ? 'checked' : ''}>
+                  Telefone
+              </label>
+              <label>
+                  <input type="checkbox" id="opt-email" ${preferenciasAtuais.mostrarEmail ? 'checked' : ''}>
+                  Email
+              </label>
+              <button id="btnSalvarPrefs">Salvar</button>
+          </div>
+      </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHTML);
+  
+  document.getElementById('btnSalvarPrefs').addEventListener('click', async () => {
+      const novasPrefs = {
+          mostrarTelefone: document.getElementById('opt-telefone').checked,
+          mostrarEmail: document.getElementById('opt-email').checked
+      };
+      
+      await salvarPreferencias(localStorage.getItem('userId'), novasPrefs);
+      document.getElementById('modalContatos').remove();
+      location.reload(); // Recarrega para aplicar mudanças
+  });
+}
+
+// Utilitários
+async function salvarPreferencias(userId, preferencias) {
+  const response = await fetch(`/usuario/${userId}/preferencias`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(preferencias)
+  });
+  
+  if (!response.ok) throw new Error('Falha ao salvar');
+}
+
+function formatarTelefone(telefone) {
+  const nums = telefone.replace(/\D/g, '');
+  return nums.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+}
+
+// Sistema de habilidades
+async function carregarHabilidades() {
+  try {
+      const response = await fetch('/habilidades');
+      if (!response.ok) throw new Error('erro ao carregar habilidades');
+      
+      const habilidades = await response.json();
+      renderizarHabilidades(habilidades);
+      
+  } catch (error) {
+      console.error('[perfil] erro ao carregar habilidades:', error);
+  }
+}
+
+function renderizarHabilidades(habilidades) {
+  const container = document.getElementById('checkboxContainer');
+  if (!container) return;
+
+  container.innerHTML = habilidades.map(habilidade => `
+      <label class="habilidade-item">
+          <input type="checkbox" value="${habilidade}">
+          ${habilidade}
+      </label>
+  `).join('');
 }
 
 function mostrarOpcoesHabilidades() {
@@ -38,94 +194,38 @@ function fecharOpcoes() {
   document.getElementById('overlay').style.display = 'none';
 }
 
-function validar() {
-  if (checkbox.checked) {
-    window.location.href = "/homepage";
-  } else {
-    mostrarAlerta();
-  }
-
-
-}
-
-
-// Habilidades -> Perfil
-async function carregarHabilidades() {
-  const resposta = await fetch('./habilidades');
-  const habilidades = await resposta.json();
-  renderizarCheckboxes(habilidades);
-}
-
-function renderizarCheckboxes(habilidades) {
-  const container = document.getElementById("checkboxContainer");
-  container.innerHTML = "";
-  habilidades.forEach(habilidade => {
-    const label = document.createElement("label");
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.value = habilidade;
-    label.appendChild(checkbox);
-    label.appendChild(document.createTextNode(" " + habilidade));
-    container.appendChild(label);
-  });
-}
-
 async function adicionarHabilidade() {
-  const input = document.getElementById("novaHabilidade");
-  const nova = input.value.trim();
+  const input = document.getElementById('novaHabilidade');
+  const habilidade = input.value.trim();
 
-  if (nova === "") {
-    alert("Digite uma habilidade!");
-    return;
+  if (!habilidade) {
+      alert('digite uma habilidade válida');
+      return;
   }
-
-  const resposta = await fetch('/adicionarHabilidade', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ novaHabilidade: nova })
-  });
-
-  const resultado = await resposta.json();
-
-  if (resposta.ok) {
-    input.value = "";
-    carregarHabilidades();
-  } else {
-    alert(resultado.erro);
-  }
-}
-
-carregarHabilidades();
-
-
-// FUNÇÃO PARA CARREGAR DADOS DO USUÁRIO
-async function carregarDadosUsuario(userId) {
-  console.log('[DADOS] Carregando dados do usuário ID:', userId);
 
   try {
-    const response = await fetch(`/usuario/${userId}`);
+      const response = await fetch('/adicionar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ novaHabilidade: habilidade })
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => null);
-      const errorMsg = errorData?.erro || `Erro HTTP! status: ${response.status}`;
-      throw new Error(errorMsg);
-    }
+      if (!response.ok) {
+          const erro = await response.json();
+          throw new Error(erro.erro || 'erro ao adicionar');
+      }
 
-    const data = await response.json();
+      input.value = '';
+      await carregarHabilidades();
+      alert('habilidade adicionada com sucesso!');
 
-    if (data.sucesso) {
-      console.log('[DADOS] Dados recebidos:', data.usuario);
-      preencherFormulario(data.usuario);
-    } else {
-      throw new Error(data.erro || "Erro ao carregar dados");
-    }
   } catch (error) {
-    console.error('[DADOS ERRO] Falha ao carregar dados:', error);
-    alert(`Erro ao carregar dados: ${error.message}`);
-    console.error('Detalhes do erro:', error);
+      console.error('[perfil] erro ao adicionar habilidade:', error);
+      alert('erro: ' + error.message);
   }
+}
 
-  console.log('[DADOS] Preenchendo formulário com dados do usuário');
-    
-    setValue('nome', usuario.Nome);
+// utilitários
+function mostrarAlerta(mensagem) {
+  alert(mensagem || 'operação não permitida');
 }

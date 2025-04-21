@@ -14,7 +14,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'PUC@1234',
+    'password': 'Root#963',
     'database': 'freela'
 }
 
@@ -43,7 +43,7 @@ def autenticar():
 
         if usuario and check_password_hash(usuario['Senha'], senha):
             session['user_id'] = usuario['ID_User']
-            return jsonify({"sucesso": True, "id": usuario['ID_User'], "session": session['user_id']})
+            return jsonify({"sucesso": True, "id": usuario['ID_User'], "session":session['user_id']})
         else:
             return jsonify({"sucesso": False, "erro": "Email ou senha incorretos."})
     except mysql.connector.Error as err:
@@ -104,7 +104,7 @@ def cadastrar():
             return jsonify({"sucesso": False, "erro": f"{campo} já está em uso"}), 400
         return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
 
-##############################
+############################## FUTURO SESSAO
 @app.route('/logado', methods=['GET'])
 def logado():
     
@@ -115,6 +115,7 @@ def logado():
     cpf = data.get('cpf')
     telefone = data.get('telefone')
     return jsonify({"sucesso": True})
+#####################################
 
 
 @app.route('/atualizarCadastro/<int:id>', methods=['PUT'])
@@ -531,14 +532,14 @@ def salvar_habilidades(habilidades):
 
 @app.route('/habilidades/perfil')
 def skills():
-    return render_template('index.html')
+    return render_template('')
 
 @app.route('/habilidades')
 def get_habilidades():
     habilidades = ler_habilidades()
     return jsonify(habilidades)
 
-@app.route('/adicionar', methods=['POST'])
+@app.route('/adicionarHabilidade', methods=['POST'])
 def adicionar_habilidade():
     nova = request.json.get('novaHabilidade', '').strip()
     if not nova:

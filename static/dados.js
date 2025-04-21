@@ -178,7 +178,6 @@ async function buscarCEP(event) {
 }
 
 // FUNÇÃO PARA ATUALIZAR DADOS
-// FUNÇÃO PARA ATUALIZAR DADOS
 async function atualizarDadosUsuario(userId) {
     console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
     
@@ -237,7 +236,6 @@ async function atualizarDadosUsuario(userId) {
     }
 }
 
-// FUNÇÃO DE VALIDAÇÃO
 // FUNÇÃO PARA ATUALIZAR DADOS
 async function atualizarDadosUsuario(userId) {
     console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
