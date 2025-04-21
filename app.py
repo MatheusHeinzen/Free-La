@@ -21,12 +21,34 @@ db_config = {
 # Sessão
 app.secret_key = 'senha_da_sessao'
 
+# Caminho para o arquivo de habilidades
+CAMINHO_JSON = 'habilidades.json'
+
+# Rotas básicas
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/homepage')
+def homepage():
+    return render_template('homepage.html')
+
+@app.route('/perfil')
+def perfil():
+    return render_template('perfil.html')
+
+@app.route('/alterarDados')
+def alterar_dados():
+    return render_template('alterarDados.html')
+
+@app.route('/termos')
+def termos():
+    return render_template('termos.html')
+
+# Autenticação e cadastro
 @app.route('/autenticar', methods=['POST'])
 def autenticar():
+    """Autentica um usuário com email e senha"""
     data = request.get_json()
     email = data.get('email')
     senha = data.get('senha')
@@ -38,9 +60,6 @@ def autenticar():
         cursor.execute("SELECT * FROM Usuario WHERE Email = %s", (email,))
         usuario = cursor.fetchone()
 
-        cursor.close()
-        conn.close()
-
         if usuario and check_password_hash(usuario['Senha'], senha):
             session['user_id'] = usuario['ID_User']
             return jsonify({"sucesso": True, "id": usuario['ID_User'], "session":session['user_id']})
@@ -48,9 +67,14 @@ def autenticar():
             return jsonify({"sucesso": False, "erro": "Email ou senha incorretos."})
     except mysql.connector.Error as err:
         return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"})
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 @app.route('/cadastrar', methods=['POST'])
 def cadastrar():
+    """Cadastra um novo usuário no sistema"""
     if request.method == 'OPTIONS':
         return '', 200
         
@@ -115,71 +139,105 @@ def logado():
     cpf = data.get('cpf')
     telefone = data.get('telefone')
     return jsonify({"sucesso": True})
-#####################################
 
+# Operações com usuários
+@app.route('/usuario/<int:user_id>', methods=['GET'])
+def obter_usuario(user_id):
+    """Obtém os dados completos de um usuário"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT u.*, e.* 
+            FROM Usuario u
+            LEFT JOIN Endereco e ON u.ID_Endereco = e.ID_Endereco
+            WHERE u.ID_User = %s
+        """, (user_id,))
+        
+        usuario = cursor.fetchone()
+        
+        if not usuario:
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado"}), 404
+        
+        usuario.pop('Senha', None)
+        return jsonify({"sucesso": True, "usuario": usuario})
 
-@app.route('/atualizarCadastro/<int:id>', methods=['PUT'])
-def atualizar_cadastro(id):
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/usuario/<int:user_id>/dados', methods=['GET'])
+def obter_dados_basicos(user_id):
+    """Obtém apenas os dados básicos do usuário (nome, email, telefone)"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("SELECT Nome, Email, Telefone FROM Usuario WHERE ID_User = %s", (user_id,))
+        usuario = cursor.fetchone()
+        
+        if not usuario:
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado"}), 404
+        
+        return jsonify({"sucesso": True, "usuario": usuario})
+
+    except mysql.connector.Error as err:
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/atualizarUsuario/<int:user_id>', methods=['PUT'])
+def atualizar_usuario(user_id):
+    """Atualiza os dados de um usuário"""
     data = request.get_json()
+    
+    # Validações básicas
+    if not all(key in data for key in ['nome', 'email', 'telefone', 'tipoUsuario', 'endereco']):
+        return jsonify({"sucesso": False, "erro": "Dados incompletos"}), 400
+    
+    # Validação adicional para freelancer
+    if data['tipoUsuario'] == 'freelancer':
+        if not data.get('cpf') or len(data['cpf'].replace('.', '').replace('-', '')) != 11:
+            return jsonify({"sucesso": False, "erro": "CPF inválido para freelancer"}), 400
+        
+        endereco = data['endereco']
+        campos_obrigatorios = ['CEP', 'Logradouro', 'Cidade', 'Bairro', 'Estado', 'Numero']
+        if not all(endereco.get(campo) for campo in campos_obrigatorios):
+            return jsonify({"sucesso": False, "erro": "Endereço incompleto para freelancer"}), 400
     
     try:
         conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-        
-        # Atualiza dados básicos do usuário
-        if 'nome' in data or 'email' in data or 'cpf' in data or 'telefone' in data:
-            campos = []
-            valores = []
-            
-            if 'nome' in data:
-                campos.append("Nome = %s")
-                valores.append(data['nome'])
-            if 'email' in data:
-                campos.append("Email = %s")
-                valores.append(data['email'])
-            if 'cpf' in data:
-                campos.append("CPF = %s")
-                valores.append(data['cpf'])
-            if 'telefone' in data:
-                campos.append("Telefone = %s")
-                valores.append(data['telefone'])
-            
-            valores.append(id)
-            query = f"UPDATE Usuario SET {', '.join(campos)} WHERE ID_User = %s"
-            cursor.execute(query, valores)
-        
-        # Atualiza perfil
-        if 'perfil' in data:
-            perfil_data = data['perfil']
-            cursor.execute("""
-                INSERT INTO Perfil (fk_Usuario_IdUsuario, Foto, Categoria_Especificacao, Bio)
-                VALUES (%s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE
-                    Foto = VALUES(Foto),
-                    Categoria_Especificacao = VALUES(Categoria_Especificacao),
-                    Bio = VALUES(Bio)
-            """, (id, perfil_data.get('Foto'), perfil_data.get('Categoria_Especificacao'), perfil_data.get('Bio')))
+        cursor = conn.cursor(dictionary=True)
         
         # Atualiza endereço
-        if 'endereco' in data:
-            endereco_data = data['endereco']
-            cursor.execute("""
-                INSERT INTO Endereco (fk_Usuario_ID_User, CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE
-                    CEP = VALUES(CEP),
-                    Logradouro = VALUES(Logradouro),
-                    Cidade = VALUES(Cidade),
-                    Bairro = VALUES(Bairro),
-                    Estado = VALUES(Estado),
-                    Numero = VALUES(Numero),
-                    Complemento = VALUES(Complemento)
-            """, (
-                id, endereco_data.get('CEP'), endereco_data.get('Logradouro'),
-                endereco_data.get('Cidade'), endereco_data.get('Bairro'),
-                endereco_data.get('Estado'), endereco_data.get('Numero'),
-                endereco_data.get('Complemento')
-            ))
+        endereco_data = data['endereco']
+        cursor.execute("""
+            INSERT INTO Endereco (
+                CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                CEP = VALUES(CEP),
+                Logradouro = VALUES(Logradouro),
+                Cidade = VALUES(Cidade),
+                Bairro = VALUES(Bairro),
+                Estado = VALUES(Estado),
+                Numero = VALUES(Numero),
+                Complemento = VALUES(Complemento)
+        """, (
+            endereco_data.get('CEP'),
+            endereco_data.get('Logradouro'),
+            endereco_data.get('Cidade'),
+            endereco_data.get('Bairro'),
+            endereco_data.get('Estado'),
+            endereco_data.get('Numero'),
+            endereco_data.get('Complemento')
+        ))
         
         conn.commit()
         cursor.close()
