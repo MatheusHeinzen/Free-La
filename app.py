@@ -13,7 +13,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'Root#963',
+    'password': 'PUC@1234',
     'database': 'freela'
 }
 
@@ -23,10 +23,32 @@ app.secret_key = 'senha_da_sessao'
 # Caminho para o arquivo de habilidades
 CAMINHO_JSON = 'habilidades.json'
 
+@app.context_processor
+def obter_nome_usuario():
+    if 'user_id' in session:
+        try:
+            conn = mysql.connector.connect(**db_config)
+            cursor = conn.cursor(dictionary=True)
+            
+            cursor.execute("SELECT Nome FROM Usuario WHERE ID_User = %s", (session['user_id'],))
+            usuario = cursor.fetchone()
+            
+            if usuario:
+                return {'obter_nome_usuario': lambda: usuario['Nome']}
+                
+        except mysql.connector.Error as err:
+            print(f"Erro ao obter nome do usuário: {err}")
+        finally:
+            if 'conn' in locals() and conn.is_connected():
+                cursor.close()
+                conn.close()
+    
+    return {'obter_nome_usuario': lambda: ''}
+
 # rotas básicas
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', session=session)
 
 @app.route('/homepage')
 def homepage():

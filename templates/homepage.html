@@ -59,6 +59,12 @@
                   <span class="link">Deletar Perfil</span>
                 </a>
               </li>
+              <li class="item_menu" id="submenu">
+                <a href="/">
+                  <span class="icon"><i class="#"></i></span>
+                  <span class="link">Login/Cadastro</span>
+                </a>
+              </li>
             </ul>
           </li>
 
@@ -78,11 +84,17 @@
 
     <div class="navbar navbar-dark bg-dark shadow-sm">
       <div class="container d-flex justify-content-between">
-        <a href="/" class="navbar-brand d-flex align-items-center">
-          Login/Cadastro
-        </a>
+        {% if session.user_id %}
+            <a href="/perfil" class="navbar-brand d-flex align-items-center">
+                Olá, {{ obter_nome_usuario() }}
+            </a>
+        {% else %}
+            <a href="/" class="navbar-brand d-flex align-items-center">
+                Login/Cadastro
+            </a>
+        {% endif %}
         <button id="toggleSidebar" style="font-size: 20px;">☰</button>
-      </div>
+    </div>
     </div>
   </header>
 
