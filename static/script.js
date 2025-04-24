@@ -153,7 +153,7 @@ async function salvar() {
 
         if (response.sucesso) {
             alert("Cadastro realizado com sucesso!");
-            window.location.href = "/homepage";
+            window.location.href = "/";
         } else {
             alert(response.erro || "Erro ao cadastrar usuário.");
         }

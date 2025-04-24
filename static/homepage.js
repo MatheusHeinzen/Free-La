@@ -16,44 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-//Dados fictícios de freelancers só para exemplo
-const trabalhosFreelancers = [
-    {
-        nome: "Rogério Silva",
-        especialidade: "Designer Gráfico",
-        descricao: "Criação de logos, banners e identidade visual.",
-        imagem: "/static/imgs/designer.jpg",
-        link: "/"
-    },
-    {
-        nome: "Antônio Mendes",
-        especialidade: "Desenvolvedor Web",
-        descricao: "Sites responsivos, landing pages e sistemas personalizados.",
-        imagem: "/static/imgs/dev.jpg",
-        link: "/"
-    },
-    {
-        nome: "Valentina Lima",
-        especialidade: "Pintora",
-        descricao: "Pinturas realistas em interior e exterior de casas e empresas.",
-        imagem: "/static/imgs/pintora.jpg",
-        link: "/"
-    },
-    {
-        nome: "Fernanda Santana",
-        especialidade: "Designer Gráfico",
-        descricao: "Design de sites e landing pages, identidade visual de empresas.",
-        imagem: "/static/imgs/designer2.jpg",
-        link: "/"
-    },
-    {
-        nome: "Jorge Rasmussen",
-        especialidade: "Encanador",
-        descricao: "Reparo e planejamento de encanamentos, pias, privadas de forma profissional.",
-        imagem: "/static/imgs/encanador.jpg",
-        link: "/"
-    }
-];
 
 //Função para exibir todos os freelancers ao carregar a página
 function exibirTodosFreelancers() {
