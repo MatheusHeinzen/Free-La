@@ -18,7 +18,7 @@ CREATE TABLE endereco (
     Complemento VARCHAR(50),
     CONSTRAINT chk_cep_format CHECK (CEP REGEXP '^[0-9]{5}-?[0-9]{3}$'),
     CONSTRAINT chk_estado_format CHECK (Estado REGEXP '^[A-Z]{2}$')
-) ;
+);
 
 -- =============================================
 -- Tabela: usuario
@@ -41,13 +41,19 @@ CREATE TABLE usuario (
         ON UPDATE CASCADE,
     CONSTRAINT chk_cpf_validacao CHECK (LENGTH(CPF) = 11 OR LENGTH(CPF) = 14),
     CONSTRAINT chk_email_valido CHECK (Email LIKE '%@%.%')
-    );
+);
 
+-- =============================================
+-- Tabela: preferenciacontato
+-- Armazena preferências de contato do usuário
+-- =============================================
 CREATE TABLE preferenciacontato (
     fk_Usuario_ID_User INT PRIMARY KEY,
     MostrarTelefone BOOLEAN DEFAULT TRUE,
     MostrarEmail BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (fk_Usuario_ID_User) REFERENCES Usuario(ID_User)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 -- =============================================
@@ -92,7 +98,7 @@ CREATE TABLE service (
     ID_Usuario INT NOT NULL,
     DataConclusao DATETIME,
     FOREIGN KEY (ID_Usuario) REFERENCES usuario(ID_User)
-        ON DELETE RESTRICT
+        ON DELETE CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT chk_nome_service_valido CHECK (LENGTH(NomeService) >= 5),
     CONSTRAINT chk_data_conclusao_valida CHECK (DataConclusao IS NULL OR DataConclusao >= DataCriacao)
@@ -121,24 +127,23 @@ CREATE TABLE perfil_categoria (
 -- =============================================
 CREATE TABLE avaliacao (
     ID_Avaliacao INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Cliente INT NOT NULL,
-    ID_Freelancer INT NOT NULL,
+    ID_Cliente INT,
+    ID_Freelancer INT,
     Nota TINYINT NOT NULL,
     Comentario TEXT,
     DataAvaliacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Resposta TEXT,
     DataResposta DATETIME,
     FOREIGN KEY (ID_Cliente) REFERENCES usuario(ID_User)
-        ON DELETE RESTRICT
+        ON DELETE SET NULL
         ON UPDATE CASCADE,
     FOREIGN KEY (ID_Freelancer) REFERENCES usuario(ID_User)
-        ON DELETE RESTRICT
+        ON DELETE SET NULL
         ON UPDATE CASCADE,
     CONSTRAINT chk_nota_valida CHECK (Nota BETWEEN 1 AND 5),
     CONSTRAINT uc_avaliacao_unica UNIQUE (ID_Cliente),
     CONSTRAINT chk_data_resposta_valida CHECK (DataResposta IS NULL OR DataResposta >= DataAvaliacao)
 );
-
 
 -- =============================================
 -- Triggers
@@ -150,30 +155,26 @@ AFTER INSERT ON Usuario
 FOR EACH ROW
 BEGIN
   INSERT INTO Perfil (ID_Usuario, Username) VALUES (NEW.ID_User, NEW.Nome);
+  
+  -- Cria também um registro de preferência de contato padrão
+  INSERT INTO preferenciacontato (fk_Usuario_ID_User) VALUES (NEW.ID_User);
 END//
 DELIMITER ;
 
 -- =============================================
--- Inserts e Selects
+-- Inserts iniciais para teste
 -- =============================================
 
 INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
 VALUES
-('123.456.789-00', 'Ana Souza', 'ana.souza@email.com', 'Senha@1234', '1995-04-20');
-
-INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
-VALUES
-('987.654.321-11', 'Bruno Lima', 'bruno.lima@email.com', 'Senha@4321', '1988-10-10');
-
-INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
-VALUES
-('111.222.555-44', 'Beatriz Soares', 'soares.beatriz@email.com', 'Senha@789012', '2000-06-15');
-
-INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
-VALUES
+('123.456.789-00', 'Ana Souza', 'ana.souza@email.com', 'Senha@1234', '1995-04-20'),
+('987.654.321-11', 'Bruno Lima', 'bruno.lima@email.com', 'Senha@4321', '1988-10-10'),
+('111.222.555-44', 'Beatriz Soares', 'soares.beatriz@email.com', 'Senha@789012', '2000-06-15'),
 ('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
 
+-- Verificação dos dados inseridos
 SELECT * FROM Usuario;
 SELECT * FROM endereco;
-select * from preferenciacontato;
-select * from perfil;
+SELECT * FROM preferenciacontato;
+SELECT * FROM perfil;
+SELECT * FROM avaliacao;
