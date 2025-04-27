@@ -281,3 +281,101 @@ function validarDadosAtualizacao(dados, tentandoVirarFreelancer) {
 
     return true;
 }
+
+// ======== VALIDAÇÃO FORMULÁRIOS DE CADASTRO E LOGIN ========
+
+document.addEventListener('DOMContentLoaded', function () {
+    const formCadastro = document.getElementById('form-cadastro');
+    const formLogin = document.getElementById('form-login');
+
+    if (formCadastro) {
+        formCadastro.addEventListener('submit', function (event) {
+            event.preventDefault();
+            limparErros();
+
+            const nome = document.getElementById('nome');
+            const email = document.getElementById('email');
+            const dataNascimento = document.getElementById('dataNascimento');
+            const cpf = document.getElementById('cpf');
+            const senha = document.getElementById('senha');
+            const confirmaSenha = document.getElementById('confirma-senha');
+            const checkbox = document.getElementById('checkbox');
+
+            if (!nome.value.trim()) {
+                mostrarErroInput(nome, 'Por favor, preencha seu nome.');
+                return;
+            }
+            if (!email.value.trim()) {
+                mostrarErroInput(email, 'Por favor, preencha seu e-mail.');
+                return;
+            }
+            if (!dataNascimento.value.trim()) {
+                mostrarErroInput(dataNascimento, 'Informe sua data de nascimento.');
+                return;
+            }
+            if (!cpf.value.trim()) {
+                mostrarErroInput(cpf, 'Informe seu CPF.');
+                return;
+            }
+            if (!senha.value.trim()) {
+                mostrarErroInput(senha, 'Digite sua senha.');
+                return;
+            }
+            if (!confirmaSenha.value.trim()) {
+                mostrarErroInput(confirmaSenha, 'Confirme sua senha.');
+                return;
+            }
+            if (senha.value !== confirmaSenha.value) {
+                mostrarErroInput(confirmaSenha, 'As senhas não conferem!');
+                return;
+            }
+            if (!checkbox.checked) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Atenção!',
+                    text: 'Você precisa aceitar os termos de uso!',
+                });
+                return;
+            }
+
+            this.submit();
+        });
+    }
+
+    if (formLogin) {
+        formLogin.addEventListener('submit', function (event) {
+            event.preventDefault();
+            limparErros();
+
+            const email = document.getElementById('login-email');
+            const senha = document.getElementById('login-senha');
+
+            if (!email.value.trim()) {
+                mostrarErroInput(email, 'Preencha seu e-mail.');
+                return;
+            }
+            if (!senha.value.trim()) {
+                mostrarErroInput(senha, 'Digite sua senha.');
+                return;
+            }
+
+            this.submit();
+        });
+    }
+});
+
+function mostrarErroInput(input, mensagem) {
+    input.classList.add('input-erro');
+    Swal.fire({
+        icon: 'error',
+        title: 'Opa...',
+        text: mensagem,
+    });
+}
+
+function limparErros() {
+    const inputs = document.querySelectorAll('.input-erro');
+    inputs.forEach(input => input.classList.remove('input-erro'));
+}
+
+
