@@ -1,31 +1,106 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Máscara CPF
     if (document.getElementById("cpf")) {
         $("#cpf").mask("000.000.000-00");
     }
 
+    // Validação de senha
     const senhaInput = document.getElementById("senha");
     if (senhaInput) {
         senhaInput.addEventListener("input", validarSenha);
     }
 
+    // Formulários
     const formCadastro = document.getElementById("form-cadastro");
     const formLogin = document.getElementById("form-login");
 
+    // Ações do formulário de cadastro
     if (formCadastro) {
         formCadastro.addEventListener("submit", function (e) {
             e.preventDefault();
+            limparErros();
+
+            const nome = document.getElementById('nome');
+            const email = document.getElementById('email');
+            const dataNascimento = document.getElementById('dataNascimento');
+            const cpf = document.getElementById('cpf');
+            const senha = document.getElementById('senha');
+            const confirmaSenha = document.getElementById('confirma-senha');
+            const checkbox = document.getElementById('checkbox');
+
+            // Verificação dos campos obrigatórios
+            if (!nome.value.trim()) {
+                mostrarErroInput(nome, 'Por favor, preencha seu nome.');
+                return;
+            }
+            if (!email.value.trim()) {
+                mostrarErroInput(email, 'Por favor, preencha seu e-mail.');
+                return;
+            }
+            if (!dataNascimento.value.trim()) {
+                mostrarErroInput(dataNascimento, 'Informe sua data de nascimento.');
+                return;
+            }
+            if (!validarIdade(dataNascimento.value)) {
+                mostrarErroInput(dataNascimento, 'A idade precisa ser entre 18 e 100 anos.');
+                return;
+            }
+            if (!cpf.value.trim()) {
+                mostrarErroInput(cpf, 'Informe seu CPF.');
+                return;
+            }
+            if (!senha.value.trim()) {
+                mostrarErroInput(senha, 'Digite sua senha.');
+                return;
+            }
+            if (!confirmaSenha.value.trim()) {
+                mostrarErroInput(confirmaSenha, 'Confirme sua senha.');
+                return;
+            }
+            if (senha.value !== confirmaSenha.value) {
+                mostrarErroInput(confirmaSenha, 'As senhas não conferem!');
+                return;
+            }
+            if (!checkbox.checked) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Atenção!',
+                    text: 'Você precisa aceitar os termos de uso!',
+                });
+                return;
+            }
+
+            // Chama a função para salvar
             salvar();
         });
     }
 
+    // Ações do formulário de login
     if (formLogin) {
         formLogin.addEventListener("submit", function (e) {
             e.preventDefault();
+            limparErros();
+
+            const emailLogin = document.getElementById("login-email");
+            const senhaLogin = document.getElementById("login-senha");
+
+            // Verificação dos campos obrigatórios
+            if (!emailLogin.value.trim()) {
+                mostrarErroInput(emailLogin, 'Por favor, preencha seu e-mail.');
+                return;
+            }
+            if (!senhaLogin.value.trim()) {
+                mostrarErroInput(senhaLogin, 'Digite sua senha.');
+                return;
+            }
+
+            // Chama a função de login se tudo estiver correto
             logar();
         });
     }
 });
 
+// Função para alternar entre os modos (login/cadastro)
 function alternarModo(modo) {
     const container = document.getElementById("container");
     if (modo === "login") {
@@ -35,6 +110,7 @@ function alternarModo(modo) {
     }
 }
 
+// Função para alternar visibilidade da senha
 function toggleSenha(id, btn) {
     const inputPass = document.getElementById(id);
     const btnShowPass = document.getElementById(btn);
@@ -47,16 +123,19 @@ function toggleSenha(id, btn) {
     }
 }
 
+// Validação da senha (mínimo de 8 caracteres, números, letras maiúsculas/minúsculas e símbolos)
 function validarSenha(senha) {
     const regex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{8,}$/;
     return regex.test(senha);
 }
 
+// Validação de e-mail (formato padrão)
 function validarEmail(email) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
 }
 
+// Validação de CPF
 function validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]/g, "");
     if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -80,6 +159,7 @@ function validarCPF(cpf) {
     return true;
 }
 
+// Função de validação de idade
 function validarIdade(dataNascimento) {
     const hoje = new Date();
     const nascimento = new Date(dataNascimento);
@@ -93,6 +173,7 @@ function validarIdade(dataNascimento) {
     return idade >= 18 && idade <= 100;
 }
 
+// Função para salvar os dados
 async function salvar() {
     console.log('[CADASTRO] Iniciando processo de cadastro');
 
@@ -102,39 +183,6 @@ async function salvar() {
     const dataNascimento = document.getElementById("dataNascimento").value;
     const senha = document.getElementById("senha").value;
     const confirmaSenha = document.getElementById("confirma-senha").value;
-    const erroSenha = document.getElementById("senha-erro");
-
-    if (!nome) {
-        alert("Por favor, insira seu nome completo.");
-        return;
-    }
-
-    if (!validarEmail(email)) {
-        alert("Por favor, insira um e-mail válido.");
-        return;
-    }
-
-    if (!validarCPF(cpf)) {
-        alert("Por favor, insira um CPF válido.");
-        return;
-    }
-
-    if (!validarIdade(dataNascimento)) {
-        alert("Você precisa ter entre 18 e 100 anos para se cadastrar.");
-        return;
-    }
-
-    if (!validarSenha(senha)) {
-        erroSenha.innerText = "A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial.";
-        return;
-    } else {
-        erroSenha.innerText = "";
-    }
-
-    if (senha !== confirmaSenha) {
-        alert("As senhas não coincidem.");
-        return;
-    }
 
     const data = { nome, email, cpf, dataNascimento, senha };
 
@@ -163,6 +211,7 @@ async function salvar() {
     }
 }
 
+// Função de login
 async function logar() {
     const email = document.getElementById("login-email").value;
     const senha = document.getElementById("login-senha").value;
@@ -195,86 +244,7 @@ async function logar() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    const formCadastro = document.getElementById('form-cadastro');
-    const formLogin = document.getElementById('form-login');
-
-    if (formCadastro) {
-        formCadastro.addEventListener('submit', function (event) {
-            event.preventDefault();
-            limparErros();
-
-            const nome = document.getElementById('nome');
-            const email = document.getElementById('email');
-            const dataNascimento = document.getElementById('dataNascimento');
-            const cpf = document.getElementById('cpf');
-            const senha = document.getElementById('senha');
-            const confirmaSenha = document.getElementById('confirma-senha');
-            const checkbox = document.getElementById('checkbox');
-
-            if (!nome.value.trim()) {
-                mostrarErroInput(nome, 'Por favor, preencha seu nome.');
-                return;
-            }
-            if (!email.value.trim()) {
-                mostrarErroInput(email, 'Por favor, preencha seu e-mail.');
-                return;
-            }
-            if (!dataNascimento.value.trim()) {
-                mostrarErroInput(dataNascimento, 'Informe sua data de nascimento.');
-                return;
-            }
-            if (!cpf.value.trim()) {
-                mostrarErroInput(cpf, 'Informe seu CPF.');
-                return;
-            }
-            if (!senha.value.trim()) {
-                mostrarErroInput(senha, 'Digite sua senha.');
-                return;
-            }
-            if (!confirmaSenha.value.trim()) {
-                mostrarErroInput(confirmaSenha, 'Confirme sua senha.');
-                return;
-            }
-            if (senha.value !== confirmaSenha.value) {
-                mostrarErroInput(confirmaSenha, 'As senhas não conferem!');
-                return;
-            }
-            if (!checkbox.checked) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Atenção!',
-                    text: 'Você precisa aceitar os termos de uso!',
-                });
-                return;
-            }
-
-            this.submit();
-        });
-    }
-
-    if (formLogin) {
-        formLogin.addEventListener('submit', function (event) {
-            event.preventDefault();
-            limparErros();
-
-            const email = document.getElementById('login-email');
-            const senha = document.getElementById('login-senha');
-
-            if (!email.value.trim()) {
-                mostrarErroInput(email, 'Preencha seu e-mail.');
-                return;
-            }
-            if (!senha.value.trim()) {
-                mostrarErroInput(senha, 'Digite sua senha.');
-                return;
-            }
-
-            this.submit();
-        });
-    }
-});
-
+// Funções auxiliares de erros
 function mostrarErroInput(input, mensagem) {
     input.classList.add('input-erro');
     Swal.fire({
@@ -288,5 +258,3 @@ function limparErros() {
     const inputs = document.querySelectorAll('.input-erro');
     inputs.forEach(input => input.classList.remove('input-erro'));
 }
-
-
