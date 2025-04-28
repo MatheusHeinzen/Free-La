@@ -18,23 +18,28 @@ O projeto não é um marketplace, mas uma plataforma para conexão entre freelan
 2. Apresentar aos usuários consumidores uma variedade de prestadores de serviço.
 3. Englobar vários profissionais de nichos diferentes em uma única rede social.
 
-## Principais futuras funcionalidades
+## Principais funcionalidades
 - **Cadastro de usuário**: CRUD para gestão de usuários e entidades do sistema.
 - **Autenticação segura**: Implementação de login e sessões protegidas.
 - **Interface user-friendly**: Design responsivo e intuitivo.
-- **Filtragem e busca**: Filtros por especialidade e tipos de serviço.
 - **Segurança**: Armazenamento criptografado de dados sensíveis.
+
+## Principais futuras funcionalidades
+- **Filtragem e busca**: Filtros por especialidade e tipos de serviço.
+- **Avaliações**: Sistema de avaliação dos trabalhos feitos pelos freelancers
 
 ## Tecnologias utilizadas
 - **Front-end**: HTML, CSS, JavaScript/React
-- **Back-end**: Node.JS
+- **Back-end**: Flask (Python)
 - **Banco de Dados**: MySQL
 
-## Estruturas a serem implementadas
+## Estruturas implementadas
 1. **Cadastro e autenticação**: Registro, login e gerenciamento de sessão.
+4. **Gerenciamento de informações**: Validação e consistência de dados.
+
+## Estruturas a serem implementadas
 2. **Avaliação de freelancers e clientes**: Sistema de feedback para serviços.
 3. **Filtros de busca**: Por especialidade e tipo de serviço prestado.
-4. **Gerenciamento de informações**: Validação e consistência de dados.
 
 ---
 Acompanhe o progresso e sinta-se à vontade para contribuir com sugestões e melhorias.
