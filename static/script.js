@@ -249,9 +249,12 @@ async function salvar() {
     }
 }
 // Função de login atualizada
+// Função de login atualizada
 async function logar() {
-    const email = document.getElementById("login-email").value;
-    const senha = document.getElementById("login-senha").value;
+    console.log('[LOGIN] Iniciando processo de login');
+
+    const email = document.getElementById("login-email").value.trim();
+    const senha = document.getElementById("login-senha").value.trim();
 
     if (!email || !senha) {
         Swal.fire({
@@ -272,12 +275,13 @@ async function logar() {
         });
 
         const resposta = await res.json();
+        console.log('[LOGIN] Resposta do servidor:', resposta);
 
-        if (resposta.sucesso) {
+        if (res.ok && resposta.sucesso) {
             Swal.fire({
                 icon: 'success',
-                title: 'Sucesso!',
-                text: resposta.mensagem,
+                title: 'Login realizado!',
+                text: resposta.mensagem || "Login feito com sucesso!",
                 timer: 2000,
                 showConfirmButton: false
             }).then(() => {
@@ -287,16 +291,16 @@ async function logar() {
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Erro!',
-                text: resposta.mensagem
+                title: 'Erro no login',
+                text: resposta.mensagem || "E-mail ou senha inválidos. Tente novamente."
             });
         }
     } catch (err) {
         console.error('[LOGIN] Erro na requisição:', err);
         Swal.fire({
             icon: 'error',
-            title: 'Erro!',
-            text: "Erro ao conectar com o servidor. Por favor, tente novamente."
+            title: 'Erro de conexão',
+            text: "Não foi possível conectar ao servidor. Por favor, tente novamente."
         });
     }
 }
