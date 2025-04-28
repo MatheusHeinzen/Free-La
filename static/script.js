@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formCadastro.addEventListener("submit", function (e) {
             e.preventDefault();
             limparErros();
-
+    
             const nome = document.getElementById('nome');
             const email = document.getElementById('email');
             const dataNascimento = document.getElementById('dataNascimento');
@@ -27,40 +27,63 @@ document.addEventListener('DOMContentLoaded', () => {
             const senha = document.getElementById('senha');
             const confirmaSenha = document.getElementById('confirma-senha');
             const checkbox = document.getElementById('checkbox');
-
-            // Verificação dos campos obrigatórios
+    
+            // Validação dos campos obrigatórios e suas regras específicas
             if (!nome.value.trim()) {
                 mostrarErroInput(nome, 'Por favor, preencha seu nome.');
                 return;
             }
+    
             if (!email.value.trim()) {
                 mostrarErroInput(email, 'Por favor, preencha seu e-mail.');
                 return;
             }
+    
+            if (!validarEmail(email.value)) {
+                mostrarErroInput(email, 'Por favor, insira um e-mail válido.');
+                return;
+            }
+    
             if (!dataNascimento.value.trim()) {
                 mostrarErroInput(dataNascimento, 'Informe sua data de nascimento.');
                 return;
             }
+    
             if (!validarIdade(dataNascimento.value)) {
-                mostrarErroInput(dataNascimento, 'A idade precisa ser entre 18 e 100 anos.');
+                mostrarErroInput(dataNascimento, 'Você precisa ter entre 18 e 100 anos para se cadastrar.');
                 return;
             }
+    
             if (!cpf.value.trim()) {
                 mostrarErroInput(cpf, 'Informe seu CPF.');
                 return;
             }
+    
+            if (!validarCPF(cpf.value)) {
+                mostrarErroInput(cpf, 'Por favor, insira um CPF válido.');
+                return;
+            }
+    
             if (!senha.value.trim()) {
                 mostrarErroInput(senha, 'Digite sua senha.');
                 return;
             }
+    
+            if (!validarSenha(senha.value)) {
+                mostrarErroInput(senha, 'A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, um número e um caractere especial.');
+                return;
+            }
+    
             if (!confirmaSenha.value.trim()) {
                 mostrarErroInput(confirmaSenha, 'Confirme sua senha.');
                 return;
             }
+    
             if (senha.value !== confirmaSenha.value) {
                 mostrarErroInput(confirmaSenha, 'As senhas não conferem!');
                 return;
             }
+    
             if (!checkbox.checked) {
                 Swal.fire({
                     icon: 'error',
@@ -69,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 return;
             }
-
+    
             // Chama a função para salvar
             salvar();
         });
@@ -200,14 +223,13 @@ async function salvar() {
         console.log('[CADASTRO] Resposta do servidor:', response);
 
         if (response.sucesso) {
-            alert("Cadastro realizado com sucesso!");
             window.location.href = "/";
         } else {
-            alert(response.erro || "Erro ao cadastrar usuário.");
+            mostrarErroInput(response, 'Ouve um erro para cadastrar, tente novamente mais tarde.');
         }
     } catch (err) {
         console.error('[CADASTRO] Erro na requisição:', err);
-        alert("Erro de conexão com o servidor. Por favor, tente novamente.");
+        mostrarErroInput
     }
 }
 
