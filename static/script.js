@@ -211,13 +211,17 @@ async function salvar() {
     }
 }
 
-// Função de login
+// Função de login atualizada
 async function logar() {
     const email = document.getElementById("login-email").value;
     const senha = document.getElementById("login-senha").value;
 
     if (!email || !senha) {
-        alert("Por favor, preencha o e-mail e a senha.");
+        Swal.fire({
+            icon: 'error',
+            title: 'Atenção!',
+            text: 'Por favor, preencha o e-mail e a senha.'
+        });
         return;
     }
 
@@ -233,28 +237,29 @@ async function logar() {
         const resposta = await res.json();
 
         if (resposta.sucesso) {
-            localStorage.setItem('userId', resposta.id);
-            window.location.href = "/homepage";
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: resposta.mensagem,
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                localStorage.setItem('userId', resposta.id);
+                window.location.href = "/homepage";
+            });
         } else {
-            alert(resposta.erro || "Email ou senha inválidos.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: resposta.mensagem
+            });
         }
     } catch (err) {
         console.error('[LOGIN] Erro na requisição:', err);
-        alert("Erro ao conectar com o servidor. Por favor, tente novamente.");
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: "Erro ao conectar com o servidor. Por favor, tente novamente."
+        });
     }
-}
-
-// Funções auxiliares de erros
-function mostrarErroInput(input, mensagem) {
-    input.classList.add('input-erro');
-    Swal.fire({
-        icon: 'error',
-        title: 'Opa...',
-        text: mensagem,
-    });
-}
-
-function limparErros() {
-    const inputs = document.querySelectorAll('.input-erro');
-    inputs.forEach(input => input.classList.remove('input-erro'));
 }

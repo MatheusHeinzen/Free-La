@@ -82,15 +82,16 @@ def autenticar():
 
         if usuario and check_password_hash(usuario['Senha'], senha):
             session['user_id'] = usuario['ID_User']
-            return jsonify({"sucesso": True, "id": usuario['ID_User'], "session": session['user_id']})
+            return jsonify({"sucesso": True, "mensagem": "Login realizado com sucesso!", "id": usuario['ID_User']})
         else:
-            return jsonify({"sucesso": False, "erro": "Email ou senha incorretos."})
+            return jsonify({"sucesso": False, "mensagem": "Email ou senha incorretos."})
     except mysql.connector.Error as err:
-        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"})
+        return jsonify({"sucesso": False, "mensagem": f"Erro no banco de dados: {err}"})
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
 
 @app.route('/cadastrar', methods=['POST'])
 def cadastrar():

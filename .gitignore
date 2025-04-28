@@ -1,7 +1,7 @@
 # Ambiente Virtual -> Bruna
 /freela 
-
+/ambiente
 /venv
 # testes :P
 /templates/teste.html
-
+/get-ping.py
