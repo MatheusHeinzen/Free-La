@@ -10,16 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
         senhaInput.addEventListener("input", validarSenha);
     }
 
-    // Formulários
-    const formCadastro = document.getElementById("form-cadastro");
-    const formLogin = document.getElementById("form-login");
-
     // Ações do formulário de cadastro
+    const formCadastro = document.getElementById("form-cadastro");
     if (formCadastro) {
         formCadastro.addEventListener("submit", function (e) {
             e.preventDefault();
             limparErros();
-    
+
             const nome = document.getElementById('nome');
             const email = document.getElementById('email');
             const dataNascimento = document.getElementById('dataNascimento');
@@ -27,63 +24,63 @@ document.addEventListener('DOMContentLoaded', () => {
             const senha = document.getElementById('senha');
             const confirmaSenha = document.getElementById('confirma-senha');
             const checkbox = document.getElementById('checkbox');
-    
+
             // Validação dos campos obrigatórios e suas regras específicas
             if (!nome.value.trim()) {
                 mostrarErroInput(nome, 'Por favor, preencha seu nome.');
                 return;
             }
-    
+
             if (!email.value.trim()) {
                 mostrarErroInput(email, 'Por favor, preencha seu e-mail.');
                 return;
             }
-    
+
             if (!validarEmail(email.value)) {
                 mostrarErroInput(email, 'Por favor, insira um e-mail válido.');
                 return;
             }
-    
+
             if (!dataNascimento.value.trim()) {
                 mostrarErroInput(dataNascimento, 'Informe sua data de nascimento.');
                 return;
             }
-    
+
             if (!validarIdade(dataNascimento.value)) {
                 mostrarErroInput(dataNascimento, 'Você precisa ter entre 18 e 100 anos para se cadastrar.');
                 return;
             }
-    
+
             if (!cpf.value.trim()) {
                 mostrarErroInput(cpf, 'Informe seu CPF.');
                 return;
             }
-    
+
             if (!validarCPF(cpf.value)) {
                 mostrarErroInput(cpf, 'Por favor, insira um CPF válido.');
                 return;
             }
-    
+
             if (!senha.value.trim()) {
                 mostrarErroInput(senha, 'Digite sua senha.');
                 return;
             }
-    
+
             if (!validarSenha(senha.value)) {
                 mostrarErroInput(senha, 'A senha deve ter pelo menos 8 caracteres, uma letra maiúscula, um número e um caractere especial.');
                 return;
             }
-    
+
             if (!confirmaSenha.value.trim()) {
                 mostrarErroInput(confirmaSenha, 'Confirme sua senha.');
                 return;
             }
-    
+
             if (senha.value !== confirmaSenha.value) {
                 mostrarErroInput(confirmaSenha, 'As senhas não conferem!');
                 return;
             }
-    
+
             if (!checkbox.checked) {
                 Swal.fire({
                     icon: 'error',
@@ -92,13 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 return;
             }
-    
+
             // Chama a função para salvar
             salvar();
         });
     }
 
     // Ações do formulário de login
+    const formLogin = document.getElementById("form-login");
     if (formLogin) {
         formLogin.addEventListener("submit", function (e) {
             e.preventDefault();
@@ -197,7 +195,6 @@ function validarIdade(dataNascimento) {
 }
 
 // Função para salvar os dados
-// Função para salvar os dados
 async function salvar() {
     console.log('[CADASTRO] Iniciando processo de cadastro');
 
@@ -248,7 +245,7 @@ async function salvar() {
         });
     }
 }
-// Função de login atualizada
+
 // Função de login atualizada
 async function logar() {
     console.log('[LOGIN] Iniciando processo de login');
@@ -274,100 +271,48 @@ async function logar() {
             body: JSON.stringify({ email, senha })
         });
 
-        const resposta = await res.json();
-        console.log('[LOGIN] Resposta do servidor:', resposta);
-
-        if (res.ok && resposta.sucesso) {
+        const response = await res.json();
+        if (response.sucesso) {
             Swal.fire({
                 icon: 'success',
-                title: 'Login realizado!',
-                text: resposta.mensagem || "Login feito com sucesso!",
+                title: 'Login bem-sucedido!',
+                text: "Redirecionando...",
                 timer: 2000,
                 showConfirmButton: false
             }).then(() => {
-                localStorage.setItem('userId', resposta.id);
-                window.location.href = "/homepage";
+                window.location.href = "/";
             });
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Erro no login',
-                text: resposta.mensagem || "E-mail ou senha inválidos. Tente novamente."
+                title: 'Erro de login',
+                text: response.mensagem || "Credenciais inválidas. Tente novamente."
             });
         }
     } catch (err) {
-        console.error('[LOGIN] Erro na requisição:', err);
+        console.error('[LOGIN] Erro ao realizar login:', err);
         Swal.fire({
             icon: 'error',
             title: 'Erro de conexão',
-            text: "Não foi possível conectar ao servidor. Por favor, tente novamente."
+            text: "Não foi possível conectar ao servidor. Tente novamente."
         });
     }
 }
 
-
-// Adiciona evento ao form de cadastro
-document.getElementById("form-cadastro").addEventListener("submit", function (event) {
-    event.preventDefault(); // Previne o comportamento padrão do formulário (enviar dados)
-    
-    // Coleta os dados dos inputs
-    const nome = document.getElementById("nome").value;
-    const email = document.getElementById("email").value;
-    const dataNascimento = document.getElementById("dataNascimento").value;
-    const cpf = document.getElementById("cpf").value;
-    const senha = document.getElementById("senha").value;
-    const confirmaSenha = document.getElementById("confirma-senha").value;
-    
-    // Adicione aqui a validação e o envio de dados
-    if (senha !== confirmaSenha) {
-        alert("As senhas não coincidem!");
-        return;
-    }
-
-    // Exemplo de envio de dados (substitua conforme sua lógica de backend)
-    console.log("Dados de Cadastro:", { nome, email, dataNascimento, cpf, senha });
-
-    // Caso esteja tudo certo, pode enviar os dados para o servidor
-    // Exemplo: enviar dados via AJAX ou redirecionar
-    alert("Cadastro realizado com sucesso!");
-});
-
-// Adiciona evento ao form de login
-document.getElementById("form-login").addEventListener("submit", function (event) {
-    event.preventDefault(); // Previne o comportamento padrão do formulário (enviar dados)
-
-    const email = document.getElementById("login-email").value;
-    const senha = document.getElementById("login-senha").value;
-
-    // Exemplo de verificação de login (substitua conforme sua lógica)
-    console.log("Dados de Login:", { email, senha });
-
-    // Valide e faça a autenticação
-    alert("Login realizado com sucesso!");
-});
-
-// Função para alternar entre cadastro e login
-function alternarModo(tipo) {
-    const container = document.getElementById("container");
-    if (tipo === "login") {
-        container.classList.remove("right-panel-active");
-    } else {
-        container.classList.add("right-panel-active");
-    }
+// Função para exibir o erro em um input
+function mostrarErroInput(input, mensagem) {
+    input.classList.add('erro');
+    Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: mensagem
+    });
 }
 
-// Função para alternar a visibilidade da senha
-function toggleSenha(id, btnId) {
-    const inputSenha = document.getElementById(id);
-    const btnSenha = document.getElementById(btnId);
-
-    if (inputSenha.type === "password") {
-        inputSenha.type = "text";
-        btnSenha.classList.remove("bi-eye-fill");
-        btnSenha.classList.add("bi-eye-slash-fill");
-    } else {
-        inputSenha.type = "password";
-        btnSenha.classList.remove("bi-eye-slash-fill");
-        btnSenha.classList.add("bi-eye-fill");
-    }
+// Função para limpar os erros
+function limparErros() {
+    const campos = document.querySelectorAll('input');
+    campos.forEach(input => {
+        input.classList.remove('erro');
+    });
 }
