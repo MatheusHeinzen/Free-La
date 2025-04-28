@@ -113,7 +113,6 @@ async function atualizarDadosUsuario(userId) {
 
         if (data.sucesso) {
             alert('Dados atualizados com sucesso!');
-            // MODIFICADO: Redireciona para homepage após salvar
             window.location.href = '/homepage';
         } else {
             throw new Error(data.erro || "Erro ao atualizar dados");
