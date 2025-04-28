@@ -304,3 +304,70 @@ async function logar() {
         });
     }
 }
+
+
+// Adiciona evento ao form de cadastro
+document.getElementById("form-cadastro").addEventListener("submit", function (event) {
+    event.preventDefault(); // Previne o comportamento padrão do formulário (enviar dados)
+    
+    // Coleta os dados dos inputs
+    const nome = document.getElementById("nome").value;
+    const email = document.getElementById("email").value;
+    const dataNascimento = document.getElementById("dataNascimento").value;
+    const cpf = document.getElementById("cpf").value;
+    const senha = document.getElementById("senha").value;
+    const confirmaSenha = document.getElementById("confirma-senha").value;
+    
+    // Adicione aqui a validação e o envio de dados
+    if (senha !== confirmaSenha) {
+        alert("As senhas não coincidem!");
+        return;
+    }
+
+    // Exemplo de envio de dados (substitua conforme sua lógica de backend)
+    console.log("Dados de Cadastro:", { nome, email, dataNascimento, cpf, senha });
+
+    // Caso esteja tudo certo, pode enviar os dados para o servidor
+    // Exemplo: enviar dados via AJAX ou redirecionar
+    alert("Cadastro realizado com sucesso!");
+});
+
+// Adiciona evento ao form de login
+document.getElementById("form-login").addEventListener("submit", function (event) {
+    event.preventDefault(); // Previne o comportamento padrão do formulário (enviar dados)
+
+    const email = document.getElementById("login-email").value;
+    const senha = document.getElementById("login-senha").value;
+
+    // Exemplo de verificação de login (substitua conforme sua lógica)
+    console.log("Dados de Login:", { email, senha });
+
+    // Valide e faça a autenticação
+    alert("Login realizado com sucesso!");
+});
+
+// Função para alternar entre cadastro e login
+function alternarModo(tipo) {
+    const container = document.getElementById("container");
+    if (tipo === "login") {
+        container.classList.remove("right-panel-active");
+    } else {
+        container.classList.add("right-panel-active");
+    }
+}
+
+// Função para alternar a visibilidade da senha
+function toggleSenha(id, btnId) {
+    const inputSenha = document.getElementById(id);
+    const btnSenha = document.getElementById(btnId);
+
+    if (inputSenha.type === "password") {
+        inputSenha.type = "text";
+        btnSenha.classList.remove("bi-eye-fill");
+        btnSenha.classList.add("bi-eye-slash-fill");
+    } else {
+        inputSenha.type = "password";
+        btnSenha.classList.remove("bi-eye-slash-fill");
+        btnSenha.classList.add("bi-eye-fill");
+    }
+}
