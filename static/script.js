@@ -197,6 +197,7 @@ function validarIdade(dataNascimento) {
 }
 
 // Função para salvar os dados
+// Função para salvar os dados
 async function salvar() {
     console.log('[CADASTRO] Iniciando processo de cadastro');
 
@@ -205,7 +206,6 @@ async function salvar() {
     const cpf = document.getElementById("cpf").value;
     const dataNascimento = document.getElementById("dataNascimento").value;
     const senha = document.getElementById("senha").value;
-    const confirmaSenha = document.getElementById("confirma-senha").value;
 
     const data = { nome, email, cpf, dataNascimento, senha };
 
@@ -223,16 +223,31 @@ async function salvar() {
         console.log('[CADASTRO] Resposta do servidor:', response);
 
         if (response.sucesso) {
-            window.location.href = "/";
+            Swal.fire({
+                icon: 'success',
+                title: 'Cadastro realizado!',
+                text: response.mensagem || "Usuário cadastrado com sucesso!",
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "/";
+            });
         } else {
-            mostrarErroInput(response, 'Ouve um erro para cadastrar, tente novamente mais tarde.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao cadastrar',
+                text: response.erro || "Houve um erro ao cadastrar. Tente novamente mais tarde."
+            });
         }
     } catch (err) {
         console.error('[CADASTRO] Erro na requisição:', err);
-        mostrarErroInput
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro de conexão',
+            text: "Não foi possível conectar ao servidor. Tente novamente."
+        });
     }
 }
-
 // Função de login atualizada
 async function logar() {
     const email = document.getElementById("login-email").value;
