@@ -109,17 +109,50 @@ function confirmarDelecao() {
         .then(response => response.json())
         .then(data => {
             if (data.sucesso) {
-                alert("Perfil deletado com sucesso.");
-                window.location.href = "/"; // ou /login
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Perfil deletado com sucesso.',
+                    text: "Redirecionando...",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/";
+                });
             } else {
-                alert(data.erro || "Erro ao deletar.");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops, algo deu errado.',
+                    text: 'Ocorreu um problema para deletar.'
+                });
+                return false;
             }
         })
         .catch(error => {
             console.error("Erro:", error);
-            alert("Erro interno.");
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops, algo deu errado.',
+                text: 'Contate o suporte, por favor!'
+            });
+            return false;
         });
 }
 
 
+function mostrarErroInput(input, mensagem) {
+    input.classList.add('erro');
+    Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: mensagem
+    });
+}
+
+// Função para limpar os erros
+function limparErros() {
+    const campos = document.querySelectorAll('input');
+    campos.forEach(input => {
+        input.classList.remove('erro');
+    });
+}
 

@@ -9,12 +9,12 @@ USE freela;
 CREATE TABLE endereco (
     ID_Endereco INT AUTO_INCREMENT PRIMARY KEY,
     Pais VARCHAR(20) NOT NULL DEFAULT 'Brasil',
-    CEP VARCHAR(10) NOT NULL,
-    Logradouro VARCHAR(50) NOT NULL,
-    Cidade VARCHAR(50) NOT NULL,
-    Bairro VARCHAR(50) NOT NULL,
-    Estado CHAR(2) NOT NULL,
-    Numero INT NOT NULL,
+    CEP VARCHAR(10),
+    Logradouro VARCHAR(50),
+    Cidade VARCHAR(50),
+    Bairro VARCHAR(50),
+    Estado CHAR(2),
+    Numero INT,
     Complemento VARCHAR(50),
     CONSTRAINT chk_cep_format CHECK (CEP REGEXP '^[0-9]{5}-?[0-9]{3}$'),
     CONSTRAINT chk_estado_format CHECK (Estado REGEXP '^[A-Z]{2}$')
@@ -98,7 +98,7 @@ CREATE TABLE service (
     ID_Usuario INT NOT NULL,
     DataConclusao DATETIME,
     FOREIGN KEY (ID_Usuario) REFERENCES usuario(ID_User)
-        ON DELETE CASCADE
+        ON DELETE CASCADE  -- Alterado de RESTRICT para CASCADE
         ON UPDATE CASCADE,
     CONSTRAINT chk_nome_service_valido CHECK (LENGTH(NomeService) >= 5),
     CONSTRAINT chk_data_conclusao_valida CHECK (DataConclusao IS NULL OR DataConclusao >= DataCriacao)
@@ -135,10 +135,10 @@ CREATE TABLE avaliacao (
     Resposta TEXT,
     DataResposta DATETIME,
     FOREIGN KEY (ID_Cliente) REFERENCES usuario(ID_User)
-        ON DELETE SET NULL
+        ON DELETE SET NULL  -- Alterado de RESTRICT para SET NULL
         ON UPDATE CASCADE,
     FOREIGN KEY (ID_Freelancer) REFERENCES usuario(ID_User)
-        ON DELETE SET NULL
+        ON DELETE SET NULL  -- Alterado de RESTRICT para SET NULL
         ON UPDATE CASCADE,
     CONSTRAINT chk_nota_valida CHECK (Nota BETWEEN 1 AND 5),
     CONSTRAINT uc_avaliacao_unica UNIQUE (ID_Cliente),
@@ -165,12 +165,12 @@ DELIMITER ;
 -- Inserts iniciais para teste
 -- =============================================
 
-INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
-VALUES
-('123.456.789-00', 'Ana Souza', 'ana.souza@email.com', 'Senha@1234', '1995-04-20'),
-('987.654.321-11', 'Bruno Lima', 'bruno.lima@email.com', 'Senha@4321', '1988-10-10'),
-('111.222.555-44', 'Beatriz Soares', 'soares.beatriz@email.com', 'Senha@789012', '2000-06-15'),
-('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
+-- INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
+-- VALUES
+-- ('123.456.789-00', 'Ana Souza', 'ana.souza@email.com', 'Senha@1234', '1995-04-20'),
+-- ('987.654.321-11', 'Bruno Lima', 'bruno.lima@email.com', 'Senha@4321', '1988-10-10'),
+-- ('111.222.555-44', 'Beatriz Soares', 'soares.beatriz@email.com', 'Senha@789012', '2000-06-15'),
+-- ('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
 
 -- Verificação dos dados inseridos
 SELECT * FROM Usuario;

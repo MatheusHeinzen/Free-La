@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, request, render_template, redirect, jsonify, session
+from flask import Flask, request, render_template, redirect, jsonify, session, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import mysql.connector
@@ -13,7 +13,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': '1234',
+    'password': 'PUC@1234',
     'database': 'freela'
 }
 
@@ -82,7 +82,7 @@ def autenticar():
 
         if usuario and check_password_hash(usuario['Senha'], senha):
             session['user_id'] = usuario['ID_User']
-            return jsonify({"sucesso": True, "mensagem": "Login realizado com sucesso!", "id": usuario['ID_User']})
+            return jsonify({"sucesso": True, "mensagem": "Login realizado com sucesso!", "id": usuario['ID_User'], "session": session['user_id']})
         else:
             return jsonify({"sucesso": False, "mensagem": "Email ou senha incorretos."})
     except mysql.connector.Error as err:
@@ -190,31 +190,36 @@ def obter_dados_basicos(user_id):
             conn.close()
 
 
-# Atualizar cadastro do usuario
 @app.route('/atualizarUsuario/<int:user_id>', methods=['PUT'])
 def atualizar_usuario(user_id):
     data = request.get_json()
-    
-    # validações básicas
+
+    # Verifica se os campos principais existem
     if not all(key in data for key in ['nome', 'email', 'telefone', 'tipoUsuario', 'endereco']):
         return jsonify({"sucesso": False, "erro": "dados incompletos"}), 400
-    
-    # validação adicional para freelancer
-    if data['tipoUsuario'] == 'freelancer':
+
+    tipo_usuario = data['tipoUsuario']
+    endereco = data.get('endereco', {})
+
+    # Se for freelancer, exige todos os campos obrigatórios preenchidos
+    if tipo_usuario == 'freelancer':
         if not data.get('cpf') or len(data['cpf'].replace('.', '').replace('-', '')) != 11:
-            return jsonify({"sucesso": False, "erro": "cpf inválido para freelancer"}), 400
-        
-        endereco = data['endereco']
+            return jsonify({"sucesso": False, "erro": "CPF inválido para freelancer"}), 400
+
         campos_obrigatorios = ['CEP', 'Logradouro', 'Cidade', 'Bairro', 'Estado', 'Numero']
         if not all(endereco.get(campo) for campo in campos_obrigatorios):
-            return jsonify({"sucesso": False, "erro": "endereço incompleto para freelancer"}), 400
-    
+            return jsonify({"sucesso": False, "erro": "Endereço incompleto para freelancer"}), 400
+
+    # Se não for freelancer, campos vazios viram None
+    else:
+        data['cpf'] = data.get('cpf') or None
+        endereco = {k: (v if v else None) for k, v in endereco.items()}
+
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
-        
-        # atualiza endereço
-        endereco_data = data['endereco']
+
+        # atualiza endereço (inserindo ou atualizando)
         cursor.execute("""
             INSERT INTO Endereco (
                 CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento
@@ -228,15 +233,15 @@ def atualizar_usuario(user_id):
                 Numero = VALUES(Numero),
                 Complemento = VALUES(Complemento)
         """, (
-            endereco_data.get('CEP'),
-            endereco_data.get('Logradouro'),
-            endereco_data.get('Cidade'),
-            endereco_data.get('Bairro'),
-            endereco_data.get('Estado'),
-            endereco_data.get('Numero'),
-            endereco_data.get('Complemento')
+            endereco.get('CEP'),
+            endereco.get('Logradouro'),
+            endereco.get('Cidade'),
+            endereco.get('Bairro'),
+            endereco.get('Estado'),
+            endereco.get('Numero'),
+            endereco.get('Complemento')
         ))
-        
+
         # atualiza dados do usuário
         cursor.execute("""
             UPDATE Usuario SET 
@@ -251,20 +256,22 @@ def atualizar_usuario(user_id):
             data['email'],
             data['telefone'],
             data.get('cpf'),
-            data['tipoUsuario'],
+            tipo_usuario,
             user_id
         ))
-        
+
         conn.commit()
         return jsonify({"sucesso": True, "mensagem": "dados atualizados com sucesso"})
 
     except mysql.connector.Error as err:
         conn.rollback()
-        return jsonify({"sucesso": False, "erro": f"erro no banco de dados: {err}"}), 500
+        return jsonify({"sucesso": False, "erro": f"Erro no banco de dados: {err}"}), 500
+
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
 
 # categorias
 @app.route('/categorias', methods=['GET'])
@@ -531,6 +538,10 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
+
+    if response.content_type == 'application/json':
+        response.headers['Content-Type'] = 'application/json'
+
     return response
 
 if __name__ == '__main__':

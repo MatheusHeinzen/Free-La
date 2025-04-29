@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (!userId || isNaN(userId)) {
         console.error('[DADOS ERRO] ID de usuário inválido ou não encontrado');
-        alert('Sessão expirada ou inválida. Redirecionando para login...');
+        //alert('Sessão expirada ou inválida. Redirecionando para login...');
         window.location.href = '/';
         return;
     }
@@ -57,18 +57,18 @@ document.addEventListener('DOMContentLoaded', function() {
         cepInput.addEventListener('blur', buscarCEP);
     }
 
-    // Botão cancelar - MODIFICADO para redirecionar para homepage
+    // Botão cancelar
     const btnCancelar = document.getElementById('btnCancelar');
     if (btnCancelar) {
         btnCancelar.addEventListener('click', function() {
             if (confirm('Tem certeza que deseja descartar as alterações?')) {
-                window.location.href = '/homepage'; // Redireciona para homepage
+                window.location.href = '/homepage';
             }
         });
     }
 });
 
-// FUNÇÃO PARA ATUALIZAR DADOS - MODIFICADA para redirecionar após salvar
+// FUNÇÃO PARA ATUALIZAR DADOS
 async function atualizarDadosUsuario(userId) {
     console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
     
@@ -112,14 +112,21 @@ async function atualizarDadosUsuario(userId) {
         const data = await response.json();
 
         if (data.sucesso) {
-            alert('Dados atualizados com sucesso!');
-            window.location.href = '/homepage';
+            Swal.fire({
+                icon: 'success',
+                title: 'Atualização bem sucedida',
+                text: "Redirecionando...",
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                window.location.href = "/homepage";
+            });
         } else {
             throw new Error(data.erro || "Erro ao atualizar dados");
         }
     } catch (error) {
         console.error('[DADOS ERRO] Falha na atualização:', error);
-        alert('Erro ao atualizar dados: ' + error.message);
+        //alert('Erro ao atualizar dados: ' + error.message);
     }
 }
 
@@ -145,9 +152,11 @@ async function carregarDadosUsuario(userId) {
             throw new Error(data.erro || "Erro ao carregar dados");
         }
     } catch (error) {
-        console.error('[DADOS ERRO] Falha ao carregar dados:', error);
-        alert(`Erro ao carregar dados: ${error.message}`);
-        console.error('Detalhes do erro:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: 'Erro ao atualizar dados: ' + error.message
+        });
     }
 }
 
@@ -232,51 +241,113 @@ async function buscarCEP(event) {
     }
 }
 
+// VALIDA CPF COM ALGORITMO OFICIAL
+function validarCPF(cpf) {
+    cpf = cpf.replace(/\D/g, '');
+    if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) return false;
+
+    let soma = 0;
+    for (let i = 0; i < 9; i++) soma += parseInt(cpf[i]) * (10 - i);
+    let resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    if (resto !== parseInt(cpf[9])) return false;
+
+    soma = 0;
+    for (let i = 0; i < 10; i++) soma += parseInt(cpf[i]) * (11 - i);
+    resto = (soma * 10) % 11;
+    if (resto === 10 || resto === 11) resto = 0;
+    return resto === parseInt(cpf[10]);
+}
+
+// VALIDA TELEFONE COM DDD (10 ou 11 dígitos, 9º dígito se celular)
+function validarTelefone(telefone) {
+    telefone = telefone.replace(/\D/g, '');
+    if (!(telefone.length === 10 || telefone.length === 11)) return false;
+    
+    const dddValido = /^[1-9][0-9]/.test(telefone.substring(0, 2));
+    const celularValido = telefone.length === 11 ? telefone[2] === '9' : true;
+
+    return dddValido && celularValido;
+}
+
 // FUNÇÃO DE VALIDAÇÃO MELHORADA
 function validarDadosAtualizacao(dados, tentandoVirarFreelancer) {
-    // Campos obrigatórios para todos
-    if (!dados.nome || !dados.email || !dados.telefone) {
-        alert('Por favor, preencha todos os campos obrigatórios (Nome, E-mail e Telefone).');
+    if (!dados.nome || !dados.email || !dados.cpf) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Atenção!',
+            text: 'Por favor, preencha todos os campos obrigatórios (Nome, E-mail e CPF).'
+        });
         return false;
     }
 
-    // Validação de e-mail
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(dados.email)) {
-        alert('Por favor, insira um e-mail válido.');
+        Swal.fire({
+            icon: 'error',
+            title: 'E-mail inválido!',
+            text: 'Por favor, insira um e-mail válido.'
+        });
         return false;
     }
 
-    // Validação de telefone
-    const telefoneLimpo = dados.telefone.replace(/\D/g, '');
-    if (telefoneLimpo.length < 10 || telefoneLimpo.length > 11) {
-        alert('Por favor, insira um telefone válido com DDD (10 ou 11 dígitos).');
+    if (dados.telefone && !validarTelefone(dados.telefone)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Telefone inválido!',
+            text: 'Insira um telefone válido com DDD. Celulares devem conter 11 dígitos (incluindo 9).'
+        });
         return false;
     }
 
-    // Se está tentando virar freelancer, valida campos adicionais
+    if (!validarCPF(dados.cpf)) {
+        Swal.fire({
+            icon: 'error',
+            title: 'CPF inválido!',
+            text: 'Por favor, insira um CPF válido.'
+        });
+        return false;
+    }
+
     if (tentandoVirarFreelancer) {
-        // Valida CPF
-        if (!dados.cpf || dados.cpf.replace(/\D/g, '').length !== 11) {
-            alert('Para se tornar Freelancer, informe um CPF válido (11 dígitos).');
-            return false;
-        }
-
-        // Valida endereço completo
         const endereco = dados.endereco;
         if (!endereco.CEP || !endereco.Logradouro || !endereco.Cidade || 
             !endereco.Bairro || !endereco.Estado || !endereco.Numero) {
-            alert('Para se tornar Freelancer, seu endereço deve estar completo (CEP, Logradouro, Número, Bairro, Cidade e Estado).');
+            Swal.fire({
+                icon: 'error',
+                title: 'Endereço incompleto!',
+                text: 'Para se tornar Freelancer, o endereço deve estar completo (CEP, Logradouro, Número, Bairro, Cidade e Estado).'
+            });
             return false;
         }
 
-        // Valida CEP
         if (endereco.CEP.replace(/\D/g, '').length !== 8) {
-            document.getElementById('cep-error').style.display = 'block';
-            document.getElementById('cep-error').textContent = 'CEP inválido! Deve conter 8 dígitos.';
+            Swal.fire({
+                icon: 'error',
+                title: 'CEP inválido!',
+                text: 'CEP deve conter exatamente 8 dígitos.'
+            });
             return false;
         }
     }
 
     return true;
+}
+
+
+function mostrarErroInput(input, mensagem) {
+    input.classList.add('erro');
+    Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: mensagem
+    });
+}
+
+// Função para limpar os erros
+function limparErros() {
+    const campos = document.querySelectorAll('input');
+    campos.forEach(input => {
+        input.classList.remove('erro');
+    });
 }

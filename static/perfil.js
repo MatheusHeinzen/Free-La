@@ -1,29 +1,101 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    const userId = localStorage.getItem('userId') || sessionStorage.getItem('user_id');
+    if (!userId) {
+        window.location.href = '/';
+        return;
+    }
+
     try {
-        const userId = localStorage.getItem('userId') || sessionStorage.getItem('user_id');
-        if (!userId) {
-            window.location.href = '/';
-            return;
-        }
-
-        // Carrega dados do usuário
-        const response = await fetch(`/usuario/${userId}`);
-        if (!response.ok) throw new Error('Erro ao carregar usuário');
-
-        const { usuario } = await response.json();
-
-        // Atualiza a interface
-        document.querySelector('.profile-card-4 h5').textContent = usuario.Nome || 'Nome não informado';
-
-        // Carrega preferências
-        const prefResponse = await fetch(`/usuario/${userId}/preferencias`);
-        const preferencias = prefResponse.ok ? await prefResponse.json() : {
+        const usuario = await carregarUsuario(userId);
+        const preferencias = await carregarPreferencias(userId) || {
             mostrarTelefone: true,
             mostrarEmail: true
         };
 
-        // Atualiza contatos
-        const listaContatos = document.querySelector('#contatos .list-group');
+        atualizarInterface(usuario, preferencias);
+
+        const btnContatos = document.getElementById('btnAdicionarContatos');
+        if (btnContatos) {
+            btnContatos.addEventListener('click', () => mostrarModalContatos(preferencias));
+        }
+
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao carregar perfil');
+    }
+
+    // Sidebar
+    const sidebar = document.querySelector(".menu_lateral");
+    const toggleButton = document.getElementById("toggleSidebar");
+    if (sidebar && toggleButton) {
+        toggleButton.addEventListener("click", function (event) {
+            sidebar.classList.toggle("ativo");
+            event.stopPropagation();
+        });
+
+        document.addEventListener("click", function (event) {
+            if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                sidebar.classList.remove("ativo");
+            }
+        });
+    }
+
+    // Edit modal
+    const modal = document.getElementById("editModal");
+    const btn = document.getElementById("editBtn");
+    const span = document.querySelector(".close");
+
+    if (btn && modal) btn.onclick = () => modal.style.display = "block";
+    if (span && modal) span.onclick = () => modal.style.display = "none";
+
+    window.onclick = (event) => {
+        if (event.target == modal) modal.style.display = "none";
+    };
+
+    const form = document.getElementById("editForm");
+    if (form) {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const categoria = document.getElementById("categoria").value;
+            const descricao = document.getElementById("descricao").value;
+
+            console.log("Categoria:", categoria);
+            console.log("Descrição:", descricao);
+
+            modal.style.display = "none";
+        });
+    }
+});
+
+// Funções principais
+async function carregarUsuario(userId) {
+    const response = await fetch(`/usuario/${userId}`);
+    if (!response.ok) throw new Error('Erro ao carregar usuário');
+
+    const { usuario } = await response.json();
+    return usuario;
+}
+
+async function carregarPreferencias(userId) {
+    try {
+        const response = await fetch(`/usuario/${userId}/preferencias`);
+        if (!response.ok) throw new Error();
+        return await response.json();
+    } catch {
+        console.warn('[perfil] usando preferências padrão');
+        return null;
+    }
+}
+
+function atualizarInterface(usuario, preferencias) {
+    const nomeEl = document.querySelector('.profile-card-4 h5');
+    const catEl = document.querySelector('.profile-card-4 h6');
+    const listaContatos = document.querySelector('#contatos .list-group');
+
+    if (nomeEl) nomeEl.textContent = usuario.Nome || 'Nome não informado';
+    if (catEl) catEl.textContent = usuario.Profissao || usuario.Categoria || 'Perfil do Usuário';
+
+    if (listaContatos) {
         listaContatos.innerHTML = '';
 
         if (preferencias.mostrarTelefone && usuario.Telefone) {
@@ -47,112 +119,23 @@ document.addEventListener("DOMContentLoaded", async () => {
                     </div>
                 </li>`;
         }
-
-        // Configura eventos
-        document.getElementById('btnAdicionarContatos').addEventListener('click', () => {
-            mostrarModalContatos(preferencias);
-        });
-
-    } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao carregar perfil');
-    }
-});
-
-// Funções principais
-async function carregarUsuario(userId) {
-    const response = await fetch(`/usuario/${userId}/dados`);
-    if (!response.ok) throw new Error('Erro ao carregar usuário');
-
-    const data = await response.json();
-    localStorage.setItem('usuario', JSON.stringify(data.usuario));
-
-    // Mostra dados do usuário na lista de debug (da versão anterior)
-    const lista = document.getElementById("dados-usuario");
-    if (lista) {
-        lista.innerHTML = '';
-        for (const chave in data.usuario) {
-            const item = document.createElement("li");
-            item.textContent = `${chave}: ${data.usuario[chave]}`;
-            lista.appendChild(item);
-        }
-    }
-
-    return data.usuario;
-}
-
-async function carregarPreferencias(userId) {
-    try {
-        const response = await fetch(`/usuario/${userId}/preferencias`);
-        if (!response.ok) throw new Error('Erro ao carregar preferências');
-
-        const data = await response.json();
-        localStorage.setItem('preferenciasContato', JSON.stringify(data));
-        return data;
-    } catch (error) {
-        console.warn('[perfil] usando preferências padrão');
-        return null;
     }
 }
 
-function atualizarInterface(usuario, preferencias) {
-    // Atualiza cabeçalho
-    document.querySelector('.profile-card-4 h5').textContent = usuario.Nome || 'Nome não informado';
-    document.querySelector('.profile-card-4 h6').textContent =
-        usuario.Profissao || usuario.Categoria || 'Perfil do Usuário';
+function mostrarModalContatos(preferencias) {
+    const existente = document.getElementById("modalContatos");
+    if (existente) existente.remove();
 
-    // Atualiza contatos
-    const listaContatos = document.querySelector('#contatos .list-group');
-    listaContatos.innerHTML = '';
-
-    if (preferencias.mostrarTelefone && usuario.Telefone) {
-        listaContatos.innerHTML += `
-          <li class="list-group-item">
-              <div class="list-icon">
-                  <i class="bi bi-telephone"></i>
-              </div>
-              <div class="list-details">
-                  <span>${formatarTelefone(usuario.Telefone)}</span>
-                  <small>Telefone</small>
-              </div>
-          </li>
-      `;
-    }
-
-    if (preferencias.mostrarEmail && usuario.Email) {
-        listaContatos.innerHTML += `
-          <li class="list-group-item">
-              <div class="list-icon">
-                  <i class="bi bi-envelope"></i>
-              </div>
-              <div class="list-details">
-                  <span>${usuario.Email}</span>
-                  <small>Email</small>
-              </div>
-          </li>
-      `;
-    }
-}
-
-// Modal de contatos
-function mostrarModalContatos(preferenciasAtuais) {
     const modalHTML = `
       <div class="modal-contatos" id="modalContatos">
           <div class="modal-content">
               <h3>Exibir contatos</h3>
-              <label>
-                  <input type="checkbox" id="opt-telefone" ${preferenciasAtuais.mostrarTelefone ? 'checked' : ''}>
-                  Telefone
-              </label>
-              <label>
-                  <input type="checkbox" id="opt-email" ${preferenciasAtuais.mostrarEmail ? 'checked' : ''}>
-                  Email
-              </label>
+              <label><input type="checkbox" id="opt-telefone" ${preferencias.mostrarTelefone ? 'checked' : ''}> Telefone</label>
+              <label><input type="checkbox" id="opt-email" ${preferencias.mostrarEmail ? 'checked' : ''}> Email</label>
               <button id="btnSalvarPrefs">Salvar</button>
           </div>
       </div>
   `;
-
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 
     document.getElementById('btnSalvarPrefs').addEventListener('click', async () => {
@@ -163,11 +146,10 @@ function mostrarModalContatos(preferenciasAtuais) {
 
         await salvarPreferencias(localStorage.getItem('userId'), novasPrefs);
         document.getElementById('modalContatos').remove();
-        location.reload(); // Recarrega para aplicar mudanças
+        location.reload();
     });
 }
 
-// Utilitários
 async function salvarPreferencias(userId, preferencias) {
     const response = await fetch(`/usuario/${userId}/preferencias`, {
         method: 'PUT',
@@ -178,20 +160,14 @@ async function salvarPreferencias(userId, preferencias) {
     if (!response.ok) throw new Error('Falha ao salvar');
 }
 
-function formatarTelefone(telefone) {
-    const nums = telefone.replace(/\D/g, '');
-    return nums.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-}
-
-// Sistema de habilidades
+// Habilidades
 async function carregarHabilidades() {
     try {
         const response = await fetch('/habilidades');
-        if (!response.ok) throw new Error('erro ao carregar habilidades');
+        if (!response.ok) throw new Error('Erro ao carregar habilidades');
 
         const habilidades = await response.json();
         renderizarHabilidades(habilidades);
-
     } catch (error) {
         console.error('[perfil] erro ao carregar habilidades:', error);
     }
@@ -201,15 +177,12 @@ function renderizarHabilidades(habilidades) {
     const container = document.getElementById('checkboxContainer');
     if (!container) return;
 
-    container.innerHTML = habilidades.map(habilidade => `
-      <label class="habilidade-item">
-          <input type="checkbox" value="${habilidade}">
-          ${habilidade}
-      </label>
-  `).join('');
+    container.innerHTML = habilidades.map(hab => `
+        <label class="habilidade-item">
+            <input type="checkbox" value="${hab}">
+            ${hab}
+        </label>`).join('');
 }
-
-const checkbox = document.getElementById('checkbox');
 
 function mostrarOpcoesHabilidades() {
     document.getElementById('showOpcoesHabilidades').style.display = 'block';
@@ -220,35 +193,13 @@ function mostrarOpcoesHabilidades() {
 function fecharOpcoes() {
     document.getElementById('showOpcoesHabilidades').style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
-    // pensar futuramente -> criação de tabela sql para salvar as habilidades selecionadas
-    // try {
-    //     checkbox.addEventListener('change', function () {
-    //         this.checked;
-    //     });
-    // } catch (error){
-
-    // }
-
-}
-
-function salvarHabilidades() {
-
-    const botao = document.querySelector('.btn-primary');
-
-    checkbox.addEventListener('change', function () {
-        botao.disabled = !this.checked;
-    });
-
 }
 
 async function adicionarHabilidade() {
     const input = document.getElementById('novaHabilidade');
     const habilidade = input.value.trim();
 
-    if (!habilidade) {
-        alert('digite uma habilidade válida');
-        return;
-    }
+    if (!habilidade) return alert('Digite uma habilidade válida');
 
     try {
         const response = await fetch('/habilidades/adicionar', {
@@ -257,47 +208,74 @@ async function adicionarHabilidade() {
             body: JSON.stringify({ novaHabilidade: habilidade })
         });
 
-        if (!response.ok) {
-            const erro = await response.json();
-            throw new Error(erro.erro || 'erro ao adicionar');
-        }
+        if (!response.ok) throw new Error('Erro ao adicionar habilidade');
 
         input.value = '';
         await carregarHabilidades();
-        alert('habilidade adicionada com sucesso!');
-
+        alert('Habilidade adicionada com sucesso!');
     } catch (error) {
         console.error('[perfil] erro ao adicionar habilidade:', error);
-        alert('erro: ' + error.message);
+        alert('Erro: ' + error.message);
     }
 }
 
-// utilitários
-function mostrarAlerta(mensagem) {
-    alert(mensagem || 'operação não permitida');
+function salvarHabilidades() {
+    const checkboxes = document.querySelectorAll('#checkboxContainer input[type="checkbox"]');
+    const botao = document.querySelector('.btn-primary');
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            botao.disabled = !Array.from(checkboxes).some(cb => cb.checked);
+        });
+    });
 }
 
-
-// Para modo edição
-const modal = document.getElementById("editModal");
-const btn = document.getElementById("editBtn");
-const span = document.getElementsByClassName("close")[0];
-
-btn.onclick = () => modal.style.display = "block";
-span.onclick = () => modal.style.display = "none";
-window.onclick = (event) => {
-    if (event.target == modal) modal.style.display = "none";
+function formatarTelefone(telefone) {
+    const nums = telefone.replace(/\D/g, '');
+    return nums.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
 }
 
-document.getElementById("editForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-    const categoria = document.getElementById("categoria").value;
-    const descricao = document.getElementById("descricao").value;
+// Deletar usuário
+function showPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
 
-    console.log("Categoria:", categoria);
-    console.log("Descrição:", descricao);
+function fecharPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
 
-    // Aqui você pode atualizar o DOM ou enviar para o backend via fetch/AJAX
+function confirmarDelecao() {
+    fetch('/DeletarUsuario', { method: 'DELETE' })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                alert("Perfil deletado com sucesso.");
+                window.location.href = "/";
+            } else {
+                alert(data.erro || "Erro ao deletar.");
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            alert("Erro interno.");
+        });
+}
 
-    modal.style.display = "none"; // Fecha o modal após salvar
-});
+function mostrarErroInput(input, mensagem) {
+    input.classList.add('erro');
+    Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: mensagem
+    });
+}
+
+// Função para limpar os erros
+function limparErros() {
+    const campos = document.querySelectorAll('input');
+    campos.forEach(input => {
+        input.classList.remove('erro');
+    });
+}

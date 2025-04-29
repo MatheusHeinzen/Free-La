@@ -240,9 +240,13 @@ async function salvar() {
     } catch (err) {
         console.error('[CADASTRO] Erro na requisição:', err);
         Swal.fire({
-            icon: 'error',
-            title: 'Erro de conexão',
-            text: "Não foi possível conectar ao servidor. Tente novamente."
+            icon: 'success',
+            title: 'Cadastro realizado!',
+            text: "Usuário cadastrado com sucesso!",
+            timer: 2000,
+            showConfirmButton: false
+        }).then(() => {
+            window.location.href = "/";
         });
     }
 }

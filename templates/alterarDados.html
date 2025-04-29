@@ -8,9 +8,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Alterar Dados</title>
-    <link rel="stylesheet" href="/static/sidebar.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='sidebar.css') }}">
     <style>
-
         form {
             display: flex;
             flex-direction: column;
@@ -46,6 +45,17 @@
         #tipoUsuarioLabel {
             font-weight: 500;
             margin-left: 0.5rem;
+        }
+
+        input[type=number]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+
         }
     </style>
 </head>
@@ -104,21 +114,21 @@
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Nome Completo</label>
                     <div class="col-lg-9">
-                        <input class="form-control" type="text" id="nome" required>
+                        <input class="form-control" type="text" id="nome">
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">E-mail</label>
                     <div class="col-lg-9">
-                        <input class="form-control" type="email" id="email" required>
+                        <input class="form-control" type="email" id="email">
                     </div>
                 </div>
 
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Telefone</label>
                     <div class="col-lg-9">
-                        <input class="form-control" type="tel" id="telefone" required>
+                        <input class="form-control" type="tel" id="telefone">
                     </div>
                 </div>
 
@@ -161,7 +171,7 @@
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label"></label>
                     <div class="col-lg-2">
-                        <input class="form-control" type="text" name="numero" placeholder="Número">
+                        <input class="form-control" type="number" name="numero" placeholder="Número">
                     </div>
                     <div class="col-lg-4">
                         <input class="form-control" type="text" name="complemento" placeholder="Complemento">
@@ -193,6 +203,7 @@
     <script src="{{ url_for('static', filename='dados.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script>
         $(document).ready(function () {
             $('#cep').mask('00000-000');
