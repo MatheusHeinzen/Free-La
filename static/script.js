@@ -220,6 +220,7 @@ async function salvar() {
         console.log('[CADASTRO] Resposta do servidor:', response);
 
         if (response.sucesso) {
+            localStorage.setItem('user_id', resposta.id);
             Swal.fire({
                 icon: 'success',
                 title: 'Cadastro realizado!',
@@ -280,7 +281,7 @@ async function logar() {
                 timer: 2000,
                 showConfirmButton: false
             }).then(() => {
-                window.location.href = "/";
+                window.location.href = "/homepage";
             });
         } else {
             Swal.fire({
