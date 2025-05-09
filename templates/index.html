@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro / Login</title>
-    <link rel="shortcut icon" href="../static/imgs/icon.png">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='imgs/icon.png') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body>
@@ -18,9 +17,9 @@
             <form id="form-cadastro" novalidate>
                 <h1>Crie sua Conta</h1>
                 <div class="social-container">
-                    <a href="#" class="social"><img src="/static/imgs/facebook.png" alt="Facebook"></a>
-                    <a href="#" class="social"><img src="/static/imgs/google.png" alt="Google"></a>
-                    <a href="#" class="social"><img src="/static/imgs/linkedin.png" alt="LinkedIn"></a>
+                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/facebook.png') }}" alt="Facebook"></a>
+                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/google.png') }}" alt="Google"></a>
+                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/linkedin.png') }}" alt="LinkedIn"></a>
                 </div>
                 <span>Se já possui cadastro <a onclick="alternarModo('login')" href="#">Clique Aqui!</a></span>
 
@@ -72,9 +71,9 @@
             <form id="form-login" novalidate>
                 <h1>Realize seu Login</h1>
                 <div class="social-container">
-                    <a href="#" class="social"><img src="/static/imgs/facebook.png" alt="Facebook"></a>
-                    <a href="#" class="social"><img src="/static/imgs/google.png" alt="Google"></a>
-                    <a href="#" class="social"><img src="/static/imgs/linkedin.png" alt="LinkedIn"></a>
+                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/facebook.png') }}" alt="Facebook"></a>
+                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/google.png') }}" alt="Google"></a>
+                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/linkedin.png') }}" alt="LinkedIn"></a>
                 </div>
                 <span>Ou se não possui uma conta <a href="#" onclick="alternarModo('cadastro')">Clique Aqui!</a></span>
                 <input id="login-email" type="email" placeholder="Email" />
@@ -107,7 +106,7 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js" defer></script>
-    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 </body>
 
