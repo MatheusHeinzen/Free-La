@@ -155,9 +155,12 @@ function limparErros() {
     });
 }
 
+// Função para carregar categorias
 async function carregarCategorias() {
     try {
-        const response = await fetch('/categories/');
+        const response = await fetch('/category/', { //
+            method: 'GET'
+        });
         const data = await response.json();
         if (data.sucesso) {
             console.log("Categorias:", data.categorias);
@@ -179,9 +182,12 @@ async function carregarCategorias() {
     }
 }
 
+// Função para carregar habilidades
 async function carregarHabilidades() {
     try {
-        const response = await fetch('/skills/');
+        const response = await fetch('/skills/', { //
+            method: 'GET'
+        });
         const data = await response.json();
         if (data.sucesso) {
             console.log("Habilidades:", data.habilidades);

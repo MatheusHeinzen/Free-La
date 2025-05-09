@@ -73,7 +73,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Funções principais
 async function carregarUsuario(userId) {
-    const response = await fetch(`/usuario/${userId}`);
+    const response = await fetch(`/user/${userId}`, { 
+        method: 'GET'
+    });
     if (!response.ok) throw new Error('Erro ao carregar usuário');
 
     const { usuario } = await response.json();
@@ -82,7 +84,9 @@ async function carregarUsuario(userId) {
 
 async function carregarPreferencias(userId) {
     try {
-        const response = await fetch(`/usuario/${userId}/preferencias`);
+        const response = await fetch(`/preferences/${userId}`, { 
+            method: 'GET'
+        });
         if (!response.ok) throw new Error();
         return await response.json();
     } catch {
@@ -155,7 +159,7 @@ function mostrarModalContatos(preferencias) {
 }
 
 async function salvarPreferencias(userId, preferencias) {
-    const response = await fetch(`/usuario/${userId}/preferencias`, {
+    const response = await fetch(`/preferences/${userId}`, { 
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(preferencias)

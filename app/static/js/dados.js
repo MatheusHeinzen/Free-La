@@ -101,7 +101,7 @@ async function atualizarDadosUsuario(userId) {
     console.log('[DADOS] Dados para atualização:', dadosAtualizacao);
 
     try {
-        const response = await fetch(`/atualizarUsuario/${userId}`, {
+        const response = await fetch(`/user/${userId}`, { 
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -126,7 +126,6 @@ async function atualizarDadosUsuario(userId) {
         }
     } catch (error) {
         console.error('[DADOS ERRO] Falha na atualização:', error);
-        //alert('Erro ao atualizar dados: ' + error.message);
     }
 }
 
@@ -135,18 +134,19 @@ async function carregarDadosUsuario(userId) {
     console.log('[DADOS] Carregando dados do usuário ID:', userId);
     
     try {
-        const response = await fetch(`/usuario/${userId}`);
-        
+        const response = await fetch(`/user/${userId}`, { 
+            method: 'GET'
+        });
+
         if (!response.ok) {
             const errorData = await response.json().catch(() => null);
             const errorMsg = errorData?.erro || `Erro HTTP! status: ${response.status}`;
             throw new Error(errorMsg);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.sucesso) {
-            console.log('[DADOS] Dados recebidos:', data.usuario);
             preencherFormulario(data.usuario);
         } else {
             throw new Error(data.erro || "Erro ao carregar dados");
@@ -155,7 +155,7 @@ async function carregarDadosUsuario(userId) {
         Swal.fire({
             icon: 'error',
             title: 'Erro!',
-            text: 'Erro ao atualizar dados: ' + error.message
+            text: 'Erro ao carregar dados: ' + error.message
         });
     }
 }

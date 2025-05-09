@@ -194,7 +194,7 @@ function validarIdade(dataNascimento) {
     return idade >= 18 && idade <= 100;
 }
 
-// Função para salvar os dados
+// Função para salvar os dados (Cadastro)
 async function salvar() {
     console.log('[CADASTRO] Iniciando processo de cadastro');
 
@@ -208,7 +208,7 @@ async function salvar() {
 
     try {
         console.log('[CADASTRO] Enviando dados para o servidor');
-        const res = await fetch("http://localhost:5000/cadastrar", {
+        const res = await fetch("/user/register", { //
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -220,7 +220,7 @@ async function salvar() {
         console.log('[CADASTRO] Resposta do servidor:', response);
 
         if (response.sucesso) {
-            localStorage.setItem('user_id', resposta.id);
+            localStorage.setItem('user_id', response.id);
             Swal.fire({
                 icon: 'success',
                 title: 'Cadastro realizado!',
@@ -240,18 +240,14 @@ async function salvar() {
     } catch (err) {
         console.error('[CADASTRO] Erro na requisição:', err);
         Swal.fire({
-            icon: 'success',
-            title: 'Cadastro realizado!',
-            text: "Usuário cadastrado com sucesso!",
-            timer: 2000,
-            showConfirmButton: false
-        }).then(() => {
-            window.location.href = "/";
+            icon: 'error',
+            title: 'Erro!',
+            text: "Erro ao realizar cadastro. Tente novamente."
         });
     }
 }
 
-// Função de login atualizada
+// Função de login
 async function logar() {
     console.log('[LOGIN] Iniciando processo de login');
 
@@ -268,7 +264,7 @@ async function logar() {
     }
 
     try {
-        const res = await fetch("http://localhost:5000/autenticar", {
+        const res = await fetch("/auth/login", { 
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
