@@ -88,12 +88,42 @@
                             <span class="link">Contato</span>
                         </a>
                     </li>
-                    <li class="item_menu">
-                        <a href="/alterarDados">
+                    <li class="item_menu has-submenu">
+                        <a href="#" onclick="toggleSubmenu(event)">
                             <span class="icon"><i class="#"></i></span>
                             <span class="link">Configurações</span>
                         </a>
+
+                        <ul class="submenu">
+                            <li class="item_menu" id="submenu">
+                                <a href="/alterarDados">
+                                    <span class="icon"><i class="#"></i></span>
+                                    <span class="link">Atualizar Dados</span>
+                                </a>
+                            </li>
+                            <li class="item_menu" id="submenu">
+                                <a href="#" onclick="showPopUpDeletar()">
+                                    <span class="icon"><i class="#"></i></span>
+                                    <span class="link">Deletar Perfil</span>
+                                </a>
+                            </li>
+                            <li class="item_menu" id="submenu">
+                                {% if session.user_id %}
+                                <a href="#" onclick="logout()">
+                                    <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                                    <span class="link">Logout</span>
+                                </a>
+                                {% else %}
+                                <a href="/">
+                                    <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                    <span class="link">Login</span>
+                                </a>
+                                {% endif %}
+                            </li>
+                        </ul>
                     </li>
+
+
                 </ul>
             </nav>
         </div>
@@ -206,9 +236,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script>
         function toggleSubmenu(event) {
-          event.preventDefault();
-          const item = event.currentTarget.closest('.has-submenu');
-          item.classList.toggle('active');
+            event.preventDefault();
+            const item = event.currentTarget.closest('.has-submenu');
+            item.classList.toggle('active');
         }
     </script>
     <script>

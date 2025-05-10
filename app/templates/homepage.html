@@ -60,10 +60,17 @@
                 </a>
               </li>
               <li class="item_menu" id="submenu">
-                <a href="/">
-                  <span class="icon"><i class="#"></i></span>
-                  <span class="link">Login/Cadastro</span>
+                {% if session.user_id %}
+                <a href="#" onclick="logout()">
+                  <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                  <span class="link">Logout</span>
                 </a>
+                {% else %}
+                <a href="/">
+                  <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                  <span class="link">Login</span>
+                </a>
+                {% endif %}
               </li>
             </ul>
           </li>
@@ -85,16 +92,16 @@
     <div class="navbar navbar-dark bg-dark shadow-sm">
       <div class="container d-flex justify-content-between">
         {% if session.user_id %}
-            <a href="/perfil" class="navbar-brand d-flex align-items-center">
-                Olá, {{ obter_nome_usuario() }}
-            </a>
+        <a href="/perfil" class="navbar-brand d-flex align-items-center">
+          Olá, {{ obter_nome_usuario() }}
+        </a>
         {% else %}
-            <a href="/" class="navbar-brand d-flex align-items-center">
-                Login/Cadastro
-            </a>
+        <a href="/" class="navbar-brand d-flex align-items-center">
+          Login/Cadastro
+        </a>
         {% endif %}
         <button id="toggleSidebar" style="font-size: 20px;">☰</button>
-    </div>
+      </div>
     </div>
   </header>
 
@@ -203,4 +210,5 @@
   integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
   integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
 </html>

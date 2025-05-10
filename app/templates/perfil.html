@@ -18,6 +18,7 @@
         <div class="container">
             <nav class="menu_lateral" id="menu_lateral">
                 <div class="expandir">
+                    <i class="bi bi-list"></i>
                 </div>
                 <ul>
                     <span class="icon"><img src="/static/imgs/perfil.png" width="140px"
@@ -60,10 +61,17 @@
                                 </a>
                             </li>
                             <li class="item_menu" id="submenu">
-                                <a href="/">
-                                    <span class="icon"><i class="#"></i></span>
-                                    <span class="link">Login/Cadastro</span>
+                                {% if session.user_id %}
+                                <a href="#" onclick="logout()">
+                                    <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                                    <span class="link">Logout</span>
                                 </a>
+                                {% else %}
+                                <a href="/">
+                                    <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                    <span class="link">Login</span>
+                                </a>
+                                {% endif %}
                             </li>
                         </ul>
                     </li>
@@ -73,7 +81,7 @@
             </nav>
         </div>
 
-        
+
 
         <div class="navbar navbar-dark bg-dark shadow-sm">
             <div class="container d-flex justify-content-between">
@@ -245,9 +253,9 @@
 <script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
 <script>
     function toggleSubmenu(event) {
-      event.preventDefault();
-      const item = event.currentTarget.closest('.has-submenu');
-      item.classList.toggle('active');
+        event.preventDefault();
+        const item = event.currentTarget.closest('.has-submenu');
+        item.classList.toggle('active');
     }
 </script>
 

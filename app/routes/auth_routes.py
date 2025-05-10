@@ -26,3 +26,8 @@ def autenticar():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({"sucesso": True, "mensagem": "Sessão encerrada com sucesso!"})

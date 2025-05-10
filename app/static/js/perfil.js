@@ -356,3 +356,39 @@ async function salvarPerfil(userId, dadosPerfil) {
         });
     }
 }
+
+async function logout() {
+    try {
+        const response = await fetch('/auth/logout', { // Rota de logout no backend
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const data = await response.json();
+        if (data.sucesso) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Logout realizado!',
+                text: data.mensagem,
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                // Redireciona para a página inicial ou de login
+                window.location.href = "/";
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: 'Não foi possível encerrar a sessão. Tente novamente.'
+            });
+        }
+    } catch (error) {
+        console.error("Erro ao realizar logout:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: 'Erro ao realizar logout. Tente novamente.'
+        });
+    }
+}
