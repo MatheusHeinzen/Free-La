@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from app.utils.db import init_db
+from datetime import timedelta
 
 def create_app():
     app = Flask(__name__)
@@ -13,6 +14,9 @@ def create_app():
         'database': 'freela'
     }
     app.secret_key = 'senha_da_sessao'
+
+    # Configuração de expiração da sessão
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
     init_db(app)
 

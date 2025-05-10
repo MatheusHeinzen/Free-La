@@ -245,6 +245,32 @@ async function logout() {
     }
 }
 
+let inatividadeTimer;
+
+// Função para redefinir o timer de inatividade
+function resetarInatividade() {
+    clearTimeout(inatividadeTimer);
+    inatividadeTimer = setTimeout(() => {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Sessão expirada!',
+            text: 'Você foi desconectado devido à inatividade.',
+            timer: 3000,
+            showConfirmButton: false
+        }).then(() => {
+            logout(); // Chama a função de logout
+        });
+    }, 30 * 60 * 1000); // 30 minutos
+}
+
+// Adiciona eventos para monitorar a atividade do usuário
+document.addEventListener('mousemove', resetarInatividade);
+document.addEventListener('keydown', resetarInatividade);
+document.addEventListener('click', resetarInatividade);
+
+// Inicializa o timer ao carregar a página
+resetarInatividade();
+
 // Chamar as funções ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
     carregarCategorias();
