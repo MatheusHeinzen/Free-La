@@ -1,13 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    const userId = localStorage.getItem('userId') || sessionStorage.getItem('user_id');
-    if (!userId) {
-        window.location.href = '/';
-        return;
-    }
-
     try {
-        const usuario = await carregarUsuario(userId);
-        const preferencias = await carregarPreferencias(userId) || {
+        const usuario = await carregarUsuario();
+        const preferencias = await carregarPreferencias() || {
             mostrarTelefone: true,
             mostrarEmail: true
         };
@@ -72,26 +66,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 // Funções principais
-async function carregarUsuario(userId) {
-    const response = await fetch(`/user/${userId}`, { 
-        method: 'GET'
-    });
+async function carregarUsuario() {
+    const response = await fetch('/user', { method: 'GET' });
     if (!response.ok) throw new Error('Erro ao carregar usuário');
 
     const { usuario } = await response.json();
     return usuario;
 }
 
-async function carregarPreferencias(userId) {
+async function carregarPreferencias() {
     try {
-        const response = await fetch(`/preferences/${userId}`, { 
-            method: 'GET'
-        });
-        if (!response.ok) throw new Error();
-        return await response.json();
-    } catch {
-        console.warn('[perfil] usando preferências padrão');
-        return null;
+        const response = await fetch('/preferences/', { method: 'GET' });
+        if (!response.ok) throw new Error('Erro ao carregar preferências');
+
+        const data = await response.json();
+        if (data.sucesso) {
+            return data.preferencias; // Retorna as preferências do servidor
+        } else {
+            console.warn('Preferências não encontradas, usando padrão.');
+            return { mostrarTelefone: true, mostrarEmail: true }; // Valores padrão
+        }
+    } catch (error) {
+        console.error('Erro ao carregar preferências:', error);
+        return { mostrarTelefone: true, mostrarEmail: true }; // Valores padrão
     }
 }
 
@@ -152,20 +149,42 @@ function mostrarModalContatos(preferencias) {
             mostrarEmail: document.getElementById('opt-email').checked
         };
 
-        await salvarPreferencias(localStorage.getItem('userId'), novasPrefs);
+        await salvarPreferencias(novasPrefs);
         document.getElementById('modalContatos').remove();
         location.reload();
     });
 }
 
-async function salvarPreferencias(userId, preferencias) {
-    const response = await fetch(`/preferences/${userId}`, { 
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(preferencias)
-    });
+async function salvarPreferencias(preferencias) {
+    try {
+        const response = await fetch('/preferences/', { 
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ preferencias }) // Enviar como objeto com chave 'preferencias'
+        });
 
-    if (!response.ok) throw new Error('Falha ao salvar');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Falha ao salvar preferências');
+        }
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Preferências salvas!',
+            text: 'Suas preferências foram atualizadas com sucesso.'
+        });
+
+        // Recarregar as preferências do backend e atualizar a interface
+        const novasPreferencias = await carregarPreferencias();
+        atualizarInterface(await carregarUsuario(), novasPreferencias);
+    } catch (error) {
+        console.error('Erro ao salvar preferências:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: error.message || 'Erro ao salvar preferências.'
+        });
+    }
 }
 
 // Habilidades

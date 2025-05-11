@@ -182,32 +182,32 @@ async function carregarCategorias() {
     }
 }
 
-// Função para carregar habilidades
-async function carregarHabilidades() {
-    try {
-        const response = await fetch('/skills/', { //
-            method: 'GET'
-        });
-        const data = await response.json();
-        if (data.sucesso) {
-            console.log("Habilidades:", data.habilidades);
-            // Renderizar habilidades na página
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'Erro ao carregar habilidades.'
-            });
-        }
-    } catch (error) {
-        console.error("Erro ao carregar habilidades:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Erro ao carregar habilidades.'
-        });
-    }
-}
+// // Função para carregar habilidades
+// async function carregarHabilidades() {
+//     try {
+//         const response = await fetch('/skills/', { //
+//             method: 'GET'
+//         });
+//         const data = await response.json();
+//         if (data.sucesso) {
+//             console.log("Habilidades:", data.habilidades);
+//             // Renderizar habilidades na página
+//         } else {
+//             Swal.fire({
+//                 icon: 'error',
+//                 title: 'Erro!',
+//                 text: 'Erro ao carregar habilidades.'
+//             });
+//         }
+//     } catch (error) {
+//         console.error("Erro ao carregar habilidades:", error);
+//         Swal.fire({
+//             icon: 'error',
+//             title: 'Erro!',
+//             text: 'Erro ao carregar habilidades.'
+//         });
+//     }
+// }
 
 async function logout() {
     try {

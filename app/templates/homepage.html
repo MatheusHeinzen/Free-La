@@ -102,9 +102,18 @@
             Login
           </a>
           {% endif %}
-          <a href="#" class="phone-hidden" >Sobre</a>
+          <a href="#" class="phone-hidden">Sobre</a>
           <a href="#" class="phone-hidden">Contato</a>
-          <a href="#" class="phone-hidden">Configurações</a>
+          <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Configurações</a>
+          <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
+            <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
+            <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
+            {% if session.user_id %}
+            <a class="dropdown-item" href="#" onclick="logout()">Logout</a>
+            {% else %}
+            <a class="dropdown-item" href="/">Login</a>
+            {% endif %}
+          </div>
           <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
         </div>
       </div>

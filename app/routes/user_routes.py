@@ -55,3 +55,25 @@ def obter_usuario(user_id):
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@user_bp.route('/', methods=['GET'])
+def obter_usuario_atual():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Usuário não autenticado'}), 401
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (user_id,))
+        usuario = cursor.fetchone()
+
+        if usuario:
+            return jsonify({'sucesso': True, 'usuario': usuario})
+        else:
+            return jsonify({'sucesso': False, 'mensagem': 'Usuário não encontrado'}), 404
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()

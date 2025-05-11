@@ -5,5 +5,10 @@ def buscar_preferencias(user_id):
     return {"sucesso": True, "preferencias": preferencias}, 200
 
 def atualizar_preferencias(user_id, preferencias):
-    salvar_preferencias(user_id, preferencias)
-    return {"sucesso": True, "mensagem": "Preferências atualizadas com sucesso"}, 200
+    try:
+        # Pass the dictionary directly to the model function
+        salvar_preferencias(user_id, preferencias)
+        return {'message': 'Preferências atualizadas com sucesso'}, 200
+    except Exception as e:
+        print(f"Erro no serviço de preferências: {e}")
+        return {'error': 'Erro ao atualizar preferências'}, 500
