@@ -16,17 +16,15 @@
 <body>
     <header>
         <div class="container">
-            <!-- Para celulares -->
+            <!-- Navbar para dispositivos móveis -->
             <nav class="menu_lateral" id="menu_lateral">
                 <div class="expandir">
                     <i class="bi bi-list"></i>
                 </div>
                 <ul>
-                    <span class="icon"><img src="/static/imgs/perfil.png" width="140px"
-                            style="margin-left: 20px;"></span>
                     <li class="item_menu">
                         <a href="/perfil">
-                            <span class="icon"></span>
+                            <span class="icon"><img src="/static/imgs/perfil.png" alt="Perfil" width="140px"></span>
                             <span class="link">Perfil</span>
                         </a>
                     </li>
@@ -47,7 +45,7 @@
                             <span class="icon"><i class="#"></i></span>
                             <span class="link">Configurações</span>
                         </a>
-
+                        <ul class="submenu">
                         <ul class="submenu">
                             <li class="item_menu" id="submenu">
                                 <a href="/alterarDados">
@@ -82,13 +80,11 @@
 
 
         <!-- Par desktops -->
-        <nav class="desktop-version">
-            <div class="navbar navbar-dark bg-dark shadow-sm">
-                <div class="container d-flex justify-content-between">
-                    <a href="/homepage" class="navbar-brand d-flex align-items-center">Menu</a>
-                    <a href="#" class="phone-hidden">Sobre</a>
-                    <a href="#" class="phone-hidden">Contato</a>
-                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
+        <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+                <a href="/homepage" class="navbar-brand">Menu</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">Configurações</a>
                     <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
                         <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
@@ -99,8 +95,8 @@
                         <a class="dropdown-item" href="/">Login</a>
                         {% endif %}
                     </div>
-                    <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
                 </div>
+                <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
             </div>
         </nav>
     </header>
@@ -262,8 +258,7 @@
         <div class="overlay" id="overlay"></div>
         <div class="pop-up-deletar" id="pop-up-deletar">
             <h3>Deletar Perfil?</h3>
-            <p>Tem certeza que deseja excluir seu perfil? <br>
-                Você perderá todos seus dados e não poderá executar todas as funcionalidades do Site</p>
+            <p>Tem certeza que deseja excluir seu perfil? Você perderá todos seus dados e não poderá executar todas as funcionalidades do site.</p>
             <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
             <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
         </div>

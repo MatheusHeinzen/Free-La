@@ -71,8 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // FUNÇÃO PARA ATUALIZAR DADOS
 async function atualizarDadosUsuario(userId) {
     console.log('[DADOS] Iniciando atualização para usuário ID:', userId);
-    
-    // Coleta os dados do formulário
+
     const dadosAtualizacao = {
         nome: document.getElementById('nome').value,
         email: document.getElementById('email').value,
@@ -90,18 +89,8 @@ async function atualizarDadosUsuario(userId) {
         }
     };
 
-    // Valida se está tentando virar freelancer
-    const tentandoVirarFreelancer = document.getElementById('tipoUsuarioSwitch').checked;
-    
-    // Validações
-    if (!validarDadosAtualizacao(dadosAtualizacao, tentandoVirarFreelancer)) {
-        return;
-    }
-
-    console.log('[DADOS] Dados para atualização:', dadosAtualizacao);
-
     try {
-        const response = await fetch(`/user/${userId}`, { 
+        const response = await fetch(`/user/${userId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,8 +98,13 @@ async function atualizarDadosUsuario(userId) {
             body: JSON.stringify(dadosAtualizacao)
         });
 
-        const data = await response.json();
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            const errorMsg = errorData?.erro || `Erro HTTP! status: ${response.status}`;
+            throw new Error(errorMsg);
+        }
 
+        const data = await response.json();
         if (data.sucesso) {
             Swal.fire({
                 icon: 'success',
@@ -126,6 +120,11 @@ async function atualizarDadosUsuario(userId) {
         }
     } catch (error) {
         console.error('[DADOS ERRO] Falha na atualização:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: error.message || 'Erro ao atualizar dados.'
+        });
     }
 }
 
@@ -371,37 +370,6 @@ async function obterDadosUsuario(userId) {
             icon: 'error',
             title: 'Erro!',
             text: 'Erro ao obter dados do usuário.'
-        });
-    }
-}
-
-async function atualizarPreferencias(userId, preferencias) {
-    try {
-        const response = await fetch(`/preferences/${userId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ preferencias })
-        });
-        const data = await response.json();
-        if (data.sucesso) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Sucesso!',
-                text: data.mensagem
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: data.erro
-            });
-        }
-    } catch (error) {
-        console.error("Erro ao atualizar preferências:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Erro ao atualizar preferências.'
         });
     }
 }

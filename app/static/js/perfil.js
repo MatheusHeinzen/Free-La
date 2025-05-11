@@ -92,6 +92,37 @@ async function carregarPreferencias() {
     }
 }
 
+async function atualizarPreferencias(userId, preferencias) {
+    try {
+        const response = await fetch(`/preferences/${userId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ preferencias })
+        });
+        const data = await response.json();
+        if (data.sucesso) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Sucesso!',
+                text: data.mensagem
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: data.erro
+            });
+        }
+    } catch (error) {
+        console.error("Erro ao atualizar preferências:", error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro!',
+            text: 'Erro ao atualizar preferências.'
+        });
+    }
+}
+
 function atualizarInterface(usuario, preferencias) {
     const nomeEl = document.querySelector('.profile-card-4 h5');
     const catEl = document.querySelector('.profile-card-4 h6');

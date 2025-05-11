@@ -209,6 +209,46 @@ async function carregarCategorias() {
 //     }
 // }
 
+async function carregarFreelancers() {
+    try {
+        const response = await fetch('/freelancers', { method: 'GET' });
+        if (!response.ok) throw new Error('Erro ao carregar freelancers');
+
+        const data = await response.json();
+        if (data.sucesso) {
+            exibirFreelancers(data.freelancers);
+        } else {
+            throw new Error(data.erro || 'Erro ao carregar freelancers');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar freelancers:', error);
+        document.getElementById('resultados-pesquisa').innerHTML = '<p>Erro ao carregar freelancers.</p>';
+    }
+}
+
+function exibirFreelancers(freelancers) {
+    const section = document.getElementById('resultados-pesquisa');
+    section.innerHTML = '';
+
+    freelancers.forEach(freelancer => {
+        section.innerHTML += `
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <img class="card-img-top" src="data:image/jpeg;base64,${freelancer.Foto || ''}" alt="${freelancer.Username}">
+                    <div class="card-body">
+                        <h5 class="card-title">${freelancer.Username || freelancer.Nome}</h5>
+                        <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
+                        <a href="/perfil/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+}
+
+// Chama a função ao carregar a página
+document.addEventListener('DOMContentLoaded', carregarFreelancers);
+
 async function logout() {
     try {
         const response = await fetch('/auth/logout', { // Rota de logout no backend

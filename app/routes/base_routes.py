@@ -21,3 +21,7 @@ def alterar_dados():
 @base_bp.route('/termos')
 def termos():
     return render_template('termos.html')
+
+@base_bp.route('/perfilPublico/<int:user_id>')
+def perfil_publico(user_id):
+    return render_template('perfil_publico.html', user_id=user_id)
