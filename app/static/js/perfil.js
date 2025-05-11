@@ -411,3 +411,113 @@ async function logout() {
         });
     }
 }
+
+// Para editar perfil
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Envio da imagem de perfil
+    const imageForm = document.querySelector('form[action="/upload"]');
+    imageForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(imageForm);
+
+        try {
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            const text = await response.text();
+
+            if (text.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Atualização feita com sucesso!',
+                    text: text.mensagem,
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: 'Não foi possível atualizar o seu perfil! Por favor, Tente novamente.'
+                });
+            }
+                
+            } catch (error) {
+            console.error("Erro ao enviar imagem:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: 'Erro ao enviar imagem! Tente novamente.'
+        });
+        
+        }
+    });
+
+    // Envio da bio/categoria
+    const editForm = document.getElementById('editForm');
+    editForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(editForm);
+
+        try {
+            const response = await fetch('/editar_perfil', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (result.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Atualização feita com sucesso!',
+                    text: result.mensagem,
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: 'Não foi possível atualizar o seu perfil! Por favor, Tente novamente.'
+                });
+            }
+
+        } catch (error) {
+            console.error("Erro ao atualizar perfil:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: 'Erro ao salvar alterações! Tente novamente.'
+            });
+            }
+    });
+
+});
+
+// Para ver a imagem
+const imgInput = document.getElementById('img');
+const preview = document.getElementById('preview');
+
+imgInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            preview.src = e.target.result;
+            preview.style.display = 'block'; // Mostra a imagem
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.style.display = 'none';
+    }
+});

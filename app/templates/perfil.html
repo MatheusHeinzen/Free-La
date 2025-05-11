@@ -22,7 +22,10 @@
                 </div>
                 <ul>
                     <span class="icon"><img src="/static/imgs/perfil.png" width="140px"
-                            style="margin-left: 20px;"></span>
+                            style="margin-left: 20px;">
+                            
+                        </span>
+                        
                     <li class="item_menu">
                         <a href="/perfil">
                             <span class="icon"></span>
@@ -165,10 +168,8 @@
                                             <!-- Categoria e Profissão com uma pequena descrição -->
                                         </p>
 
-
                                         <!-- pular linhas -->
                                         <br><br><br>
-
 
                                     </div>
                                     <div class="col-md-6">
@@ -215,7 +216,16 @@
                                             <div class="modal-content-editar-perfil">
                                                 <span class="close">&times;</span>
                                                 <h3>Editar Perfil</h3>
+                                                <form action="/upload" method="POST" enctype="multipart/form-data">
+                                                    <div id="preview-container">
+                                                        <img id="preview" alt="Pré-visualização da imagem" style="display: none;">
+                                                    </div>
+                                                    <label for="image">Selecione uma imagem:</label>
+                                                    <input type="file" name="image" id="image"accept="image/*">
+                                                    <button type="submit">Alterar Imagem</button>
+                                                </form>
                                                 <form id="editForm">
+                                                    <input type="hidden" name="user_id" value="session['user_id']">
                                                     <label for="categoria">Palavra-chave / Profissão /
                                                         Categoria:</label>
                                                     <input type="text" id="categoria" name="categoria"
@@ -250,8 +260,8 @@
     </main>
 
 </body>
-<script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
 <script>
     function toggleSubmenu(event) {
         event.preventDefault();

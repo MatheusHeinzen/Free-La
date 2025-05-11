@@ -24,12 +24,12 @@
                 <span>Se já possui cadastro <a onclick="alternarModo('login')" href="#">Clique Aqui!</a></span>
 
                 <div class="input-container">
-                    <input id="nome" type="text" placeholder="Nome*" />
+                    <input id="nome" type="text" placeholder="Nome*" autocomplete="off"/>
                     <i data-tooltip="Digite seu nome completo." class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
-                    <input id="email" type="email" placeholder="Email*" />
+                    <input id="email" type="email" placeholder="Email*" autocomplete="off"/>
                     <i data-tooltip="Digite seu melhor e-mail." class="bi bi-question-circle-fill"></i>
                 </div>
 
@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="input-container">
-                    <input id="cpf" type="text" placeholder="CPF*" />
+                    <input id="cpf" type="text" placeholder="CPF*" autocomplete="off" />
                     <i data-tooltip="Informe o seu CPF, apenas números." class="bi bi-question-circle-fill"></i>
                 </div>
 
@@ -76,7 +76,7 @@
                     <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/linkedin.png') }}" alt="LinkedIn"></a>
                 </div>
                 <span>Ou se não possui uma conta <a href="#" onclick="alternarModo('cadastro')">Clique Aqui!</a></span>
-                <input id="login-email" type="email" placeholder="Email" />
+                <input id="login-email" type="email" placeholder="Email" autocomplete="off" />
                 <div class="senha-container">
                     <input id="login-senha" type="password" placeholder="Senha" />
                     <i class="bi bi-eye-fill" id="btn-senha3" onclick="toggleSenha('login-senha','btn-senha3')"></i>
