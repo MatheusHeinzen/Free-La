@@ -406,6 +406,53 @@ async function atualizarPreferencias(userId, preferencias) {
     }
 }
 
+function showPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'block';
+    // document.getElementById("")
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function fecharPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function confirmarDelecao() {
+    fetch('/DeletarUsuario', {
+        method: 'DELETE'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Perfil deletado com sucesso.',
+                    text: "Redirecionando...",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops, algo deu errado.',
+                    text: 'Ocorreu um problema para deletar.'
+                });
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops, algo deu errado.',
+                text: 'Contate o suporte, por favor!'
+            });
+            return false;
+        });
+}
+
 async function logout() {
     try {
         const response = await fetch('/auth/logout', { // Rota de logout no backend
@@ -441,3 +488,30 @@ async function logout() {
         });
     }
 }
+
+
+let inatividadeTimer;
+
+// Função para redefinir o timer de inatividade
+function resetarInatividade() {
+    clearTimeout(inatividadeTimer);
+    inatividadeTimer = setTimeout(() => {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Sessão expirada!',
+            text: 'Você foi desconectado devido à inatividade.',
+            timer: 3000,
+            showConfirmButton: false
+        }).then(() => {
+            logout(); // Chama a função de logout
+        });
+    }, 10 * 60 * 1000); // 10 minutos
+}
+
+// Adiciona eventos para monitorar a atividade do usuário
+document.addEventListener('mousemove', resetarInatividade);
+document.addEventListener('keydown', resetarInatividade);
+document.addEventListener('click', resetarInatividade);
+
+// Inicializa o timer ao carregar a página
+resetarInatividade();

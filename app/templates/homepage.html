@@ -62,7 +62,7 @@
               </li>
               <li class="item_menu" id="submenu">
                 {% if session.user_id %}
-                <a href="#" onclick="logout()">
+                <a href="/" onclick="logout()">
                   <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
                   <span class="link">Logout</span>
                 </a>
@@ -109,7 +109,7 @@
             <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
             <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
             {% if session.user_id %}
-            <a class="dropdown-item" href="#" onclick="logout()">Logout</a>
+            <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
             {% else %}
             <a class="dropdown-item" href="/">Login</a>
             {% endif %}
@@ -212,13 +212,6 @@
 </script>
 <script src="{{ url_for('static', filename='js/homepage.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-<script>
-  function toggleSubmenu(event) {
-    event.preventDefault();
-    const item = event.currentTarget.closest('.has-submenu');
-    item.classList.toggle('active');
-  }
-</script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
   integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"

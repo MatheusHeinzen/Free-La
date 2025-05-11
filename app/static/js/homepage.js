@@ -260,7 +260,7 @@ function resetarInatividade() {
         }).then(() => {
             logout(); // Chama a função de logout
         });
-    }, 30 * 60 * 1000); // 30 minutos
+    }, 10 * 60 * 1000); // 10 minutos
 }
 
 // Adiciona eventos para monitorar a atividade do usuário

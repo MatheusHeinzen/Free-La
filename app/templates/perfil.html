@@ -16,16 +16,14 @@
 <body>
     <header>
         <div class="container">
+            <!-- Para celulares -->
             <nav class="menu_lateral" id="menu_lateral">
                 <div class="expandir">
                     <i class="bi bi-list"></i>
                 </div>
                 <ul>
                     <span class="icon"><img src="/static/imgs/perfil.png" width="140px"
-                            style="margin-left: 20px;">
-                            
-                        </span>
-                        
+                            style="margin-left: 20px;"></span>
                     <li class="item_menu">
                         <a href="/perfil">
                             <span class="icon"></span>
@@ -65,7 +63,7 @@
                             </li>
                             <li class="item_menu" id="submenu">
                                 {% if session.user_id %}
-                                <a href="#" onclick="logout()">
+                                <a href="/" onclick="logout()">
                                     <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
                                     <span class="link">Logout</span>
                                 </a>
@@ -78,22 +76,33 @@
                             </li>
                         </ul>
                     </li>
-
-
                 </ul>
             </nav>
         </div>
 
 
-
-        <div class="navbar navbar-dark bg-dark shadow-sm">
-            <div class="container d-flex justify-content-between">
-                <a href="/homepage" class="navbar-brand d-flex align-items-center">
-                    Home
-                </a>
-                <button id="toggleSidebar" style="font-size: 20px;">☰</button>
+        <!-- Par desktops -->
+        <nav class="desktop-version">
+            <div class="navbar navbar-dark bg-dark shadow-sm">
+                <div class="container d-flex justify-content-between">
+                    <a href="/homepage" class="navbar-brand d-flex align-items-center">Menu</a>
+                    <a href="#" class="phone-hidden">Sobre</a>
+                    <a href="#" class="phone-hidden">Contato</a>
+                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">Configurações</a>
+                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
+                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
+                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
+                        {% if session.user_id %}
+                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/">Login</a>
+                        {% endif %}
+                    </div>
+                    <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
+                </div>
             </div>
-        </div>
+        </nav>
     </header>
 
     <main>
@@ -218,10 +227,11 @@
                                                 <h3>Editar Perfil</h3>
                                                 <form action="/upload" method="POST" enctype="multipart/form-data">
                                                     <div id="preview-container">
-                                                        <img id="preview" alt="Pré-visualização da imagem" style="display: none;">
+                                                        <img id="preview" alt="Pré-visualização da imagem"
+                                                            style="display: none;">
                                                     </div>
                                                     <label for="image">Selecione uma imagem:</label>
-                                                    <input type="file" name="image" id="image"accept="image/*">
+                                                    <input type="file" name="image" id="image" accept="image/*">
                                                     <button type="submit">Alterar Imagem</button>
                                                 </form>
                                                 <form id="editForm">
@@ -260,7 +270,9 @@
     </main>
 
 </body>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
 <script>
     function toggleSubmenu(event) {
@@ -269,6 +281,5 @@
         item.classList.toggle('active');
     }
 </script>
-
 
 </html>

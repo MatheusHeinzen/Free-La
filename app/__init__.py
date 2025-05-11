@@ -16,7 +16,7 @@ def create_app():
     app.secret_key = 'senha_da_sessao'
 
     # Configuração de expiração da sessão
-    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=10)
 
     init_db(app)
 

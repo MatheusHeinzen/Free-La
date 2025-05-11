@@ -9,6 +9,7 @@
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <title>Alterar Dados</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
     <style>
         form {
             display: flex;
@@ -63,6 +64,7 @@
 <body>
     <header>
         <div class="container">
+            <!-- Para celulares -->
             <nav class="menu_lateral" id="menu_lateral">
                 <div class="expandir">
                     <i class="bi bi-list"></i>
@@ -109,7 +111,7 @@
                             </li>
                             <li class="item_menu" id="submenu">
                                 {% if session.user_id %}
-                                <a href="#" onclick="logout()">
+                                <a href="/" onclick="logout()">
                                     <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
                                     <span class="link">Logout</span>
                                 </a>
@@ -122,20 +124,42 @@
                             </li>
                         </ul>
                     </li>
-
-
                 </ul>
             </nav>
         </div>
 
-        <div class="navbar navbar-dark bg-dark shadow-sm">
-            <div class="container d-flex justify-content-between">
-                <a href="/homepage" class="navbar-brand d-flex align-items-center">
-                    Home
-                </a>
-                <button id="toggleSidebar" style="font-size: 20px;">☰</button>
-            </div>
+        <div class="overlay" id="overlay"></div>
+        <div class="pop-up-deletar" id="pop-up-deletar">
+            <h3>Deletar Perfil?</h3>
+            <p>Tem certeza que deseja excluir seu perfil? <br>
+                Você perderá todos seus dados e não poderá executar todas as funcionalidades do Site</p>
+            <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
+            <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
         </div>
+
+
+        <!-- Par desktops -->
+        <nav class="desktop-version">
+            <div class="navbar navbar-dark bg-dark shadow-sm">
+                <div class="container d-flex justify-content-between">
+                    <a href="/homepage" class="navbar-brand d-flex align-items-center">Menu</a>
+                    <a href="#" class="phone-hidden">Sobre</a>
+                    <a href="#" class="phone-hidden">Contato</a>
+                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">Configurações</a>
+                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
+                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
+                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
+                        {% if session.user_id %}
+                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/">Login</a>
+                        {% endif %}
+                    </div>
+                    <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
+                </div>
+            </div>
+        </nav>
     </header>
     <main>
         <div class="tab-pane" id="edit">
@@ -246,6 +270,9 @@
             $('#cep').mask('00000-000');
         });
     </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </body>
 
 
