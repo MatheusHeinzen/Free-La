@@ -16,6 +16,7 @@
 <body>
   <header>
     <div class="container">
+      <!-- Para celulares -->
       <nav class="menu_lateral" id="menu_lateral">
         <div class="expandir">
           <i class="bi bi-list"></i>
@@ -74,8 +75,6 @@
               </li>
             </ul>
           </li>
-
-
         </ul>
       </nav>
     </div>
@@ -89,20 +88,27 @@
       <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
     </div>
 
-    <div class="navbar navbar-dark bg-dark shadow-sm">
-      <div class="container d-flex justify-content-between">
-        {% if session.user_id %}
-        <a href="/perfil" class="navbar-brand d-flex align-items-center">
-          Olá, {{ obter_nome_usuario() }}
-        </a>
-        {% else %}
-        <a href="/" class="navbar-brand d-flex align-items-center">
-          Login/Cadastro
-        </a>
-        {% endif %}
-        <button id="toggleSidebar" style="font-size: 20px;">☰</button>
+
+    <!-- Par desktops -->
+    <nav class="desktop-version">
+      <div class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container d-flex justify-content-between">
+          {% if session.user_id %}
+          <a href="/perfil" class="navbar-brand d-flex align-items-center">
+            Olá, {{ obter_nome_usuario() }}
+          </a>
+          {% else %}
+          <a href="/" class="navbar-brand d-flex align-items-center">
+            Login
+          </a>
+          {% endif %}
+          <a href="#" class="phone-hidden" >Sobre</a>
+          <a href="#" class="phone-hidden">Contato</a>
+          <a href="#" class="phone-hidden">Configurações</a>
+          <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
+        </div>
       </div>
-    </div>
+    </nav>
   </header>
 
   <main>
