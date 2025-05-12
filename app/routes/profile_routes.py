@@ -11,6 +11,7 @@ def salvar_imagem_perfil():
     conn = None
     cursor = None
     try:
+        # Verifica se o arquivo foi enviado
         if 'image' not in request.files:
             return jsonify({"sucesso": False, "erro": "Nenhuma imagem enviada"}), 400
 
@@ -18,6 +19,7 @@ def salvar_imagem_perfil():
         if imagem.filename == '':
             return jsonify({"sucesso": False, "erro": "Nenhuma imagem selecionada"}), 400
 
+        # Obtém o ID do usuário
         user_id = request.form.get('user_id')
         if not user_id:
             return jsonify({"sucesso": False, "erro": "ID do usuário não fornecido"}), 400
@@ -25,7 +27,7 @@ def salvar_imagem_perfil():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Atualizar o atributo Foto na tabela Perfil
+        # Atualiza a imagem no banco de dados
         cursor.execute("""
             UPDATE perfil
             SET Foto = %s
@@ -92,26 +94,36 @@ def listar_freelancers():
         conn.close()
 
 @profile.route('/perfil/<int:user_id>', methods=['GET'])
-def perfil_publico(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+def exibir_perfil_publico(user_id):
+    conn = None
+    cursor = None
     try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Consulta para obter os dados do perfil público
         cursor.execute("""
-            SELECT u.Nome, u.Email, u.Telefone, p.Username, p.Bio, p.Foto
+            SELECT u.Nome, u.Email, u.Telefone, p.Bio, c.NomeCategoria
             FROM usuario u
-            INNER JOIN perfil p ON u.ID_User = p.ID_Usuario
-            WHERE u.ID_User = %s AND u.TipoUsuario = 'freelancer' AND u.Ativo = TRUE
+            LEFT JOIN perfil p ON u.ID_User = p.ID_Usuario
+            LEFT JOIN perfil_categoria pc ON p.IdPerfil = pc.ID_Perfil
+            LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
+            WHERE u.ID_User = %s AND u.Ativo = TRUE
         """, (user_id,))
         perfil = cursor.fetchone()
+
         if not perfil:
-            return "Perfil não encontrado", 404
-        return jsonify({"sucesso": True, "perfil": perfil}), 200
+            return render_template('404.html'), 404
+
+        return render_template('perfil_publico.html', perfil=perfil)
     except Exception as e:
-        print(f"Erro ao carregar perfil público: {e}")
-        return jsonify({"sucesso": False, "erro": "Erro ao carregar perfil público"}), 500
+        print(f"Erro ao exibir perfil público: {e}")
+        return render_template('500.html'), 500
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 @profile.route('/user/<int:user_id>', methods=['PUT'])
 def atualizar_usuario(user_id):

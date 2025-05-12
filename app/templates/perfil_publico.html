@@ -4,41 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perfil Público</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="card">
-            <div class="card-body text-center">
-                <img id="foto" class="rounded-circle mb-3" alt="Foto do Freelancer" width="150">
-                <h3 id="nome"></h3>
-                <p id="bio"></p>
-                <p><strong>Email:</strong> <span id="email"></span></p>
-                <p><strong>Telefone:</strong> <span id="telefone"></span></p>
-            </div>
-        </div>
-    </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const userId = window.location.pathname.split('/').pop();
-            try {
-                const response = await fetch(`/perfil/${userId}`);
-                if (!response.ok) throw new Error('Erro ao carregar perfil público');
-                const data = await response.json();
-                if (data.sucesso) {
-                    document.getElementById('foto').src = `data:image/jpeg;base64,${data.perfil.Foto || ''}`;
-                    document.getElementById('nome').textContent = data.perfil.Username || data.perfil.Nome;
-                    document.getElementById('bio').textContent = data.perfil.Bio || 'Sem descrição disponível.';
-                    document.getElementById('email').textContent = data.perfil.Email || 'Não disponível.';
-                    document.getElementById('telefone').textContent = data.perfil.Telefone || 'Não disponível.';
-                } else {
-                    throw new Error(data.erro || 'Erro ao carregar perfil público');
-                }
-            } catch (error) {
-                console.error(error);
-                alert('Erro ao carregar perfil público.');
-            }
-        });
-    </script>
+    <header>
+        <h1>Perfil de {{ perfil.Nome }}</h1>
+    </header>
+    <main>
+        <section>
+            <p><strong>Email:</strong> {{ perfil.Email }}</p>
+            <p><strong>Telefone:</strong> {{ perfil.Telefone or 'Não informado' }}</p>
+            <p><strong>Categoria:</strong> {{ perfil.NomeCategoria or 'Não informado' }}</p>
+            <p><strong>Bio:</strong> {{ perfil.Bio or 'Sem descrição' }}</p>
+        </section>
+    </main>
 </body>
 </html>

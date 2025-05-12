@@ -69,6 +69,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             e.preventDefault();
             const formData = new FormData(formUploadImagem);
 
+            // Adiciona o user_id ao FormData
+            const userId = document.querySelector('input[name="user_id"]').value;
+            formData.append('user_id', userId);
+
             try {
                 const response = await fetch('/profile/upload_imagem', {
                     method: 'POST',
