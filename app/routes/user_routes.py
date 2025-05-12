@@ -1,8 +1,31 @@
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, session, redirect, url_for
+from functools import wraps
 from werkzeug.security import generate_password_hash
 from app.utils.db import get_db_connection
 
 user_bp = Blueprint('user', __name__)
+
+# Decorador para verificar autenticação 
+def login_required(func):
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        if not session.get('user_id'):
+            # Se for uma requisição API, retorne JSON
+            if request.is_json:
+                return jsonify({"sucesso": False, "mensagem": "Não autenticado"}), 401
+            # Caso contrário, redirecione para login
+            return redirect(url_for('/login'))  # Ajuste a rota conforme necessário
+        return func(*args, **kwargs)
+    return decorated_function
+
+# Rota de exemplo que usa a sessão 
+@user_bp.route('/')
+def home():
+    if 'user_id' in session:
+        return redirect(url_for('user.obter_usuario', user_id=session['user_id']))
+    return "Bem-vindo! Faça login para continuar."
+
+
 
 @user_bp.route('/register', methods=['POST'])
 def cadastrar():

@@ -33,15 +33,15 @@ form {
     width: 70vh;
 }
 #preview-container {
-    height: 25vh;
+    height: 32vh;
     width: 35vw;;
     margin-top: 20px;
     text-align: center;
 }
 
 #preview {
-    width: 45vw;
-    height: 55vh;
+    width: 30vw;
+    height: 30vh;
     object-fit: cover;
     border: 2px solid #ccc;
     border-radius: 5px;

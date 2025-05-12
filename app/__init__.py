@@ -10,7 +10,7 @@ def create_app():
     app.config['DB_CONFIG'] = {
         'host': 'localhost',
         'user': 'root',
-        'password': 'PUC@1234',
+        'password': 'Root#963',
         'database': 'freela'
     }
     app.secret_key = 'senha_da_sessao'
@@ -28,7 +28,7 @@ def create_app():
     from app.routes.skill_routes import skill_bp
     from app.routes.preference_routes import preference_bp
     from app.utils.session_helpers import obter_nome_usuario
-    from app.routes.profile_roures import profile
+    from app.routes.profile_routes import profile
 
 
     app.register_blueprint(user_bp, url_prefix='/user')

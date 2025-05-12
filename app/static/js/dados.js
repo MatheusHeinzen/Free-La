@@ -61,10 +61,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCancelar = document.getElementById('btnCancelar');
     if (btnCancelar) {
         btnCancelar.addEventListener('click', function() {
-            if (confirm('Tem certeza que deseja descartar as alterações?')) {
-                window.location.href = '/homepage';
-            }
-        });
+        try{
+            Swal.fire({
+                icon: 'error',
+                title: 'Cancelar Alterações',
+                text: "Você está sendo redirecionado para a Homepage...",
+                timer: 2000,
+                showConfirmButton: true
+            }).then(() => {
+                window.location.href = "/homepage";
+            });
+        } catch {
+            throw new Error(data.erro || "Erro");
+        }
+    });
     }
 });
 

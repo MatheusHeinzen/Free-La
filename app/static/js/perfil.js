@@ -480,11 +480,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
                 
             } catch (error) {
-            console.error("Erro ao enviar imagem:", error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'Erro ao enviar imagem! Tente novamente.'
+                console.error("Erro ao enviar imagem:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: 'Erro ao enviar imagem! Tente novamente.'
         });
         
         }
@@ -535,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Para ver a imagem
-const imgInput = document.getElementById('img');
+const imgInput = document.getElementById('image');
 const preview = document.getElementById('preview');
 
 imgInput.addEventListener('change', (event) => {
