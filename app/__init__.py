@@ -10,7 +10,7 @@ def create_app():
     app.config['DB_CONFIG'] = {
         'host': 'localhost',
         'user': 'root',
-        'password': 'Root#963',
+        'password': 'PUC@1234',
         'database': 'freela'
     }
     app.secret_key = 'senha_da_sessao'

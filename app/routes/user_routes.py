@@ -127,7 +127,7 @@ def atualizar_usuario(user_id):
             WHERE ID_User = %s
         """, (nome, email, telefone, cpf, tipo_usuario, user_id))
 
-        # Atualizar endereço
+        # Atualizar ou criar endereço
         cursor.execute("""
             INSERT INTO endereco (CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
@@ -141,6 +141,13 @@ def atualizar_usuario(user_id):
         """, (endereco.get('CEP'), endereco.get('Logradouro'), endereco.get('Cidade'),
               endereco.get('Bairro'), endereco.get('Estado'), endereco.get('Numero'),
               endereco.get('Complemento')))
+
+        # Associar o endereço ao usuário
+        cursor.execute("""
+            UPDATE usuario
+            SET ID_Endereco = (SELECT ID_Endereco FROM endereco WHERE CEP = %s AND Logradouro = %s)
+            WHERE ID_User = %s
+        """, (endereco.get('CEP'), endereco.get('Logradouro'), user_id))
 
         conn.commit()
         return jsonify({"sucesso": True, "mensagem": "Dados atualizados com sucesso!"}), 200

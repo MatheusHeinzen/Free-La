@@ -724,7 +724,7 @@ async function logout() {
                 timer: 2000,
                 showConfirmButton: false
             }).then(() => {
-                // Redireciona para a página inicial ou de login
+                // Redireciona para a página de login
                 window.location.href = "/";
             });
         } else {
