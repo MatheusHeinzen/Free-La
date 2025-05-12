@@ -13,6 +13,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             btnContatos.addEventListener('click', () => mostrarModalContatos(preferencias));
         }
 
+        // Atualiza a foto do perfil
+        const fotoPerfil = document.getElementById('fotoPerfil');
+        if (fotoPerfil) {
+            fotoPerfil.src = `/profile/imagem/${usuario.ID_User}?timestamp=${new Date().getTime()}`;
+        }
+
+        // Carrega bio e categoria do perfil
+        await carregarPerfil(usuario.ID_User);
+
+        // Carrega categorias no formulário de edição
+        await carregarCategorias();
+
     } catch (error) {
         console.error('Erro:', error);
         Swal.fire({
@@ -50,17 +62,84 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (event.target == modal) modal.style.display = "none";
     };
 
+    // Configura envio do formulário de imagem
+    const formUploadImagem = document.getElementById('formUploadImagem');
+    if (formUploadImagem) {
+        formUploadImagem.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(formUploadImagem);
+
+            try {
+                const response = await fetch('/profile/upload_imagem', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) throw new Error('Erro ao atualizar imagem');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Imagem atualizada com sucesso!',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } catch (error) {
+                console.error('Erro ao atualizar imagem:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: 'Erro ao atualizar imagem.'
+                });
+            }
+        });
+    }
+
+    // Configura envio do formulário de bio e categoria
+    const editForm = document.getElementById('editForm');
+    if (editForm) {
+        editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userId = document.querySelector('input[name="user_id"]').value;
+            const bio = document.getElementById('descricao')?.value || '';
+            const categoriaId = document.getElementById('categoria')?.value || '';
+
+            try {
+                const response = await fetch('/profile/salvar_bio_categoria', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: userId, bio, categoria_id: categoriaId })
+                });
+
+                if (!response.ok) throw new Error('Erro ao salvar bio e categoria');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Bio e categoria atualizadas com sucesso!',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } catch (error) {
+                console.error('Erro ao salvar bio e categoria:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: 'Erro ao salvar bio e categoria.'
+                });
+            }
+        });
+    }
+
     const form = document.getElementById("editForm");
     if (form) {
-        form.addEventListener("submit", function (e) {
+        form.addEventListener("submit", async function (e) {
             e.preventDefault();
             const categoria = document.getElementById("categoria").value;
             const descricao = document.getElementById("descricao").value;
 
-            console.log("Categoria:", categoria);
-            console.log("Descrição:", descricao);
-
-            modal.style.display = "none";
+            try {
+                await salvarPerfil(categoria, descricao);
+                modal.style.display = "none"; // Fecha o modal após salvar
+            } catch (error) {
+                console.error("Erro ao salvar perfil:", error);
+            }
         });
     }
 });
@@ -124,12 +203,12 @@ async function atualizarPreferencias(userId, preferencias) {
 }
 
 function atualizarInterface(usuario, preferencias) {
-    const nomeEl = document.querySelector('.profile-card-4 h5');
-    const catEl = document.querySelector('.profile-card-4 h6');
-    const listaContatos = document.querySelector('#contatos .list-group');
+    const nomeEl = document.getElementById('nomeUsuario');
+    const profissaoEl = document.getElementById('profissaoUsuario');
+    const listaContatos = document.getElementById('listaContatos');
 
     if (nomeEl) nomeEl.textContent = usuario.Nome || 'Nome não informado';
-    if (catEl) catEl.textContent = usuario.Profissao || usuario.Categoria || 'Perfil do Usuário';
+    if (profissaoEl) profissaoEl.textContent = usuario.Profissao || usuario.Categoria || 'Perfil do Usuário';
 
     if (listaContatos) {
         listaContatos.innerHTML = '';
@@ -158,6 +237,7 @@ function atualizarInterface(usuario, preferencias) {
     }
 }
 
+// Atualizei a função para fechar o modal de preferências corretamente
 function mostrarModalContatos(preferencias) {
     const existente = document.getElementById("modalContatos");
     if (existente) existente.remove();
@@ -180,9 +260,13 @@ function mostrarModalContatos(preferencias) {
             mostrarEmail: document.getElementById('opt-email').checked
         };
 
-        await salvarPreferencias(novasPrefs);
-        document.getElementById('modalContatos').remove();
-        location.reload();
+        try {
+            await salvarPreferencias(novasPrefs);
+            document.getElementById('modalContatos').remove(); // Fecha o modal
+            location.reload(); // Recarrega a página para atualizar a interface
+        } catch (error) {
+            console.error("Erro ao salvar preferências:", error);
+        }
     });
 }
 
@@ -354,24 +438,27 @@ function limparErros() {
 
 async function carregarPerfil(userId) {
     try {
-        const response = await fetch(`/user/${userId}`);
-        const data = await response.json();
-        if (data.sucesso) {
-            console.log("Perfil do usuário:", data.usuario);
-            // Preencher os campos do perfil com os dados do usuário
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: data.erro
-            });
+        const response = await fetch(`/profile/obter_perfil/${userId}`);
+        if (!response.ok) throw new Error('Erro ao carregar perfil');
+
+        const { perfil } = await response.json();
+
+        // Atualiza a bio e a categoria na interface
+        const descricaoEl = document.querySelector('#profile p');
+        if (descricaoEl) {
+            descricaoEl.textContent = perfil.Bio || 'Descrição não informada.';
+        }
+
+        const profissaoEl = document.getElementById('profissaoUsuario');
+        if (profissaoEl) {
+            profissaoEl.textContent = perfil.NomeCategoria || 'Categoria não informada.';
         }
     } catch (error) {
-        console.error("Erro ao carregar perfil:", error);
+        console.error('Erro ao carregar perfil:', error);
         Swal.fire({
             icon: 'error',
             title: 'Erro!',
-            text: 'Erro ao carregar perfil.'
+            text: 'Erro ao carregar bio e categoria do perfil.'
         });
     }
 }
@@ -554,25 +641,25 @@ imgInput.addEventListener('change', (event) => {
 });
 
 // Chamar categorias
-document.addEventListener('DOMContentLoaded', function() {
-    
-    fetch('/obter-categorias')
-        .then(response => response.json())
-        .then(categorias => {
-            const select = document.getElementById('categoria');
-            
+async function carregarCategorias() {
+    try {
+        const response = await fetch('/profile/obter-categorias');
+        if (!response.ok) throw new Error('Erro ao carregar categorias');
+
+        const categorias = await response.json();
+        const select = document.getElementById('categoria');
+        if (select) {
             categorias.forEach(categoria => {
                 const option = document.createElement('option');
-                option.value = categoria.ID_Categoria; // Usando o ID como valor
+                option.value = categoria.ID_Categoria;
                 option.textContent = categoria.NomeCategoria;
                 select.appendChild(option);
             });
-        })
-        .catch(error => {
-            console.error('Erro ao carregar categorias:', error);
-        });
-});
-
+        }
+    } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+    }
+}
 
 function showPopUpDeletar() {
     document.getElementById('pop-up-deletar').style.display = 'block';

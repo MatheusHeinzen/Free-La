@@ -1,54 +1,75 @@
-from flask import Blueprint, request, redirect, url_for, jsonify, send_file, render_template
+from flask import Blueprint, request, redirect, url_for, jsonify, send_file, render_template, session, Response
 import io
 from app.utils.db import get_db_connection
+from werkzeug.utils import secure_filename
 
 profile = Blueprint('profile', __name__)
 
 # Atualizar apenas a imagem de perfil
-@profile.route('/upload', methods=['POST'])
-def upload_imagem():
-    imagem = request.files.get('image')
-    user_id = request.form.get('user_id')  
+@profile.route('/upload_imagem', methods=['POST'])
+def salvar_imagem_perfil():
+    conn = None
+    cursor = None
+    try:
+        if 'image' not in request.files:
+            return jsonify({"sucesso": False, "erro": "Nenhuma imagem enviada"}), 400
 
-    if not user_id:
-        return "ID de usuário ausente", 400
+        imagem = request.files['image']
+        if imagem.filename == '':
+            return jsonify({"sucesso": False, "erro": "Nenhuma imagem selecionada"}), 400
 
-    if imagem:
-        blob = imagem.read()
+        user_id = request.form.get('user_id')
+        if not user_id:
+            return jsonify({"sucesso": False, "erro": "ID do usuário não fornecido"}), 400
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("UPDATE perfil SET Foto = %s WHERE ID_Usuario = %s", (blob, user_id))
+
+        # Atualizar o atributo Foto na tabela Perfil
+        cursor.execute("""
+            UPDATE perfil
+            SET Foto = %s
+            WHERE ID_Usuario = %s
+        """, (imagem.read(), user_id))
+
         conn.commit()
-        cursor.close()
-        conn.close()
-
-        return "Imagem enviada com sucesso!"
-
-    return "Nenhuma imagem enviada", 400
+        return jsonify({"sucesso": True, "mensagem": "Imagem atualizada com sucesso!"}), 200
+    except Exception as e:
+        print(f"Erro ao salvar imagem do perfil: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao salvar imagem do perfil"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # Atualizar bio e categoria
 @profile.route('/editar_perfil', methods=['POST'])
 def editar_perfil():
-    categoria = request.form.get('categoria')
-    descricao = request.form.get('descricao')
-    user_id = request.form.get('user_id')
+    try:
+        dados = request.get_json()
+        categoria = dados.get('categoria')
+        descricao = dados.get('descricao')
+        user_id = session.get('user_id')
 
-    if not user_id:
-        return "ID de usuário ausente", 400
+        if not user_id:
+            return jsonify({"sucesso": False, "erro": "Usuário não autenticado"}), 401
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE perfil 
-        SET Username = %s, Bio = %s 
-        WHERE ID_Usuario = %s
-    """, (categoria, descricao, user_id))
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    return jsonify({"message": "Perfil atualizado com sucesso!"})
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE perfil 
+            SET Username = %s, Bio = %s 
+            WHERE ID_Usuario = %s
+        """, (categoria, descricao, user_id))
+        conn.commit()
+        return jsonify({"sucesso": True, "mensagem": "Perfil atualizado com sucesso!"}), 200
+    except Exception as e:
+        print(f"Erro ao editar perfil: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao editar perfil"}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 @profile.route('/freelancers', methods=['GET'])
 def listar_freelancers():
@@ -131,19 +152,31 @@ def atualizar_usuario(user_id):
         cursor.close()
         conn.close()
 
-@profile.route('/imagem/<int:user_id>')
-def exibir_imagem(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT Foto FROM perfil WHERE ID_Usuario = %s", (user_id,))
-    resultado = cursor.fetchone()
-    cursor.close()
-    conn.close()
+@profile.route('/imagem/<int:user_id>', methods=['GET'])
+def obter_imagem_perfil(user_id):
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    if resultado and resultado[0]:
-        return send_file(io.BytesIO(resultado[0]), mimetype='image/jpeg')  # ou image/png
-    return "Imagem não encontrada", 404
+        cursor.execute("""
+            SELECT Foto FROM perfil WHERE ID_Usuario = %s
+        """, (user_id,))
+        imagem = cursor.fetchone()
 
+        if not imagem or not imagem[0]:
+            return jsonify({"sucesso": False, "erro": "Imagem não encontrada"}), 404
+
+        return Response(imagem[0], mimetype='image/jpeg')
+    except Exception as e:
+        print(f"Erro ao obter imagem do perfil: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao obter imagem do perfil"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # Para capturar as categorias
 @profile.route('/obter-categorias', methods=['GET'])
@@ -163,4 +196,77 @@ def obter_categorias():
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
+            conn.close()
+
+@profile.route('/salvar_bio_categoria', methods=['POST'])
+def salvar_bio_categoria():
+    conn = None
+    cursor = None
+    try:
+        dados = request.get_json()
+        user_id = dados.get('user_id')
+        bio = dados.get('bio')
+        categoria_id = dados.get('categoria_id')
+
+        if not user_id:
+            return jsonify({"sucesso": False, "erro": "ID do usuário não fornecido"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Atualizar a bio na tabela Perfil
+        cursor.execute("""
+            UPDATE perfil
+            SET Bio = %s
+            WHERE ID_Usuario = %s
+        """, (bio, user_id))
+
+        # Atualizar ou inserir a categoria na tabela perfil_categoria
+        if categoria_id:
+            cursor.execute("""
+                INSERT INTO perfil_categoria (ID_Perfil, ID_Categoria)
+                VALUES ((SELECT IdPerfil FROM perfil WHERE ID_Usuario = %s), %s)
+                ON DUPLICATE KEY UPDATE ID_Categoria = VALUES(ID_Categoria)
+            """, (user_id, categoria_id))
+
+        conn.commit()
+        return jsonify({"sucesso": True, "mensagem": "Bio e categoria atualizadas com sucesso!"}), 200
+    except Exception as e:
+        print(f"Erro ao salvar bio e categoria: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao salvar bio e categoria"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@profile.route('/obter_perfil/<int:user_id>', methods=['GET'])
+def obter_perfil(user_id):
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Consulta para obter bio e categoria do perfil
+        cursor.execute("""
+            SELECT p.Bio, c.NomeCategoria
+            FROM perfil p
+            LEFT JOIN perfil_categoria pc ON p.IdPerfil = pc.ID_Perfil
+            LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
+            WHERE p.ID_Usuario = %s
+        """, (user_id,))
+        perfil = cursor.fetchone()
+
+        if not perfil:
+            return jsonify({"sucesso": False, "erro": "Perfil não encontrado"}), 404
+
+        return jsonify({"sucesso": True, "perfil": perfil}), 200
+    except Exception as e:
+        print(f"Erro ao obter perfil: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao obter perfil"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
             conn.close()

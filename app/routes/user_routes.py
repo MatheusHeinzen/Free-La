@@ -100,3 +100,55 @@ def obter_usuario_atual():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@user_bp.route('/<int:user_id>', methods=['PUT'])
+def atualizar_usuario(user_id):
+    conn = None
+    cursor = None
+    try:
+        dados = request.get_json()
+        if not isinstance(dados, dict):
+            return jsonify({"sucesso": False, "erro": "Dados inválidos"}), 400
+
+        nome = dados.get('nome')
+        email = dados.get('email')
+        telefone = dados.get('telefone', None)
+        cpf = dados.get('cpf')
+        tipo_usuario = dados.get('tipoUsuario')
+        endereco = dados.get('endereco', {})
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Atualizar dados básicos do usuário
+        cursor.execute("""
+            UPDATE usuario
+            SET Nome = %s, Email = %s, Telefone = %s, CPF = %s, TipoUsuario = %s
+            WHERE ID_User = %s
+        """, (nome, email, telefone, cpf, tipo_usuario, user_id))
+
+        # Atualizar endereço
+        cursor.execute("""
+            INSERT INTO endereco (CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE
+                Logradouro = VALUES(Logradouro),
+                Cidade = VALUES(Cidade),
+                Bairro = VALUES(Bairro),
+                Estado = VALUES(Estado),
+                Numero = VALUES(Numero),
+                Complemento = VALUES(Complemento)
+        """, (endereco.get('CEP'), endereco.get('Logradouro'), endereco.get('Cidade'),
+              endereco.get('Bairro'), endereco.get('Estado'), endereco.get('Numero'),
+              endereco.get('Complemento')))
+
+        conn.commit()
+        return jsonify({"sucesso": True, "mensagem": "Dados atualizados com sucesso!"}), 200
+    except Exception as e:
+        print(f"Erro ao atualizar usuário: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao atualizar dados do usuário"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
