@@ -46,33 +46,33 @@
                             <span class="link">Configurações</span>
                         </a>
                         <ul class="submenu">
-                        <ul class="submenu">
-                            <li class="item_menu" id="submenu">
-                                <a href="/alterarDados">
-                                    <span class="icon"><i class="#"></i></span>
-                                    <span class="link">Atualizar Dados</span>
-                                </a>
-                            </li>
-                            <li class="item_menu" id="submenu">
-                                <a href="#" onclick="showPopUpDeletar()">
-                                    <span class="icon"><i class="#"></i></span>
-                                    <span class="link">Deletar Perfil</span>
-                                </a>
-                            </li>
-                            <li class="item_menu" id="submenu">
-                                {% if session.user_id %}
-                                <a href="/" onclick="logout()">
-                                    <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
-                                    <span class="link">Logout</span>
-                                </a>
-                                {% else %}
-                                <a href="/">
-                                    <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
-                                    <span class="link">Login</span>
-                                </a>
-                                {% endif %}
-                            </li>
-                        </ul>
+                            <ul class="submenu">
+                                <li class="item_menu" id="submenu">
+                                    <a href="/alterarDados">
+                                        <span class="icon"><i class="#"></i></span>
+                                        <span class="link">Atualizar Dados</span>
+                                    </a>
+                                </li>
+                                <li class="item_menu" id="submenu">
+                                    <a href="#" onclick="showPopUpDeletar()">
+                                        <span class="icon"><i class="#"></i></span>
+                                        <span class="link">Deletar Perfil</span>
+                                    </a>
+                                </li>
+                                <li class="item_menu" id="submenu">
+                                    {% if session.user_id %}
+                                    <a href="/" onclick="logout()">
+                                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                                        <span class="link">Logout</span>
+                                    </a>
+                                    {% else %}
+                                    <a href="/">
+                                        <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                        <span class="link">Login</span>
+                                    </a>
+                                    {% endif %}
+                                </li>
+                            </ul>
                     </li>
                 </ul>
             </nav>
@@ -110,7 +110,11 @@
                         <div class="card">
                             <div class="card-body text-center bg-primary rounded-top">
                                 <div class="user-box">
+                                    {% if session.user_id %}
+                                    <img src="/imagem/1" alt="Foto de Perfil" width="150" height="150">
+                                    {% else %}
                                     <img src="../static/imgs/perfil.png" alt="user avatar">
+                                    {% endif %}
                                 </div>
                                 <h5 class="mb-1 text-white" value="nome"></h5>
                                 <h6 class="text-light">Palavra-Chave/Profissão/Categoria</h6>
@@ -218,31 +222,46 @@
 
                                     <div class="editar-dados-perfil" id="editar-dados">
                                         <div id="editModal" class="modal">
-                                            <div class="modal-content-editar-perfil">
+                                            <div class="modal-content-editar-perfil" style="display: flex;">
                                                 <span class="close">&times;</span>
-                                                <h3>Editar Perfil</h3>
-                                                <form action="/upload" method="POST" enctype="multipart/form-data">
-                                                    <div id="preview-container">
-                                                        <img id="preview" alt="Pré-visualização da imagem"
-                                                            style="display: none;">
-                                                    </div>
-                                                    <label for="image">Selecione uma imagem:</label>
-                                                    <input type="file" name="image" id="image" accept="image/*">
-                                                    <button type="submit">Alterar Imagem</button>
-                                                </form>
-                                                <form id="editForm">
-                                                    <input type="hidden" name="user_id" value="session['user_id']">
-                                                    <label for="categoria">Palavra-chave / Profissão /
-                                                        Categoria:</label>
-                                                    <input type="text" id="categoria" name="categoria"
-                                                        placeholder="Ex: Desenvolvedora Frontend">
+                                                <div class="separador">
+                                                    <h3 style="justify-content: center;">Editar Perfil</h3>
+                                                    <form action="/upload" method="POST" enctype="multipart/form-data">
+                                                        <div id="preview-container">
+                                                            <img id="preview" alt="Pré-visualização da imagem"
+                                                                style="display: none;">
+                                                        </div>
+                                                        <label for="image">Selecione uma imagem:</label>
+                                                        <input type="file" name="image" id="image" accept="image/*">
+                                                        <button type="submit">Alterar Imagem</button>
+                                                    </form>
+                                                </div>
+                                                <div class="separador">
+                                                    <form id="editForm">
+                                                        <input type="hidden" name="user_id"
+                                                            value="{{ session['user_id'] }}">
 
-                                                    <label for="descricao">Descrição:</label>
-                                                    <textarea id="descricao" name="descricao" rows="3"
-                                                        placeholder="Escreva sua descrição..."></textarea>
+                                                        <label for="categoria">Palavra-chave / Profissão /
+                                                            Categoria:</label>
+                                                        <select id="categoria" name="categoria">
+                                                            <option value="" disabled selected>Escolha uma categoria
+                                                            </option>
+                                                            {% for cat in categorias %}
+                                                            <option value="{{ cat }}">{{ cat }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <select id="categoria" name="categoria" required>
+                                                            <option value="" disabled selected>Selecione uma categoria</option>
+                                                            <!-- As opções serão preenchidas via JavaScript -->
+                                                        </select>
 
-                                                    <button type="submit">Salvar</button>
-                                                </form>
+                                                        <label for="descricao">Descrição:</label>
+                                                        <textarea id="descricao" name="descricao" rows="3"
+                                                            placeholder="Escreva sua descrição..."></textarea>
+
+                                                        <button type="submit">Salvar</button>
+                                                    </form>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -258,16 +277,23 @@
         <div class="overlay" id="overlay"></div>
         <div class="pop-up-deletar" id="pop-up-deletar">
             <h3>Deletar Perfil?</h3>
-            <p>Tem certeza que deseja excluir seu perfil? Você perderá todos seus dados e não poderá executar todas as funcionalidades do site.</p>
+            <p>Tem certeza que deseja excluir seu perfil? Você perderá todos seus dados e não poderá executar todas as
+                funcionalidades do site.</p>
             <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
             <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
         </div>
     </main>
 
 </body>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
 <script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
 <script>
     function toggleSubmenu(event) {

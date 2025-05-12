@@ -3,6 +3,7 @@
     width: 110px;
     margin: auto;
     margin-bottom: auto;
+    padding: auto;
 
 }
 
@@ -30,7 +31,7 @@
 
 /* Para pré- visualização da imagem */
 form {
-    width: 70vh;
+    width: 80%;
 }
 #preview-container {
     height: 32vh;

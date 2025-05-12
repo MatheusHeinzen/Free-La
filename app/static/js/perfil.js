@@ -553,6 +553,27 @@ imgInput.addEventListener('change', (event) => {
     }
 });
 
+// Chamar categorias
+document.addEventListener('DOMContentLoaded', function() {
+    
+    fetch('/obter-categorias')
+        .then(response => response.json())
+        .then(categorias => {
+            const select = document.getElementById('categoria');
+            
+            categorias.forEach(categoria => {
+                const option = document.createElement('option');
+                option.value = categoria.ID_Categoria; // Usando o ID como valor
+                option.textContent = categoria.NomeCategoria;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar categorias:', error);
+        });
+});
+
+
 function showPopUpDeletar() {
     document.getElementById('pop-up-deletar').style.display = 'block';
     // document.getElementById("")

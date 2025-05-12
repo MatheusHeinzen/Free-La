@@ -1,5 +1,4 @@
-from flask import Blueprint, request, redirect, url_for, jsonify
-import mysql.connector
+from flask import Blueprint, request, redirect, url_for, jsonify, send_file, render_template
 import io
 from app.utils.db import get_db_connection
 
@@ -131,3 +130,37 @@ def atualizar_usuario(user_id):
     finally:
         cursor.close()
         conn.close()
+
+@profile.route('/imagem/<int:user_id>')
+def exibir_imagem(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT Foto FROM perfil WHERE ID_Usuario = %s", (user_id,))
+    resultado = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if resultado and resultado[0]:
+        return send_file(io.BytesIO(resultado[0]), mimetype='image/jpeg')  # ou image/png
+    return "Imagem não encontrada", 404
+
+
+# Para capturar as categorias
+@profile.route('/obter-categorias', methods=['GET'])
+def obter_categorias():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("SELECT ID_Categoria, NomeCategoria FROM categoria ORDER BY NomeCategoria")
+        categorias = cursor.fetchall()
+        
+        return jsonify(categorias)
+    
+    except Exception as e:
+        return jsonify({"sucesso": False, "erro": str(e)}), 500
+    
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
