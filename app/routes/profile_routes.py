@@ -93,32 +93,48 @@ def listar_freelancers():
         cursor.close()
         conn.close()
 
-@profile.route('/perfil/<int:user_id>', methods=['GET'])
-def exibir_perfil_publico(user_id):
+@profile.route('/perfilPublico/<int:user_id>', methods=['GET'])
+def obter_perfil_publico(user_id):
     conn = None
     cursor = None
     try:
+        print(f"▶️ Iniciando consulta para user_id: {user_id}")  # Log de início
+        
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Consulta para obter os dados do perfil público
+        # 1. Primeiro verifica se o usuário existe
+        cursor.execute("SELECT ID_User, Nome FROM usuario WHERE ID_User = %s AND Ativo = TRUE", (user_id,))
+        usuario = cursor.fetchone()
+        print(f"ℹ️ Dados do usuário: {usuario}")  # Log dos dados
+
+        if not usuario:
+            return jsonify({"sucesso": False, "erro": "Usuário não encontrado"}), 404
+
+        # 2. Consulta básica de perfil (simplificada para teste)
         cursor.execute("""
-            SELECT u.Nome, u.Email, u.Telefone, p.Bio, c.NomeCategoria
-            FROM usuario u
-            LEFT JOIN perfil p ON u.ID_User = p.ID_Usuario
+            SELECT p.Bio, c.NomeCategoria AS Categoria
+            FROM perfil p
             LEFT JOIN perfil_categoria pc ON p.IdPerfil = pc.ID_Perfil
             LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
-            WHERE u.ID_User = %s AND u.Ativo = TRUE
+            WHERE p.ID_Usuario = %s
+            LIMIT 1
         """, (user_id,))
         perfil = cursor.fetchone()
+        print(f"ℹ️ Dados do perfil: {perfil}")  # Log dos dados
 
-        if not perfil:
-            return render_template('404.html'), 404
+        return jsonify({
+            "sucesso": True,
+            "perfil": {
+                "Nome": usuario["Nome"],
+                "Bio": perfil["Bio"] if perfil else "",
+                "Categoria": perfil["Categoria"] if perfil else ""
+            }
+        })
 
-        return render_template('perfil_publico.html', perfil=perfil)
     except Exception as e:
-        print(f"Erro ao exibir perfil público: {e}")
-        return render_template('500.html'), 500
+        print(f"🔥 ERRO CRÍTICO: {str(e)}")  # Log detalhado
+        return jsonify({"sucesso": False, "erro": "Erro interno ao obter perfil"}), 500
     finally:
         if cursor:
             cursor.close()

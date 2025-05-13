@@ -478,7 +478,7 @@ function resetarInatividade() {
             icon: 'warning',
             title: 'Sessão expirada!',
             text: 'Você foi desconectado devido à inatividade.',
-            timer: 3000,
+            timer: 5000,
             showConfirmButton: false
         }).then(() => {
             logout(); // Chama a função de logout
