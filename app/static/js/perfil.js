@@ -30,8 +30,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         Swal.fire({
             icon: 'error',
             title: 'Erro!',
-            text: 'Erro ao carregar perfil.'
-        });
+            text: 'Erro ao carregar perfil.',
+            timer: 2000
+        }).then(() => window.location.href = `/`)
     }
 
     // Sidebar
@@ -444,7 +445,6 @@ async function carregarPerfil(userId) {
     try {
         const response = await fetch(`/profile/obter_perfil/${userId}`);
         if (!response.ok) throw new Error('Erro ao carregar perfil');
-
         const { perfil } = await response.json();
 
         // Atualiza a bio e a categoria na interface
@@ -511,9 +511,8 @@ async function logout() {
                 icon: 'success',
                 title: 'Logout realizado!',
                 text: data.mensagem,
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => {
+                timer: 2000
+                }).then(() => {
                 // Redireciona para a página inicial ou de login
                 window.location.href = "/";
             });
@@ -560,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     timer: 2000,
                     showConfirmButton: false
                 }).then(() => {
-                    window.location.href = "/";
+                    window.location.href = "/perfil";
                 });
             } else {
                 Swal.fire({
@@ -762,7 +761,8 @@ function resetarInatividade() {
             showConfirmButton: false
         }).then(() => {
             logout(); // Chama a função de logout
-        });
+            window.location.href = "/";
+        })
     }, 10 * 60 * 1000); // 10 minutos
 }
 

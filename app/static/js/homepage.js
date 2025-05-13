@@ -246,6 +246,61 @@ function exibirFreelancers(freelancers) {
     });
 }
 
+
+// async function carregar_perfis_home() {
+//     fetch('/homepage', {
+//         method: 'GET'
+//     })
+
+//     .then(response => response.json())
+//     .then(data => {
+//             if (data.sucesso) {
+
+//             }});}
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('/api/perfis')
+        .then(response => response.json())
+        .then(perfis => {
+            const container = document.getElementById('perfis-container');
+            
+            perfis.forEach(perfil => {
+                const cardHtml = `
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <img class="card-img-top" 
+                                 src="${perfil.FotoPerfil ? '' + perfil.FotoPerfil : ''}" 
+                                 alt="Foto de ${perfil.Nome}"
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">${perfil.Nome}</h5>
+                                <p class="card-text flex-grow-1">${perfil.Bio || 'Sem descrição'}</p>
+                                ${perfil.Categorias ? `<small class="text-muted mb-2">Categorias: ${perfil.Categorias}</small>` : ''}
+                                <div class="d-flex justify-content-between align-items-center mt-auto">
+                                    <a href="/perfil/${perfil.ID_User}" class="btn btn-sm btn-outline-primary">Ver Perfil</a>
+                                    <small class="text-muted">Novo</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML += cardHtml;
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar perfis:', error);
+            document.getElementById('perfis-container').innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
+                </div>
+            `;
+        });
+});
+
+
+
+
 // Chama a função ao carregar a página
 document.addEventListener('DOMContentLoaded', carregarFreelancers);
 
