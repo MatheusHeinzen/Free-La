@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="shortcut icon" href="../static/imgs/icon.png">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stylePerfil.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <title>Perfil</title>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <!-- Navbar para dispositivos móveis -->
+            <nav class="menu_lateral" id="menu_lateral">
+                <div class="expandir">
+                    <i class="bi bi-list"></i>
+                </div>
+                <ul>
+                    <li class="item_menu">
+                        <a href="/perfil">
+                            <span class="icon"><img src="/static/imgs/perfil.png" alt="Perfil" width="140px"></span>
+                            <span class="link">Perfil</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="#">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Sobre</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="#">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Contato</span>
+                        </a>
+                    </li>
+                    <li class="item_menu has-submenu">
+                        <a href="#" onclick="toggleSubmenu(event)">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Configurações</span>
+                        </a>
+                        <ul class="submenu">
+                            <ul class="submenu">
+                                <li class="item_menu" id="submenu">
+                                    <a href="/alterarDados">
+                                        <span class="icon"><i class="#"></i></span>
+                                        <span class="link">Atualizar Dados</span>
+                                    </a>
+                                </li>
+                                <li class="item_menu" id="submenu">
+                                    <a href="#" onclick="showPopUpDeletar()">
+                                        <span class="icon"><i class="#"></i></span>
+                                        <span class="link">Deletar Perfil</span>
+                                    </a>
+                                </li>
+                                <li class="item_menu" id="submenu">
+                                    {% if session.user_id %}
+                                    <a href="/" onclick="logout()">
+                                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                                        <span class="link">Logout</span>
+                                    </a>
+                                    {% else %}
+                                    <a href="/">
+                                        <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                        <span class="link">Login</span>
+                                    </a>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+
+        <!-- Par desktops -->
+        <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+                <a href="/homepage" class="navbar-brand">Menu</a>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">Configurações</a>
+                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
+                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
+                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
+                        {% if session.user_id %}
+                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/">Login</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <!-- Parte perfil - contato e foto -->
+                    <div class="profile-card-4 z-depth-3">
+                        <div class="card">
+                            <div class="card-body text-center bg-primary rounded-top">
+                                <div class="user-box">
+                                    <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" alt="Foto de Perfil" width="150" height="150">
+                                </div>
+                                <h5 class="mb-1 text-white" id="nomeUsuario">Nome do Usuário</h5>
+                                <h6 class="text-light" id="profissaoUsuario">Profissão ou Categoria</h6>
+                            </div>
+                            <div id="contatos">
+                                <button id="btnAdicionarContatos" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle"></i> Adicionar Meio de Contato
+                                </button>
+                                <div class="card-body">
+                                    <ul class="list-group shadow-none" id="listaContatos">
+                                        <!-- Contatos serão preenchidos dinamicamente -->
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <!-- Muda o card -->
+                    <div class="card z-depth-3">
+                        <div class="card-body">
+                            <ul class="nav nav-pills nav-pills-primary nav-justified">
+                                <li class="nav-item">
+                                    <a href="#" data-target="#profile" data-toggle="pill"
+                                        class="nav-link active show"><i class="icon-user"></i> <span
+                                            class="hidden-xs">Profile</span></a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#;" data-toggle="pill" class="nav-link" id="editBtn">
+                                        <i class="bi bi-pencil-square"></i> <span class="hidden-xs">Edit</span></a>
+                                </li>
+                            </ul>
+
+                            <!-- Descrição, habilidades e avaliação -->
+                            <div class="tab-content p-3">
+                                <div class="tab-pane active show" id="profile">
+                                    <br>
+                                    <h5 class="mb-3">Perfil de Usuário</h5>
+
+                                    <div class="col-md-6">
+                                        <h6>Descrição: </h6>
+                                        <p>
+                                            <!-- Categoria e Profissão com uma pequena descrição -->
+                                        </p>
+
+                                        <!-- pular linhas -->
+                                        <br><br><br>
+
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Habilidades <i class="bi bi-pencil-square"
+                                                onclick="mostrarOpcoesHabilidades()"></i></h6>
+
+                                        <!-- Selecionar skills -->
+                                        <div class="overlay" id="overlay"></div>
+
+                                        <div class="custom-alert" id="showOpcoesHabilidades" on>
+                                            <h2>Selecione suas habilidades</h2>
+                                            <div id="checkboxContainer"></div>
+
+                                            <h6>Outro:</h6>
+                                            <div style="display: flex;">
+                                                <input type="text" id="novaHabilidade"
+                                                    placeholder="Digite uma nova habilidade">
+                                                <button onclick="adicionarHabilidade()">Adicionar</button>
+                                            </div>
+                                            <br>
+                                            <button onclick="fecharOpcoes()">OK</button>
+                                        </div>
+
+                                        <!-- Apagar fututuramente e deixar com inner.html provavelmente -->
+                                        <a href="#" class="badge badge-dark badge-pill">exemplo</a>
+                                        <a href="#" class="badge badge-dark badge-pill">de</a>
+                                        <a href="#" class="badge badge-dark badge-pill">futuras</a>
+                                        <a href="#" class="badge badge-dark badge-pill">habilidades</a>
+                                        <hr>
+
+
+
+                                        <!-- Avaliações -->
+                                        <span>
+                                            futuro das avaliações ⭐⭐⭐⭐⭐
+                                        </span>
+                                    </div>
+
+
+                                    <!-- Editar dados -->
+
+                                    <div class="editar-dados-perfil" id="editar-dados">
+                                        <div id="editModal" class="modal">
+                                            <div class="modal-content-editar-perfil" style="display: flex;">
+                                                <span class="close">&times;</span>
+                                                <div class="separador">
+                                                    <h3 style="justify-content: center;">Editar Perfil</h3>
+                                                    <form id="formUploadImagem" action="/profile/upload" method="POST" enctype="multipart/form-data">
+                                                        <div id="preview-container">
+                                                            <img id="preview" alt="Pré-visualização da imagem" style="display: none;">
+                                                        </div>
+                                                        <label for="image">Selecione uma imagem:</label>
+                                                        <input type="file" name="image" id="image" accept="image/*">
+                                                        <button type="submit">Alterar Imagem</button>
+                                                    </form>
+                                                </div>
+                                                <div class="separador">
+                                                    <form id="editForm">
+                                                        <input type="hidden" name="user_id" value="{{ session['user_id'] }}">
+
+                                                        <label for="categoria">Palavra-chave / Profissão / Categoria:</label>
+                                                        <select id="categoria" name="categoria" required>
+                                                            <option value="" disabled selected>Selecione uma categoria</option>
+                                                            <!-- As opções serão preenchidas via JavaScript -->
+                                                        </select>
+
+                                                        <label for="descricao">Descrição:</label>
+                                                        <textarea id="descricao" name="descricao" rows="3" placeholder="Escreva sua descrição..."></textarea>
+
+                                                        <button type="submit">Salvar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="overlay" id="overlay"></div>
+        <div class="pop-up-deletar" id="pop-up-deletar">
+            <h3>Deletar Perfil?</h3>
+            <p>Tem certeza que deseja excluir seu perfil? Você perderá todos seus dados e não poderá executar todas as
+                funcionalidades do site.</p>
+            <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
+            <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
+        </div>
+    </main>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
+<script>
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        const item = event.currentTarget.closest('.has-submenu');
+        item.classList.toggle('active');
+    }
+</script>
+
+</html>
+``` 

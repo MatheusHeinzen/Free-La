@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil Público</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/stylePerfil.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+                <a href="/homepage" class="navbar-brand">Homepage</a>
+                <a href="/perfil" class="navbar-brand">Meu Perfil</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-lg-4">
+                    <!-- Parte do perfil - foto e contatos -->
+                    <div class="profile-card-4 z-depth-3">
+                        <div class="card">
+                            <div class="card-body text-center bg-primary rounded-top">
+                                <div class="user-box">
+                                    <img id="fotoPerfil" src="" alt="Foto de Perfil" width="150" height="150">
+                                </div>
+                                <h5 class="mb-1 text-white" id="nomeUsuario">Nome do Usuário</h5>
+                                <h6 class="text-light" id="profissaoUsuario">Profissão ou Categoria</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group shadow-none" id="listaContatos">
+                                    <!-- Contatos serão preenchidos dinamicamente -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <!-- Parte do perfil - descrição e habilidades -->
+                    <div class="card z-depth-3">
+                        <div class="card-body">
+                            <h5 class="mb-3">Perfil Público</h5>
+                            <div class="col-md-12">
+                                <h6>Descrição:</h6>
+                                <p id="descricaoUsuario">Sem descrição disponível.</p>
+                                <hr>
+                                <h6>Habilidades:</h6>
+                                <div id="habilidadesContainer">
+                                    <!-- Habilidades serão preenchidas dinamicamente -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/perfil_publico.js') }}"></script>
+</body>
+
+</html>

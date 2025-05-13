@@ -5,3 +5,4 @@
 # testes :P
 /templates/teste.html
 /get-ping.py
+__pycache__/
