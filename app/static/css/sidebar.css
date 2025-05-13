@@ -7,6 +7,10 @@ body {
     height: 100vh;
 }
 
+.img_sidebar{
+    border-radius:50%;
+}
+
 /* para celular */
 @media screen and (max-width: 768px) {
     #toggleSidebar{

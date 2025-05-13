@@ -18,14 +18,24 @@
             <!-- Navbar para dispositivos móveis -->
             <nav class="menu_lateral" id="menu_lateral">
                 <div class="expandir">
-                    <i class="bi bi-list"></i>
+                    <i class=""></i>
                 </div>
                 <ul>
                     <li class="item_menu">
                         <a href="/perfil">
+                            {% if session.user_id %}
                             <span class="icon">
-                                <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" border-radius="50%">
+                                <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar">
                             </span>
+                            {% else %}
+                            <span class="icon">
+                                <img src="../static/imgs/perfil.png" alt="Perfil" width="140px" class="img_sidebar">
+                            </span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="/perfil">
                             <span class="link">Perfil</span>
                         </a>
                     </li>
@@ -84,7 +94,7 @@
             <div class="container d-flex justify-content-between">
                 <a href="/homepage" class="navbar-brand">Menu</a>
                 <div class="dropdown">
-                    <a href="#" class="dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
+                    <a href="#" class=" phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false">Configurações</a>
                     <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
                         <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>

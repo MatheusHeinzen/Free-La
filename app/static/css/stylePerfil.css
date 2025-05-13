@@ -21,6 +21,7 @@
 }
 
 .modal-content-editar-perfil {
+    display: flex;
     background-color: #fff;
     margin: 10% auto;
     padding: 20px;
@@ -58,6 +59,7 @@ form {
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
+    padding-right: 20px;
 }
 
 label {
@@ -391,4 +393,24 @@ input[type="checkbox"] {
     margin-left: 15px;
     font-size: 16px;
     width: 250px;
+}
+
+@media screen and (max-width: 768px) {
+    .mb-3, .my-3 {
+        margin-top: 1rem;
+    }
+    .modal-content-editar-perfil{
+        display: block;
+    }
+    .separador{
+        margin-top: 20px;
+    }
+    #preview {
+        width: 40vw;
+        height: 30vh;
+    }
+    #preview img {
+        justify-content: center;
+        object-fit: cover; 
+    }
 }
