@@ -141,6 +141,37 @@ def obter_perfil_publico(user_id):
         if conn:
             conn.close()
 
+@profile.route('/perfilPublico/<int:freelancer_id>', methods=['GET'])
+def perfil_publico(freelancer_id):
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT u.ID_User, u.Nome, p.Bio, c.NomeCategoria
+            FROM usuario u
+            JOIN perfil p ON u.ID_User = p.ID_Usuario
+            LEFT JOIN perfil_categoria pc ON p.IdPerfil = pc.ID_Perfil
+            LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
+            WHERE u.ID_User = %s AND u.TipoUsuario = 'freelancer'
+        """, (freelancer_id,))
+        freelancer = cursor.fetchone()
+
+        if not freelancer:
+            return "Freelancer não encontrado", 404
+
+        return render_template('requisitar_servico.html', freelancer_id=freelancer_id, freelancer=freelancer)
+    except Exception as e:
+        print(f"Erro ao carregar perfil público: {e}")
+        return "Erro ao carregar perfil público", 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 @profile.route('/user/<int:user_id>', methods=['PUT'])
 def atualizar_usuario(user_id):
     try:
@@ -293,6 +324,31 @@ def obter_perfil(user_id):
     except Exception as e:
         print(f"Erro ao obter perfil: {e}")
         return jsonify({"sucesso": False, "erro": "Erro ao obter perfil"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@profile.route('/api/perfis', methods=['GET'])
+def obter_perfis():
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT u.ID_User, u.Nome, p.Bio
+            FROM usuario u
+            JOIN perfil p ON u.ID_User = p.ID_Usuario
+            WHERE u.TipoUsuario = 'freelancer' AND u.Ativo = TRUE
+        """)
+        perfis = cursor.fetchall()
+        return jsonify(perfis), 200
+    except Exception as e:
+        print(f"Erro ao obter perfis: {e}")
+        return jsonify({"erro": "Erro ao obter perfis"}), 500
     finally:
         if cursor:
             cursor.close()

@@ -15,31 +15,33 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
 //Função para exibir todos os freelancers ao carregar a página
-function exibirTodosFreelancers() {
-    let section = document.getElementById("resultados-pesquisa");
-    section.innerHTML = "";
+async function exibirTodosFreelancers() {
+    try {
+        const response = await fetch('/search/buscarFreelancers');
+        if (!response.ok) throw new Error('Erro ao carregar freelancers');
+        const data = await response.json();
 
-    trabalhosFreelancers.forEach(dado => {
-        section.innerHTML += `
-            <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <img class="card-img-top" src="${dado.imagem}" alt="${dado.nome}">
-                    <div class="card-body">
-                        <h5 class="card-title">${dado.nome}</h5>
-                        <p class="card-text"><strong>${dado.especialidade}</strong></p>
-                        <p class="card-text">${dado.descricao}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <a href="${dado.link}" class="btn btn-sm btn-outline-secondary">Ver Perfil</a>
-                            </div>
+        const container = document.getElementById('freelancersContainer');
+        container.innerHTML = '';
+
+        if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
+            data.freelancers.forEach(freelancer => {
+                container.innerHTML += `
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">${freelancer.Nome}</h5>
+                            <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
+                            <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                         </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
+                    </div>`;
+            });
+        } else {
+            container.innerHTML = '<p>Nenhum freelancer encontrado.</p>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar freelancers:', error);
+    }
 }
 
 //Função para pesquisar freelancers
@@ -84,15 +86,10 @@ function pesquisar() {
     section.innerHTML = resultados || "<p>Nenhum freelancer encontrado.</p>";
 }
 
-//Exibe todos os freelancers ao carregar a página
-window.onload = exibirTodosFreelancers;
-
-
 // Para deletar Usuario:
 
 function showPopUpDeletar() {
     document.getElementById('pop-up-deletar').style.display = 'block';
-    // document.getElementById("")
     document.getElementById('overlay').style.display = 'block';
 }
 
@@ -137,7 +134,6 @@ function confirmarDelecao() {
         });
 }
 
-
 function mostrarErroInput(input, mensagem) {
     input.classList.add('erro');
     Swal.fire({
@@ -158,56 +154,32 @@ function limparErros() {
 // Função para carregar categorias
 async function carregarCategorias() {
     try {
-        const response = await fetch('/category/', { //
-            method: 'GET'
-        });
+        const response = await fetch('/category');
+        if (!response.ok) throw new Error('Erro ao carregar categorias');
         const data = await response.json();
-        if (data.sucesso) {
-            console.log("Categorias:", data.categorias);
-            // Renderizar categorias na página
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'Erro ao carregar categorias.'
+
+        if (data.sucesso && Array.isArray(data.categorias)) {
+            const dropdown = document.getElementById('categoriaDropdown');
+            dropdown.innerHTML = '<option value="">Todas as categorias</option>'; // Reset dropdown
+            data.categorias.forEach(categoria => {
+                const option = document.createElement('option');
+                option.value = categoria.NomeCategoria;
+                option.textContent = categoria.NomeCategoria;
+                dropdown.appendChild(option);
             });
+        } else {
+            console.error('Categorias inválidas ou não encontradas.');
         }
     } catch (error) {
-        console.error("Erro ao carregar categorias:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Erro ao carregar categorias.'
-        });
+        console.error('Erro ao carregar categorias:', error);
     }
 }
 
-// // Função para carregar habilidades
-// async function carregarHabilidades() {
-//     try {
-//         const response = await fetch('/skills/', { //
-//             method: 'GET'
-//         });
-//         const data = await response.json();
-//         if (data.sucesso) {
-//             console.log("Habilidades:", data.habilidades);
-//             // Renderizar habilidades na página
-//         } else {
-//             Swal.fire({
-//                 icon: 'error',
-//                 title: 'Erro!',
-//                 text: 'Erro ao carregar habilidades.'
-//             });
-//         }
-//     } catch (error) {
-//         console.error("Erro ao carregar habilidades:", error);
-//         Swal.fire({
-//             icon: 'error',
-//             title: 'Erro!',
-//             text: 'Erro ao carregar habilidades.'
-//         });
-//     }
-// }
+// Função para carregar habilidades (se necessário)
+function carregarHabilidades() {
+    console.log('Função carregarHabilidades chamada.');
+    // Adicione lógica aqui se necessário
+}
 
 async function carregarFreelancers() {
     try {
@@ -246,18 +218,6 @@ function exibirFreelancers(freelancers) {
     });
 }
 
-
-// async function carregar_perfis_home() {
-//     fetch('/homepage', {
-//         method: 'GET'
-//     })
-
-//     .then(response => response.json())
-//     .then(data => {
-//             if (data.sucesso) {
-
-//             }});}
-
 document.addEventListener('DOMContentLoaded', function() {
     fetch('/api/perfis')
         .then(response => response.json())
@@ -269,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="col-md-4 mb-4">
                         <div class="card h-100 shadow-sm">
                             <img class="card-img-top" 
-                                 src="${perfil.FotoPerfil ? '' + perfil.FotoPerfil : ''}" 
+                                 src="${perfil.Foto ? '' + perfil.Foto : ''}" 
                                  alt="Foto de ${perfil.Nome}"
                                  style="height: 200px; object-fit: cover;">
                             <div class="card-body d-flex flex-column">
@@ -298,11 +258,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 });
 
-
-
-
 // Chama a função ao carregar a página
-document.addEventListener('DOMContentLoaded', carregarFreelancers);
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await carregarCategorias();
+        await exibirTodosFreelancers();
+    } catch (error) {
+        console.error('Erro ao carregar a homepage:', error);
+    }
+});
 
 async function logout() {
     try {
@@ -365,10 +329,4 @@ document.addEventListener('click', resetarInatividade);
 
 // Inicializa o timer ao carregar a página
 resetarInatividade();
-
-// Chamar as funções ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    carregarCategorias();
-    carregarHabilidades();
-});
 

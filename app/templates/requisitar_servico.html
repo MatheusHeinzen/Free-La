@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="../static/imgs/icon.png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-LtrjvnR4/J57f8z8N8A6z+Jp6U6pga5K5Q5p6XK5p6XK5p6XK5p6XK5p6XK5p6XK5p6XK" crossorigin="anonymous">
+    <title>Requisitar Serviço</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <!-- Para celulares -->
+            <nav class="menu_lateral" id="menu_lateral">
+                <div class="expandir">
+                    <i class="bi bi-list"></i>
+                </div>
+                <ul>
+                    <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar"
+                        style="margin-left: 1rem;">
+                    <li class="item_menu">
+                        <a href="/perfil">
+                            <span class="icon"></span>
+                            <span class="link">Perfil</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="/homepage">
+                            <span class="icon"></span>
+                            <span class="link">Homepage</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        <a href="/alterarDados">
+                            <span class="icon"></span>
+                            <span class="link">Atualizar Dados</span>
+                        </a>
+                    </li>
+                    <li class="item_menu">
+                        {% if session.user_id %}
+                        <a href="/" onclick="logout()">
+                            <span class="icon"></span>
+                            <span class="link">Logout</span>
+                        </a>
+                        {% else %}
+                        <a href="/">
+                            <span class="icon"></span>
+                            <span class="link">Login</span>
+                        </a>
+                        {% endif %}
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container mt-4">
+            <h1>Requisitar Serviço</h1>
+            <form id="form-requisitar-servico">
+                <input type="hidden" id="freelancerId" value="{{ freelancer_id }}">
+                <input type="hidden" id="userId" value="{{ session.user_id }}">
+                <div class="form-group">
+                    <label for="nomeServico">Nome do Serviço</label>
+                    <input type="text" class="form-control" id="nomeServico" placeholder="Digite o nome do serviço" required>
+                </div>
+                <div class="form-group">
+                    <label for="descricaoServico">Descrição</label>
+                    <textarea class="form-control" id="descricaoServico" rows="3" placeholder="Descreva o serviço" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="categoriaServico">Categoria</label>
+                    <select class="form-control" id="categoriaServico" required>
+                        <option value="" disabled selected>Selecione uma categoria</option>
+                        <!-- As opções serão preenchidas dinamicamente -->
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Requisitar Serviço</button>
+            </form>
+
+            <hr>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h3>Serviços que Você Pediu</h3>
+                    <ul id="servicosPedidos" class="list-group">
+                        <!-- Lista de serviços pedidos será preenchida dinamicamente -->
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h3>Serviços Pedidos para Você</h3>
+                    <ul id="servicosRecebidos" class="list-group">
+                        <!-- Lista de serviços recebidos será preenchida dinamicamente -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="{{ url_for('static', filename='js/requisitar_servico.js') }}"></script>
+</body>
+</html>

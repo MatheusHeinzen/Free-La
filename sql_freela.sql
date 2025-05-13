@@ -95,14 +95,19 @@ CREATE TABLE service (
     Descricao TEXT NOT NULL,
     DataCriacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Status ENUM('disponivel', 'em_andamento', 'concluido', 'cancelado', 'pausado') NOT NULL DEFAULT 'disponivel',
-    ID_Usuario INT NOT NULL,
+    ID_Cliente INT NOT NULL,
+    ID_Freelancer INT,
     DataConclusao DATETIME,
-    FOREIGN KEY (ID_Usuario) REFERENCES usuario(ID_User)
+    FOREIGN KEY (ID_Cliente) REFERENCES usuario(ID_User)
         ON DELETE CASCADE  
+        ON UPDATE CASCADE,
+    FOREIGN KEY (ID_Freelancer) REFERENCES usuario(ID_User)
+        ON DELETE SET NULL  
         ON UPDATE CASCADE,
     CONSTRAINT chk_nome_service_valido CHECK (LENGTH(NomeService) >= 5),
     CONSTRAINT chk_data_conclusao_valida CHECK (DataConclusao IS NULL OR DataConclusao >= DataCriacao)
 );
+
 
 -- =============================================
 -- Tabela: perfil_categoria
@@ -200,3 +205,4 @@ SELECT * FROM perfil;
 SELECT * FROM avaliacao;
 SELECT * FROM categoria;
 SELECT * FROM perfil_categoria;
+SELECT * FROM service;
