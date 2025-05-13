@@ -1,3 +1,19 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.querySelector(".menu_lateral");
+    const toggleButton = document.getElementById("toggleSidebar");
+
+    toggleButton.addEventListener("click", function (event) {
+        sidebar.classList.toggle("ativo");
+        event.stopPropagation();
+    });
+
+    document.addEventListener("click", function (event) {
+        if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+            sidebar.classList.remove("ativo");
+        }
+    });
+});
+
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const userId = window.location.pathname.split('/').pop();
@@ -69,3 +85,70 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('Não foi possível carregar o perfil. Consulte o console para mais detalhes.');
     }
 });
+
+// Para deletar Usuario:
+
+function showPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'block';
+    // document.getElementById("")
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function fecharPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function confirmarDelecao() {
+    fetch('/DeletarUsuario', {
+        method: 'DELETE'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Perfil deletado com sucesso.',
+                    text: "Redirecionando...",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops, algo deu errado.',
+                    text: 'Ocorreu um problema para deletar.'
+                });
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops, algo deu errado.',
+                text: 'Contate o suporte, por favor!'
+            });
+            return false;
+        });
+}
+
+
+function mostrarErroInput(input, mensagem) {
+    input.classList.add('erro');
+    Swal.fire({
+        icon: 'error',
+        title: 'Erro',
+        text: mensagem
+    });
+}
+
+// Função para limpar os erros
+function limparErros() {
+    const campos = document.querySelectorAll('input');
+    campos.forEach(input => {
+        input.classList.remove('erro');
+    });
+}
