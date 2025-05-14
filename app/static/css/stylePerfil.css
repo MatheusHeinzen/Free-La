@@ -395,6 +395,12 @@ input[type="checkbox"] {
     width: 250px;
 }
 
+#fotoPerfil{
+    object-fit: cover;
+}
+.dropdown-menu.show {
+    display: block;
+}
 @media screen and (max-width: 768px) {
     .mb-3, .my-3 {
         margin-top: 1rem;
