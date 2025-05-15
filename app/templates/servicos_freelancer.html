@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
 </head>
 <body>
+    {% if not session.user_id %}
+        <script>window.location.href = "/";</script>
+    {% endif %}
     <div class="container mt-4">
         <h2>Serviços Requisitados para Mim</h2>
         <ul id="servicosRecebidos" class="list-group">

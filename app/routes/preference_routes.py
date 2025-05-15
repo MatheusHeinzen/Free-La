@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify, session
 from app.services.preference_service import buscar_preferencias, atualizar_preferencias
+from app.utils.decorators import login_required
 
 preference_bp = Blueprint('preference', __name__)
 
 @preference_bp.route('/', methods=['GET'])
+@login_required
 def obter_preferencias():
     user_id = session.get('user_id')
     if not user_id:
@@ -16,6 +18,7 @@ def obter_preferencias():
         return jsonify({'sucesso': False, 'mensagem': 'Preferências não encontradas'}), 404
 
 @preference_bp.route('/', methods=['PUT'])
+@login_required
 def salvar_preferencias():
     try:
         user_id = session.get('user_id')

@@ -62,6 +62,9 @@
 </head>
 
 <body>
+    {% if not session.user_id %}
+    <script>window.location.href = "/";</script>
+    {% endif %}
     <header>
         <div class="container">
             <!-- Para celulares -->
@@ -268,3 +271,4 @@
 </body>
 
 </html>
+``` 

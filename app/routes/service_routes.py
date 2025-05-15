@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify, session
 from app.utils.db import get_db_connection
+from app.utils.decorators import login_required  # Corrigido aqui
 
 service_bp = Blueprint('service', __name__)
 
 @service_bp.route('/criar', methods=['POST'])
+@login_required
 def criar_servico():
     data = request.get_json()
     nome = data.get('nome')
@@ -45,6 +47,7 @@ def criar_servico():
             conn.close()
 
 @service_bp.route('/listar', methods=['GET'])
+@login_required
 def listar_servicos():
     user_id = session.get('user_id')
     print(f"[DEBUG] user_id da sessão: {user_id}")
@@ -87,6 +90,7 @@ def listar_servicos():
             conn.close()
 
 @service_bp.route('/servicos/avaliar/<int:servico_id>', methods=['POST'])
+@login_required
 def avaliar_servico(servico_id):
     data = request.get_json()
     nota = data.get('nota')

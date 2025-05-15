@@ -1,9 +1,11 @@
 from flask import Blueprint, request, jsonify
 from app.utils.db import get_db_connection
+from app.utils.decorators import login_required
 
 rating = Blueprint('rating', __name__)
 
 @rating.route('/avaliarServico/<int:service_id>', methods=['POST'])
+@login_required
 def avaliar_servico(service_id):
     nota = request.form.get('nota', type=int)
     comentario = request.form.get('comentario', '').strip()

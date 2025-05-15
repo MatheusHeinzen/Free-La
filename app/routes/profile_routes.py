@@ -2,11 +2,13 @@ from flask import Blueprint, request, redirect, url_for, jsonify, send_file, ren
 import io
 from app.utils.db import get_db_connection
 from werkzeug.utils import secure_filename
+from app.utils.decorators import login_required
 
 profile = Blueprint('profile', __name__)
 
 # Atualizar apenas a imagem de perfil
 @profile.route('/upload_imagem', methods=['POST'])
+@login_required
 def salvar_imagem_perfil():
     conn = None
     cursor = None
@@ -47,6 +49,7 @@ def salvar_imagem_perfil():
 
 # Atualizar bio e categoria
 @profile.route('/editar_perfil', methods=['POST'])
+@login_required
 def editar_perfil():
     try:
         dados = request.get_json()
@@ -173,6 +176,7 @@ def perfil_publico(freelancer_id):
             conn.close()
 
 @profile.route('/user/<int:user_id>', methods=['PUT'])
+@login_required
 def atualizar_usuario(user_id):
     try:
         dados = request.get_json()
@@ -239,6 +243,7 @@ def obter_imagem_perfil(user_id):
 
 # Para capturar as categorias
 @profile.route('/obter-categorias', methods=['GET'])
+@login_required
 def obter_categorias():
     try:
         conn = get_db_connection()
@@ -258,6 +263,7 @@ def obter_categorias():
             conn.close()
 
 @profile.route('/salvar_bio_categoria', methods=['POST'])
+@login_required
 def salvar_bio_categoria():
     conn = None
     cursor = None
@@ -300,6 +306,7 @@ def salvar_bio_categoria():
             conn.close()
 
 @profile.route('/obter_perfil/<int:user_id>', methods=['GET'])
+@login_required
 def obter_perfil(user_id):
     conn = None
     cursor = None

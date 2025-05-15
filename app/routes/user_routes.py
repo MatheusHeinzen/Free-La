@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, session, redirect, url_for
 from functools import wraps
 from werkzeug.security import generate_password_hash
 from app.utils.db import get_db_connection
+from app.utils.decorators import login_required
 
 user_bp = Blueprint('user', __name__)
 
@@ -56,6 +57,7 @@ def cadastrar():
             conn.close()
 
 @user_bp.route('/<int:user_id>', methods=['GET'])
+@login_required
 def obter_usuario(user_id):
     try:
         conn = get_db_connection()
@@ -80,6 +82,7 @@ def obter_usuario(user_id):
             conn.close()
 
 @user_bp.route('/', methods=['GET'])
+@login_required
 def obter_usuario_atual():
     user_id = session.get('user_id')
     if not user_id:
@@ -102,6 +105,7 @@ def obter_usuario_atual():
             conn.close()
 
 @user_bp.route('/<int:user_id>', methods=['PUT'])
+@login_required
 def atualizar_usuario(user_id):
     conn = None
     cursor = None

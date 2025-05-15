@@ -14,6 +14,9 @@
 </head>
 
 <body>
+    {% if not session.user_id %}
+    <script>window.location.href = "/";</script>
+    {% endif %}
     <header>
         <div class="container">
             <!-- Navbar para dispositivos móveis -->
@@ -26,7 +29,8 @@
                         <a href="/perfil">
                             {% if session.user_id %}
                             <span class="icon">
-                                <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar">
+                                <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px"
+                                    class="img_sidebar">
                             </span>
                             {% else %}
                             <span class="icon">
@@ -132,7 +136,8 @@
                                 </ul>
                             </div>
                             <div class="card-body text-center">
-                                <a href="/requisitarServico/{{ user_id }}" class="btn btn-success">Requisitar Serviço</a>
+                                <a href="/requisitarServico/{{ user_id }}" class="btn btn-success">Requisitar
+                                    Serviço</a>
                             </div>
                         </div>
                     </div>

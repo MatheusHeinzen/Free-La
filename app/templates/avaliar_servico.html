@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaliar Serviço</title>
 </head>
+
 <body>
+    {% if not session.user_id %}
+    <script>window.location.href = "/";</script>
+    {% endif %}
     <h1>Avaliar Serviço</h1>
     <form action="/avaliarServico/{{ service_id }}" method="POST">
         <label for="nota">Nota (1 a 5):</label>
@@ -15,4 +20,5 @@
         <button type="submit">Enviar Avaliação</button>
     </form>
 </body>
+
 </html>
