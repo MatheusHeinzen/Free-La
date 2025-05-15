@@ -1,0 +1,159 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('/servicos/listar', { credentials: 'include' });
+        if (!response.ok) throw new Error('Erro ao carregar serviços');
+        const data = await response.json();
+
+        const pedidos = document.getElementById('servicosPedidos');
+        pedidos.innerHTML = '';
+
+        if (data.servicosPedidos && data.servicosPedidos.length > 0) {
+            data.servicosPedidos.forEach(servico => {
+                pedidos.innerHTML += `
+                    <li class="list-group-item">
+                        <strong>${servico.Nome}</strong>
+                        <p>${servico.Descricao}</p>
+                        <small>Categoria: ${servico.Categoria}</small>
+                        <small>Status: ${servico.Status}</small>
+                        <div class="mt-2">
+                            <button class="btn btn-danger btn-sm" onclick="cancelarServico(${servico.ID_Service})">Cancelar</button>
+                            <button class="btn btn-info btn-sm" onclick="editarServico(${servico.ID_Service}, '${servico.Nome.replace(/'/g, "\\'")}', '${servico.Descricao.replace(/'/g, "\\'")}', '${servico.Categoria ? servico.Categoria.replace(/'/g, "\\'") : ''}')">Editar</button>
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                        </div>
+                    </li>`;
+            });
+        } else {
+            pedidos.innerHTML = '<li class="list-group-item">Nenhum serviço requisitado encontrado.</li>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar serviços:', error);
+    }
+});
+
+window.cancelarServico = async function(servicoId) {
+    const confirm = await Swal.fire({
+        title: 'Cancelar serviço?',
+        text: 'Tem certeza que deseja cancelar este serviço?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, cancelar',
+        cancelButtonText: 'Voltar'
+    });
+    if (confirm.isConfirmed) {
+        try {
+            const response = await fetch(`/servicos/cancelar/${servicoId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Erro ao cancelar serviço');
+            Swal.fire({
+                icon: 'success',
+                title: 'Serviço cancelado!',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => location.reload());
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao cancelar serviço.'
+            });
+        }
+    }
+};
+
+window.editarServico = function(servicoId, nome, descricao, categoria) {
+    Swal.fire({
+        title: 'Editar Serviço',
+        html: `
+            <label for="editNomeServico">Nome:</label>
+            <input id="editNomeServico" class="form-control mb-2" value="${nome}">
+            <label for="editDescricaoServico">Descrição:</label>
+            <textarea id="editDescricaoServico" class="form-control mb-2">${descricao}</textarea>
+            <label for="editCategoriaServico">Categoria:</label>
+            <input id="editCategoriaServico" class="form-control mb-2" value="${categoria}">
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Salvar',
+        cancelButtonText: 'Cancelar',
+        preConfirm: () => {
+            return {
+                nome: document.getElementById('editNomeServico').value,
+                descricao: document.getElementById('editDescricaoServico').value,
+                categoria: document.getElementById('editCategoriaServico').value
+            };
+        }
+    }).then(async (result) => {
+        if (result.isConfirmed && result.value) {
+            try {
+                const response = await fetch(`/servicos/editar/${servicoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(result.value)
+                });
+                if (!response.ok) throw new Error('Erro ao editar serviço');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Serviço editado!',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => location.reload());
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro!',
+                    text: error.message || 'Erro ao editar serviço.'
+                });
+            }
+        }
+    });
+};
+
+window.avaliarServico = async function(servicoId) {
+    const { value: formValues } = await Swal.fire({
+        title: 'Avaliar Serviço',
+        html: `
+            <label for="notaServico">Nota (1-5):</label>
+            <input id="notaServico" type="number" min="1" max="5" class="form-control mb-2">
+            <label for="comentarioServico">Comentário:</label>
+            <textarea id="comentarioServico" class="form-control" rows="3"></textarea>
+        `,
+        focusConfirm: false,
+        preConfirm: () => {
+            const nota = document.getElementById('notaServico').value;
+            const comentario = document.getElementById('comentarioServico').value.trim();
+            if (!nota || nota < 1 || nota > 5) {
+                Swal.showValidationMessage('Por favor, insira uma nota válida entre 1 e 5.');
+                return;
+            }
+            return { nota, comentario };
+        }
+    });
+
+    if (formValues) {
+        try {
+            const response = await fetch(`/servicos/avaliar/${servicoId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formValues)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.erro || 'Erro ao avaliar serviço');
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Serviço avaliado com sucesso!',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => location.reload());
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao avaliar serviço.'
+            });
+        }
+    }
+};

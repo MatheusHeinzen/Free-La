@@ -33,3 +33,11 @@ def requisitar_servicos(freelancer_id):
 @base_bp.route('/avaliarServico/<int:service_id>')
 def avaliar_servico(service_id):
     return render_template('avaliar_servico.html', service_id=service_id)
+
+@base_bp.route('/servicosCliente')
+def servicos_cliente():
+    return render_template('servicos_cliente.html')
+
+@base_bp.route('/servicosFreelancer')
+def servicos_freelancer():
+    return render_template('servicos_freelancer.html')

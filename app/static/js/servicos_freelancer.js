@@ -1,0 +1,129 @@
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        const response = await fetch('/servicos/listar', { credentials: 'include' });
+        // Verifica se o elemento existe (usuário autenticado e página correta)
+        const recebidos = document.getElementById('servicosRecebidos');
+        if (!recebidos) {
+            console.warn('Elemento servicosRecebidos não encontrado na página.');
+            return;
+        }
+
+        if (!response.ok) throw new Error('Erro ao carregar serviços');
+        const data = await response.json();
+
+        console.log('[DEBUG] Dados recebidos da API:', data);
+
+        recebidos.innerHTML = '';
+
+        // Verifica se a sessão está ativa e se o backend retornou sucesso
+        if (!data.sucesso) {
+            recebidos.innerHTML = '<li class="list-group-item text-danger">Sessão expirada ou usuário não autenticado.</li>';
+            return;
+        }
+
+        if (data.servicosRecebidos && data.servicosRecebidos.length > 0) {
+            data.servicosRecebidos.forEach(servico => {
+                recebidos.innerHTML += `
+                    <li class="list-group-item">
+                        <strong>${servico.Nome}</strong>
+                        <p>${servico.Descricao}</p>
+                        <small>Categoria: ${servico.Categoria}</small>
+                        <small>Status: ${servico.Status}</small>
+                        <div class="mt-2">
+                            <button class="btn btn-success btn-sm" onclick="concluirServico(${servico.ID_Service})">Concluir</button>
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                        </div>
+                    </li>`;
+            });
+        } else {
+            recebidos.innerHTML = '<li class="list-group-item">Nenhum serviço recebido encontrado.</li>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar serviços:', error);
+        const recebidos = document.getElementById('servicosRecebidos');
+        if (recebidos) {
+            recebidos.innerHTML = '<li class="list-group-item text-danger">Erro ao carregar serviços ou sessão expirada.</li>';
+        }
+    }
+});
+
+window.concluirServico = async function(servicoId) {
+    const confirm = await Swal.fire({
+        title: 'Concluir serviço?',
+        text: 'Tem certeza que deseja marcar este serviço como concluído?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, concluir',
+        cancelButtonText: 'Cancelar'
+    });
+    if (confirm.isConfirmed) {
+        try {
+            const response = await fetch(`/servicos/concluir/${servicoId}`, {
+                method: 'POST'
+            });
+            if (!response.ok) throw new Error('Erro ao concluir serviço');
+            Swal.fire({
+                icon: 'success',
+                title: 'Serviço concluído!',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => location.reload());
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao concluir serviço.'
+            });
+        }
+    }
+};
+
+window.avaliarServico = async function(servicoId) {
+    const { value: formValues } = await Swal.fire({
+        title: 'Avaliar Serviço',
+        html: `
+            <label for="notaServico">Nota (1-5):</label>
+            <input id="notaServico" type="number" min="1" max="5" class="form-control mb-2">
+            <label for="comentarioServico">Comentário:</label>
+            <textarea id="comentarioServico" class="form-control" rows="3"></textarea>
+        `,
+        focusConfirm: false,
+        preConfirm: () => {
+            const nota = document.getElementById('notaServico').value;
+            const comentario = document.getElementById('comentarioServico').value.trim();
+            if (!nota || nota < 1 || nota > 5) {
+                Swal.showValidationMessage('Por favor, insira uma nota válida entre 1 e 5.');
+                return;
+            }
+            return { nota, comentario };
+        }
+    });
+
+    if (formValues) {
+        try {
+            const response = await fetch(`/servicos/avaliar/${servicoId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formValues)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.erro || 'Erro ao avaliar serviço');
+            }
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Serviço avaliado com sucesso!',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => location.reload());
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao avaliar serviço.'
+            });
+        }
+    }
+};

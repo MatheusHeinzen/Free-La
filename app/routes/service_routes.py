@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from app.utils.db import get_db_connection
 
 service_bp = Blueprint('service', __name__)
@@ -46,7 +46,8 @@ def criar_servico():
 
 @service_bp.route('/listar', methods=['GET'])
 def listar_servicos():
-    user_id = request.cookies.get('user_id')
+    user_id = session.get('user_id')
+    print(f"[DEBUG] user_id da sessão: {user_id}")
 
     conn = None
     cursor = None
@@ -54,7 +55,6 @@ def listar_servicos():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # Serviços pedidos pelo usuário logado
         cursor.execute("""
             SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, c.NomeCategoria AS Categoria, s.Status
             FROM service s
@@ -64,7 +64,6 @@ def listar_servicos():
         """, (user_id,))
         servicos_pedidos = cursor.fetchall()
 
-        # Serviços recebidos pelo freelancer logado
         cursor.execute("""
             SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, c.NomeCategoria AS Categoria, s.Status
             FROM service s
@@ -73,6 +72,9 @@ def listar_servicos():
             WHERE s.ID_Freelancer = %s
         """, (user_id,))
         servicos_recebidos = cursor.fetchall()
+
+        print(f"[DEBUG] servicosPedidos: {servicos_pedidos}")
+        print(f"[DEBUG] servicosRecebidos: {servicos_recebidos}")
 
         return jsonify({"sucesso": True, "servicosPedidos": servicos_pedidos, "servicosRecebidos": servicos_recebidos}), 200
     except Exception as e:

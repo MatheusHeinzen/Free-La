@@ -30,15 +30,15 @@
             </a>
           </li>
           <li class="item_menu">
-            <a href="/perfilPublico/1">
+            <a href="/servicos_freelancer">
               <span class="icon"><i class="#"></i></span>
-              <span class="link">Sobre</span>
+              <span class="link">Serviços Pedidos</span>
             </a>
           </li>
           <li class="item_menu">
-            <a href="#">
+            <a href="/servicos_cliente">
               <span class="icon"><i class="#"></i></span>
-              <span class="link">Contato</span>
+              <span class="link">Meus Serviços</span>
             </a>
           </li>
           <li class="item_menu has-submenu">
@@ -102,8 +102,8 @@
             Login
           </a>
           {% endif %}
-          <a href="/perfilPublico/1" class="phone-hidden">Sobre</a>
-          <a href="#" class="phone-hidden">Contato</a>
+          <a href="/servicosFreelancer" class="phone-hidden">Serviços Pedidos</a>
+          <a href="/servicosCliente" class="phone-hidden">Meus Serviços</a>
           <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">Configurações</a>
           <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
@@ -148,7 +148,6 @@
 
     <!-- Seção de Perfis Ativos -->
     <section>
-      <h2>Perfis Ativos</h2>
       <div class="perfil-lista">
         {% for perfil in perfis %}
         <div class="perfil-card">
