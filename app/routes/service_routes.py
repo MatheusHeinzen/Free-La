@@ -229,3 +229,52 @@ def avaliar_servico(servico_id):
             cursor.close()
         if conn:
             conn.close()
+
+@service_bp.route('/editar/<int:servico_id>', methods=['PUT'])
+@login_required
+def editar_servico(servico_id):
+    user_id = session.get('user_id')
+    data = request.get_json()
+    nome = data.get('nome')
+    descricao = data.get('descricao')
+    categoria = data.get('categoria')
+
+    if not (nome and descricao and categoria):
+        return jsonify({"sucesso": False, "erro": "Dados incompletos para editar o serviço"}), 400
+
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Só o cliente pode editar o serviço
+        cursor.execute("SELECT ID_Cliente FROM service WHERE ID_Service = %s", (servico_id,))
+        result = cursor.fetchone()
+        if not result or str(result[0]) != str(user_id):
+            return jsonify({"sucesso": False, "erro": "Não autorizado a editar este serviço."}), 403
+
+        cursor.execute("""
+            UPDATE service SET NomeService = %s, Descricao = %s WHERE ID_Service = %s
+        """, (nome, descricao, servico_id))
+        # Atualiza categoria na tabela de ligação
+        cursor.execute("""
+            SELECT ID_Categoria FROM categoria WHERE NomeCategoria = %s
+        """, (categoria,))
+        cat = cursor.fetchone()
+        if cat:
+            cursor.execute("""
+                DELETE FROM service_categoria WHERE ID_Service = %s
+            """, (servico_id,))
+            cursor.execute("""
+                INSERT INTO service_categoria (ID_Service, ID_Categoria) VALUES (%s, %s)
+            """, (servico_id, cat[0]))
+        conn.commit()
+        return jsonify({"sucesso": True, "mensagem": "Serviço editado com sucesso!"}), 200
+    except Exception as e:
+        print(f"[ERROR] Erro ao editar serviço: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao editar serviço"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

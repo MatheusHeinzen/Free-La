@@ -45,45 +45,41 @@ async function exibirTodosFreelancers() {
 }
 
 //Função para pesquisar freelancers
-function pesquisar() {
-    let section = document.getElementById("resultados-pesquisa");
-    let campoPesquisa = document.getElementById("campo-pesquisa").value.toLowerCase();
-    let resultados = "";
+async function pesquisar() {
+    try {
+        const termo = document.getElementById("campo-pesquisa").value.trim();
+        const categoria = document.getElementById("categoriaDropdown")?.value || "";
 
-    if (!campoPesquisa) {
-        exibirTodosFreelancers();
-        return;
-    }
+        const response = await fetch(`/search/buscarFreelancers?termo=${encodeURIComponent(termo)}&categoria=${encodeURIComponent(categoria)}`);
+        if (!response.ok) throw new Error('Erro ao buscar freelancers');
+        const data = await response.json();
 
-    //Filtra os freelancers pelo termo de pesquisa
-    trabalhosFreelancers.forEach(dado => {
-        if (
-            dado.nome.toLowerCase().includes(campoPesquisa) ||
-            dado.especialidade.toLowerCase().includes(campoPesquisa) ||
-            dado.descricao.toLowerCase().includes(campoPesquisa)
-        ) {
-            resultados += `
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <img class="card-img-top" src="${dado.imagem}" alt="${dado.nome}">
-                        <div class="card-body">
-                            <h5 class="card-title">${dado.nome}</h5>
-                            <p class="card-text"><strong>${dado.especialidade}</strong></p>
-                            <p class="card-text">${dado.descricao}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <a href="${dado.link}" class="btn btn-sm btn-outline-secondary">Ver Perfil</a>
-                                </div>
+        const section = document.getElementById("resultados-pesquisa") || document.getElementById('freelancersContainer');
+        section.innerHTML = '';
+
+        if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
+            data.freelancers.forEach(freelancer => {
+                section.innerHTML += `
+                    <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <img class="card-img-top" src="/profile/imagem/${freelancer.ID_User}" alt="${freelancer.Nome}" style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">${freelancer.Nome}</h5>
+                                <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
+                                <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                             </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
+            });
+        } else {
+            section.innerHTML = '<p>Nenhum freelancer encontrado.</p>';
         }
-    });
-
-    //Se nenhum resultado for encontrado
-    section.innerHTML = resultados || "<p>Nenhum freelancer encontrado.</p>";
+    } catch (error) {
+        console.error('Erro ao buscar freelancers:', error);
+        const section = document.getElementById("resultados-pesquisa") || document.getElementById('freelancersContainer');
+        section.innerHTML = '<p>Erro ao buscar freelancers.</p>';
+    }
 }
 
 // Para deletar Usuario:
@@ -173,12 +169,6 @@ async function carregarCategorias() {
     } catch (error) {
         console.error('Erro ao carregar categorias:', error);
     }
-}
-
-// Função para carregar habilidades (se necessário)
-function carregarHabilidades() {
-    console.log('Função carregarHabilidades chamada.');
-    // Adicione lógica aqui se necessário
 }
 
 async function carregarFreelancers() {
