@@ -14,53 +14,94 @@
 </head>
 
 <body>
+<body>
     {% if not session.user_id %}
-    <script>window.location.href = "/";</script>
+        <script>window.location.href = "/";</script>
     {% endif %}
     <header>
         <div class="container">
-            <!-- Para celulares -->
+            <!-- Navbar para dispositivos móveis -->
             <nav class="menu_lateral" id="menu_lateral">
                 <div class="expandir">
-                    <i class="bi bi-list"></i>
+                    <i class=""></i>
                 </div>
                 <ul>
-                    <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar"
-                        style="margin-left: 1rem;">
                     <li class="item_menu">
                         <a href="/perfil">
-                            <span class="icon"></span>
-                            <span class="link">Perfil</span>
+                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px" >
                         </a>
                     </li>
                     <li class="item_menu">
-                        <a href="/homepage">
-                            <span class="icon"></span>
-                            <span class="link">Homepage</span>
+                        <a href="#">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Sobre</span>
                         </a>
                     </li>
                     <li class="item_menu">
-                        <a href="/alterarDados">
-                            <span class="icon"></span>
-                            <span class="link">Atualizar Dados</span>
+                        <a href="#">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Contato</span>
                         </a>
                     </li>
-                    <li class="item_menu">
-                        {% if session.user_id %}
-                        <a href="/" onclick="logout()">
-                            <span class="icon"></span>
-                            <span class="link">Logout</span>
+                    <li class="item_menu has-submenu">
+                        <a href="#" onclick="toggleSubmenu(event)">
+                            <span class="icon"><i class="#"></i></span>
+                            <span class="link">Configurações</span>
                         </a>
-                        {% else %}
-                        <a href="/">
-                            <span class="icon"></span>
-                            <span class="link">Login</span>
-                        </a>
-                        {% endif %}
+                        <ul class="submenu">
+                            <ul class="submenu">
+                                <li class="item_menu" id="submenu">
+                                    <a href="/alterarDados">
+                                        <span class="icon"><i class="#"></i></span>
+                                        <span class="link">Atualizar Dados</span>
+                                    </a>
+                                </li>
+                                <li class="item_menu" id="submenu">
+                                    <a href="#" onclick="showPopUpDeletar()">
+                                        <span class="icon"><i class="#"></i></span>
+                                        <span class="link">Deletar Perfil</span>
+                                    </a>
+                                </li>
+                                <li class="item_menu" id="submenu">
+                                    {% if session.user_id %}
+                                    <a href="/" onclick="logout()">
+                                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                                        <span class="link">Logout</span>
+                                    </a>
+                                    {% else %}
+                                    <a href="/">
+                                        <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                        <span class="link">Login</span>
+                                    </a>
+                                    {% endif %}
+                                </li>
+                            </ul>
                     </li>
                 </ul>
             </nav>
         </div>
+
+
+        <!-- Par desktops -->
+        <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+                <a href="/homepage" class="navbar-brand">Menu</a>
+                <div class="dropdown">
+                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">Configurações</a>
+                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
+                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
+                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
+                        {% if session.user_id %}
+                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
+                        {% else %}
+                        <a class="dropdown-item" href="/">Login</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
+            </div>
+        </nav>
     </header>
 
     <main>
