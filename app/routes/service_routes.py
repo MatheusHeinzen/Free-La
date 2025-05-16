@@ -58,31 +58,128 @@ def listar_servicos():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # Serviços pedidos em andamento
         cursor.execute("""
-            SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, c.NomeCategoria AS Categoria, s.Status
+            SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, 
+                   (SELECT c.NomeCategoria FROM service_categoria sc 
+                    JOIN categoria c ON sc.ID_Categoria = c.ID_Categoria 
+                    WHERE sc.ID_Service = s.ID_Service LIMIT 1) AS Categoria,
+                   s.Status
             FROM service s
-            LEFT JOIN service_categoria sc ON s.ID_Service = sc.ID_Service
-            LEFT JOIN categoria c ON sc.ID_Categoria = c.ID_Categoria
-            WHERE s.ID_Cliente = %s
+            WHERE s.ID_Cliente = %s AND s.Status != 'concluido'
         """, (user_id,))
         servicos_pedidos = cursor.fetchall()
 
+        # Serviços pedidos concluídos
         cursor.execute("""
-            SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, c.NomeCategoria AS Categoria, s.Status
+            SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, 
+                   (SELECT c.NomeCategoria FROM service_categoria sc 
+                    JOIN categoria c ON sc.ID_Categoria = c.ID_Categoria 
+                    WHERE sc.ID_Service = s.ID_Service LIMIT 1) AS Categoria,
+                   s.Status
             FROM service s
-            LEFT JOIN service_categoria sc ON s.ID_Service = sc.ID_Service
-            LEFT JOIN categoria c ON sc.ID_Categoria = c.ID_Categoria
-            WHERE s.ID_Freelancer = %s
+            WHERE s.ID_Cliente = %s AND s.Status = 'concluido'
+        """, (user_id,))
+        servicos_pedidos_concluidos = cursor.fetchall()
+
+        # Serviços recebidos em andamento
+        cursor.execute("""
+            SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, 
+                   (SELECT c.NomeCategoria FROM service_categoria sc 
+                    JOIN categoria c ON sc.ID_Categoria = c.ID_Categoria 
+                    WHERE sc.ID_Service = s.ID_Service LIMIT 1) AS Categoria,
+                   s.Status
+            FROM service s
+            WHERE s.ID_Freelancer = %s AND s.Status != 'concluido'
         """, (user_id,))
         servicos_recebidos = cursor.fetchall()
 
-        print(f"[DEBUG] servicosPedidos: {servicos_pedidos}")
-        print(f"[DEBUG] servicosRecebidos: {servicos_recebidos}")
+        # Serviços recebidos concluídos
+        cursor.execute("""
+            SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, 
+                   (SELECT c.NomeCategoria FROM service_categoria sc 
+                    JOIN categoria c ON sc.ID_Categoria = c.ID_Categoria 
+                    WHERE sc.ID_Service = s.ID_Service LIMIT 1) AS Categoria,
+                   s.Status
+            FROM service s
+            WHERE s.ID_Freelancer = %s AND s.Status = 'concluido'
+        """, (user_id,))
+        servicos_recebidos_concluidos = cursor.fetchall()
 
-        return jsonify({"sucesso": True, "servicosPedidos": servicos_pedidos, "servicosRecebidos": servicos_recebidos}), 200
+        print(f"[DEBUG] servicosPedidos: {servicos_pedidos}")
+        print(f"[DEBUG] servicosPedidosConcluidos: {servicos_pedidos_concluidos}")
+        print(f"[DEBUG] servicosRecebidos: {servicos_recebidos}")
+        print(f"[DEBUG] servicosRecebidosConcluidos: {servicos_recebidos_concluidos}")
+
+        return jsonify({
+            "sucesso": True,
+            "servicosPedidos": servicos_pedidos,
+            "servicosPedidosConcluidos": servicos_pedidos_concluidos,
+            "servicosRecebidos": servicos_recebidos,
+            "servicosRecebidosConcluidos": servicos_recebidos_concluidos
+        }), 200
     except Exception as e:
         print(f"[ERROR] Erro ao listar serviços: {e}")
         return jsonify({"sucesso": False, "erro": "Erro ao listar serviços"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@service_bp.route('/deletar/<int:servico_id>', methods=['DELETE'])
+@login_required
+def deletar_servico(servico_id):
+    user_id = session.get('user_id')
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Só o cliente pode deletar o serviço
+        cursor.execute("SELECT ID_Cliente FROM service WHERE ID_Service = %s", (servico_id,))
+        result = cursor.fetchone()
+        if not result or str(result[0]) != str(user_id):
+            return jsonify({"sucesso": False, "erro": "Não autorizado a deletar este serviço."}), 403
+
+        # Remove dependências na tabela service_categoria
+        cursor.execute("DELETE FROM service_categoria WHERE ID_Service = %s", (servico_id,))
+        # Remove o serviço
+        cursor.execute("DELETE FROM service WHERE ID_Service = %s", (servico_id,))
+        conn.commit()
+        return jsonify({"sucesso": True, "mensagem": "Serviço deletado com sucesso!"}), 200
+    except Exception as e:
+        print(f"[ERROR] Erro ao deletar serviço: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao deletar serviço"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@service_bp.route('/concluir/<int:servico_id>', methods=['POST'])
+@login_required
+def concluir_servico(servico_id):
+    user_id = session.get('user_id')
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        # Só o freelancer pode concluir o serviço
+        cursor.execute("SELECT ID_Freelancer FROM service WHERE ID_Service = %s", (servico_id,))
+        result = cursor.fetchone()
+        if not result or str(result[0]) != str(user_id):
+            return jsonify({"sucesso": False, "erro": "Não autorizado a concluir este serviço."}), 403
+
+        cursor.execute("""
+            UPDATE service SET Status = 'concluido', DataConclusao = NOW() WHERE ID_Service = %s
+        """, (servico_id,))
+        conn.commit()
+        return jsonify({"sucesso": True, "mensagem": "Serviço concluído com sucesso!"}), 200
+    except Exception as e:
+        print(f"[ERROR] Erro ao concluir serviço: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao concluir serviço"}), 500
     finally:
         if cursor:
             cursor.close()
@@ -95,20 +192,34 @@ def avaliar_servico(servico_id):
     data = request.get_json()
     nota = data.get('nota')
     comentario = data.get('comentario')
-    user_id = request.cookies.get('user_id')
+    user_id = session.get('user_id')
 
     conn = None
     cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        # Descobre se o usuário é cliente ou freelancer do serviço
+        cursor.execute("SELECT ID_Cliente, ID_Freelancer FROM service WHERE ID_Service = %s", (servico_id,))
+        result = cursor.fetchone()
+        if not result:
+            return jsonify({"sucesso": False, "erro": "Serviço não encontrado."}), 404
 
-        cursor.execute("""
-            INSERT INTO avaliacao (ID_Service, ID_Cliente, Nota, Comentario)
-            VALUES (%s, %s, %s, %s)
-        """, (servico_id, user_id, nota, comentario))
+        id_cliente, id_freelancer = result
+        if str(user_id) == str(id_cliente):
+            cursor.execute("""
+                INSERT INTO avaliacao (ID_Service, ID_Cliente, Nota, Comentario)
+                VALUES (%s, %s, %s, %s)
+            """, (servico_id, user_id, nota, comentario))
+        elif str(user_id) == str(id_freelancer):
+            cursor.execute("""
+                INSERT INTO avaliacao (ID_Service, ID_Freelancer, Nota, Comentario)
+                VALUES (%s, %s, %s, %s)
+            """, (servico_id, user_id, nota, comentario))
+        else:
+            return jsonify({"sucesso": False, "erro": "Não autorizado a avaliar este serviço."}), 403
+
         conn.commit()
-
         return jsonify({"sucesso": True, "mensagem": "Serviço avaliado com sucesso!"}), 201
     except Exception as e:
         print(f"Erro ao avaliar serviço: {e}")

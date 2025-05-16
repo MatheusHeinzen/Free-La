@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
 
         const pedidos = document.getElementById('servicosPedidos');
+        const pedidosConcluidos = document.getElementById('servicosPedidosConcluidos');
         pedidos.innerHTML = '';
+        if (pedidosConcluidos) pedidosConcluidos.innerHTML = '';
 
         if (data.servicosPedidos && data.servicosPedidos.length > 0) {
             data.servicosPedidos.forEach(servico => {
@@ -16,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <small>Categoria: ${servico.Categoria}</small>
                         <small>Status: ${servico.Status}</small>
                         <div class="mt-2">
-                            <button class="btn btn-danger btn-sm" onclick="cancelarServico(${servico.ID_Service})">Cancelar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deletarServico(${servico.ID_Service})">Deletar</button>
                             <button class="btn btn-info btn-sm" onclick="editarServico(${servico.ID_Service}, '${servico.Nome.replace(/'/g, "\\'")}', '${servico.Descricao.replace(/'/g, "\\'")}', '${servico.Categoria ? servico.Categoria.replace(/'/g, "\\'") : ''}')">Editar</button>
                             <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
                         </div>
@@ -25,41 +27,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             pedidos.innerHTML = '<li class="list-group-item">Nenhum serviço requisitado encontrado.</li>';
         }
+
+        // Corrigido: garantir que a listagem de concluídos aparece
+        if (pedidosConcluidos && data.servicosPedidosConcluidos && data.servicosPedidosConcluidos.length > 0) {
+            data.servicosPedidosConcluidos.forEach(servico => {
+                pedidosConcluidos.innerHTML += `
+                    <li class="list-group-item">
+                        <strong>${servico.Nome}</strong>
+                        <p>${servico.Descricao}</p>
+                        <small>Categoria: ${servico.Categoria}</small>
+                        <small>Status: ${servico.Status}</small>
+                        <div class="mt-2">
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                        </div>
+                    </li>`;
+            });
+        } else if (pedidosConcluidos) {
+            pedidosConcluidos.innerHTML = '<li class="list-group-item">Nenhum serviço concluído encontrado.</li>';
+        }
     } catch (error) {
         console.error('Erro ao carregar serviços:', error);
     }
 });
-
-window.cancelarServico = async function(servicoId) {
-    const confirm = await Swal.fire({
-        title: 'Cancelar serviço?',
-        text: 'Tem certeza que deseja cancelar este serviço?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Sim, cancelar',
-        cancelButtonText: 'Voltar'
-    });
-    if (confirm.isConfirmed) {
-        try {
-            const response = await fetch(`/servicos/cancelar/${servicoId}`, {
-                method: 'DELETE'
-            });
-            if (!response.ok) throw new Error('Erro ao cancelar serviço');
-            Swal.fire({
-                icon: 'success',
-                title: 'Serviço cancelado!',
-                timer: 2000,
-                showConfirmButton: false
-            }).then(() => location.reload());
-        } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: error.message || 'Erro ao cancelar serviço.'
-            });
-        }
-    }
-};
 
 window.editarServico = function(servicoId, nome, descricao, categoria) {
     Swal.fire({
@@ -153,6 +142,37 @@ window.avaliarServico = async function(servicoId) {
                 icon: 'error',
                 title: 'Erro!',
                 text: error.message || 'Erro ao avaliar serviço.'
+            });
+        }
+    }
+};
+
+window.deletarServico = async function(servicoId) {
+    const confirm = await Swal.fire({
+        title: 'Deletar serviço?',
+        text: 'Tem certeza que deseja deletar este serviço?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, deletar',
+        cancelButtonText: 'Voltar'
+    });
+    if (confirm.isConfirmed) {
+        try {
+            const response = await fetch(`/servicos/deletar/${servicoId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Erro ao deletar serviço');
+            Swal.fire({
+                icon: 'success',
+                title: 'Serviço deletado!',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => location.reload());
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao deletar serviço.'
             });
         }
     }

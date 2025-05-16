@@ -1,33 +1,26 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('/servicos/listar', { credentials: 'include' });
-        // Verifica se o elemento existe (usuário autenticado e página correta)
-        const recebidos = document.getElementById('servicosRecebidos');
-        if (!recebidos) {
-            console.warn('Elemento servicosRecebidos não encontrado na página.');
-            return;
-        }
-
         if (!response.ok) throw new Error('Erro ao carregar serviços');
         const data = await response.json();
 
-        console.log('[DEBUG] Dados recebidos da API:', data);
-
+        const recebidos = document.getElementById('servicosRecebidos');
+        const recebidosConcluidos = document.getElementById('servicosRecebidosConcluidos');
         recebidos.innerHTML = '';
+        if (recebidosConcluidos) recebidosConcluidos.innerHTML = '';
 
-        // Verifica se a sessão está ativa e se o backend retornou sucesso
-        if (!data.sucesso) {
-            recebidos.innerHTML = '<li class="list-group-item text-danger">Sessão expirada ou usuário não autenticado.</li>';
-            return;
+        // Corrige categoria nula e garante exibição
+        function renderCategoria(servico) {
+            return servico.Categoria && servico.Categoria !== 'null' ? servico.Categoria : '<span class="text-danger">Sem categoria</span>';
         }
 
-        if (data.servicosRecebidos && data.servicosRecebidos.length > 0) {
+        if (Array.isArray(data.servicosRecebidos) && data.servicosRecebidos.length > 0) {
             data.servicosRecebidos.forEach(servico => {
                 recebidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
                         <p>${servico.Descricao}</p>
-                        <small>Categoria: ${servico.Categoria}</small>
+                        <small>Categoria: ${renderCategoria(servico)}</small>
                         <small>Status: ${servico.Status}</small>
                         <div class="mt-2">
                             <button class="btn btn-success btn-sm" onclick="concluirServico(${servico.ID_Service})">Concluir</button>
@@ -38,11 +31,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             recebidos.innerHTML = '<li class="list-group-item">Nenhum serviço recebido encontrado.</li>';
         }
+
+        if (recebidosConcluidos && Array.isArray(data.servicosRecebidosConcluidos) && data.servicosRecebidosConcluidos.length > 0) {
+            data.servicosRecebidosConcluidos.forEach(servico => {
+                recebidosConcluidos.innerHTML += `
+                    <li class="list-group-item">
+                        <strong>${servico.Nome}</strong>
+                        <p>${servico.Descricao}</p>
+                        <small>Categoria: ${renderCategoria(servico)}</small>
+                        <small>Status: ${servico.Status}</small>
+                        <div class="mt-2">
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                        </div>
+                    </li>`;
+            });
+        } else if (recebidosConcluidos) {
+            recebidosConcluidos.innerHTML = '<li class="list-group-item">Nenhum serviço concluído encontrado.</li>';
+        }
     } catch (error) {
         console.error('Erro ao carregar serviços:', error);
         const recebidos = document.getElementById('servicosRecebidos');
         if (recebidos) {
-            recebidos.innerHTML = '<li class="list-group-item text-danger">Erro ao carregar serviços ou sessão expirada.</li>';
+            recebidos.innerHTML = '<li class="list-group-item text-danger">Erro ao carregar serviços.</li>';
         }
     }
 });

@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
     await carregarCategorias();
-    await carregarServicos();
 
     const form = document.getElementById('form-requisitar-servico');
     form.addEventListener('submit', async (e) => {
