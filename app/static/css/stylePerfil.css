@@ -400,6 +400,7 @@ input[type="checkbox"] {
 }
 .dropdown-menu.show {
     display: block;
+    top: 150%;
 }
 @media screen and (max-width: 768px) {
     .mb-3, .my-3 {

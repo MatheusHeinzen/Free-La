@@ -3,6 +3,6 @@
 /ambiente
 /venv
 # testes :P
-/templates/teste.html
+/templates-tests
 /get-ping.py
 __pycache__/

@@ -25,9 +25,11 @@
     border-radius: 25px;
 }
 
+
 .jumbotron {
     margin-bottom: 0rem;
 }
+
 
 /* Para deletar perfil: */
 .overlay {
@@ -83,7 +85,7 @@
 .dropdown-menu {
     position: absolute;
     top: 100%;
-    left: 0;
+    left: 76%;
     z-index: 1000;
     display: none;
     float: left;
@@ -115,6 +117,18 @@ img {
 @media(max-width: 328px) {
     .pesquisa {
         width: 90%;
+    }
+    
+}
+
+@media screen and (max-width: 768px) {
+    .d-flex{
+        display: grid;
+    }
+    #grid{
+        display: grid;
+        grid-gap: 20px;
+        justify-content: center;
     }
 }
 

@@ -22,7 +22,8 @@
           <i class="bi bi-list"></i>
         </div>
         <ul>
-          <img src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px" style="margin-left: 1rem;">
+          <img src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px"
+            style="margin-left: 1rem;">
           <li class="item_menu">
             <a href="/perfil">
               <span class="icon"></span>
@@ -133,12 +134,16 @@
           ajuda, aqui você encontra profissionais qualificados e serviços sob medida para suas necessidades. Com um
           sistema intuitivo e seguro, o Free'la facilita negociações e entrega de trabalhos, garantindo agilidade e
           qualidade para todos. Encontre, contrate e colabore com os melhores do mercado em um só lugar!</p>
-        <div class="d-flex justify-content-center">
-          <input class="pesquisa" type="text" placeholder="Pesquise por nome ou descrição..." id="campo-pesquisa">
-          <select id="categoriaDropdown categoriaServico" class="form-control mx-2" style="width: 200px;">
-            <option value="">Todas as categorias</option>
-            <!-- As opções serão preenchidas dinamicamente -->
-          </select>
+        <div class="d-flex justify-content-center align-items-center" id="grid">
+          <div>
+            <input class="pesquisa" type="text" placeholder="Pesquise por nome ou descrição..." id="campo-pesquisa">
+          </div>
+          <div>
+            <select id="categoriaDropdown categoriaServico" class="form-control mx-2" style="width: 200px;">
+              <option value="">Todas as categorias</option>
+              <!-- As opções serão preenchidas dinamicamente -->
+            </select>
+          </div>
           <button class="pesquisar_btn" onclick="pesquisar()">
             <img src="/static/imgs/pesquisa-de-lupa.png" width="20px">
           </button>
@@ -163,7 +168,9 @@
 
     <!-- Seção de Resultados da Pesquisa -->
     <section>
-      <h2>Resultados da Pesquisa</h2>
+      <div class="container" style="margin-top: 30px;">
+        <h2>Resultados da Pesquisa</h2>
+      </div>
       <div id="freelancersContainer" class="container mt-4">
         <!-- Freelancers serão carregados dinamicamente aqui -->
       </div>
