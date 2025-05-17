@@ -1,15 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
+    <link rel="shortcut icon" href="../static/imgs/icon.png">
     <title>Serviços Recebidos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <style>
+        .rating {
+            direction: rtl;
+            unicode-bidi: bidi-override;
+            font-size: 2rem;
+            display: inline-flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .rating input {
+            display: none;
+        }
+
+        .rating label {
+            cursor: pointer;
+            color: gray;
+        }
+
+        .rating input:checked~label,
+        .rating label:hover,
+        .rating label:hover~label {
+            color: gold;
+        }
+    </style>
 </head>
+
 <body>
     {% if not session.user_id %}
-        <script>window.location.href = "/";</script>
+    <script>window.location.href = "/";</script>
     {% endif %}
     <header>
         <div class="container">
@@ -21,7 +50,8 @@
                 <ul>
                     <li class="item_menu">
                         <a href="/perfil">
-                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px" >
+                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar"
+                                alt="Perfil" width="140px">
                         </a>
                     </li>
                     <li class="item_menu">
@@ -105,4 +135,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ url_for('static', filename='js/servicos_freelancer.js') }}"></script>
 </body>
+
 </html>

@@ -8,6 +8,7 @@
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="shortcut icon" href="../static/imgs/icon.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/stylePerfil.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <title>Perfil</title>
@@ -15,7 +16,7 @@
 
 <body>
     {% if not session.user_id %}
-        <script>window.location.href = "/";</script>
+    <script>window.location.href = "/";</script>
     {% endif %}
     <header>
         <div class="container">
@@ -27,7 +28,8 @@
                 <ul>
                     <li class="item_menu">
                         <a href="/perfil">
-                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px" >
+                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar"
+                                alt="Perfil" width="140px">
                         </a>
                     </li>
                     <li class="item_menu">
@@ -112,7 +114,8 @@
                         <div class="card">
                             <div class="card-body text-center bg-primary rounded-top">
                                 <div class="user-box">
-                                    <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" alt="Foto de Perfil" width="150" height="150">
+                                    <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}"
+                                        alt="Foto de Perfil" width="150" height="150">
                                 </div>
                                 <h5 class="mb-1 text-white" id="nomeUsuario">Nome do Usuário</h5>
                                 <h6 class="text-light" id="profissaoUsuario">Profissão ou Categoria</h6>
@@ -162,14 +165,14 @@
                                         <br><br><br>
 
                                     </div>
-                                    <div class="col-md-6">
+                                    <!-- <div class="col-md-6">
                                         <h6>Habilidades <i class="bi bi-pencil-square"
-                                                onclick="mostrarOpcoesHabilidades()"></i></h6>
+                                                onclick="mostrarOpcoesHabilidades()"></i></h6> -->
 
-                                        <!-- Selecionar skills -->
-                                        <div class="overlay" id="overlay"></div>
+                                    <!-- Selecionar skills -->
+                                    <div class="overlay" id="overlay"></div>
 
-                                        <div class="custom-alert" id="showOpcoesHabilidades" on>
+                                    <!-- <div class="custom-alert" id="showOpcoesHabilidades" on>
                                             <h2>Selecione suas habilidades</h2>
                                             <div id="checkboxContainer"></div>
 
@@ -181,68 +184,77 @@
                                             </div>
                                             <br>
                                             <button onclick="fecharOpcoes()">OK</button>
-                                        </div>
+                                        </div> -->
 
-                                        <!-- Apagar fututuramente e deixar com inner.html provavelmente -->
+                                    <!-- Apagar fututuramente e deixar com inner.html provavelmente
                                         <a href="#" class="badge badge-dark badge-pill">exemplo</a>
                                         <a href="#" class="badge badge-dark badge-pill">de</a>
                                         <a href="#" class="badge badge-dark badge-pill">futuras</a>
                                         <a href="#" class="badge badge-dark badge-pill">habilidades</a>
-                                        <hr>
+                                        <hr> -->
+
+                                    <!-- Avaliações -->
+                                    <hr>
+                                    <span>
+                                        futuro das avaliações ⭐⭐⭐⭐⭐
+                                        <button>Clique para ver mais</button>
+                                    </span>
+                                </div>
 
 
+                                <!-- Editar dados -->
 
-                                        <!-- Avaliações -->
-                                        <span>
-                                            futuro das avaliações ⭐⭐⭐⭐⭐
-                                        </span>
-                                    </div>
-
-
-                                    <!-- Editar dados -->
-
-                                    <div class="editar-dados-perfil" id="editar-dados">
-                                        <div id="editModal" class="modal">
-                                            <div class="modal-content-editar-perfil">
-                                                <span class="close">&times;</span>
-                                                <div class="separador">
-                                                    <h3 style="justify-content: center;">Editar Perfil</h3>
-                                                    <form id="formUploadImagem" action="/profile/upload" method="POST" enctype="multipart/form-data">
-                                                        <div id="preview-container">
-                                                            <img id="preview" alt="Pré-visualização da imagem" style="display: none;">
-                                                        </div>
-                                                        <label for="image">Selecione uma imagem:</label>
-                                                        <input type="file" name="image" id="image" accept="image/*">
-                                                        <button type="submit">Alterar Imagem</button>
-                                                    </form>
-                                                </div>
-                                                <div class="separador">
-                                                    <form id="editForm">
-                                                        <input type="hidden" name="user_id" value="{{ session['user_id'] }}">
-
-                                                        <label for="categoria">Palavra-chave / Profissão / Categoria:</label>
-                                                        <select id="categoria" name="categoria" required>
-                                                            <option value="" disabled selected>Selecione uma categoria</option>
+                                <div class="editar-dados-perfil" id="editar-dados">
+                                    <div id="editModal" class="modal">
+                                        <div class="modal-content-editar-perfil">
+                                            <span class="close">&times;</span>
+                                            <div class="separador">
+                                                <h3 style="justify-content: center;">Editar Perfil</h3>
+                                                <form id="formUploadImagem" action="/profile/upload" method="POST"
+                                                    enctype="multipart/form-data">
+                                                    <div id="preview-container">
+                                                        <img id="preview" alt="Pré-visualização da imagem"
+                                                            style="display: none;">
+                                                    </div>
+                                                    <label for="image">Selecione uma imagem:</label>
+                                                    <input type="file" name="image" id="image" accept="image/*">
+                                                    <button type="submit">Alterar Imagem</button>
+                                                </form>
+                                            </div>
+                                            <div class="separador">
+                                                <form id="editForm">
+                                                    <input type="hidden" name="user_id"
+                                                        value="{{ session['user_id'] }}">
+                                                    <div class="form-group">
+                                                        <label for="categoria">Palavra-chave / Profissão /
+                                                            Categoria:</label>
+                                                        <select id="categoria" name="categoria" class="form-control"
+                                                            required>
+                                                            <option value="" disabled selected>Selecione uma
+                                                                categoria
+                                                            </option>
                                                             <!-- As opções serão preenchidas via JavaScript -->
                                                         </select>
-
+                                                    </div>
+                                                    <div class="form-group">
                                                         <label for="descricao">Descrição:</label>
-                                                        <textarea id="descricao" name="descricao" rows="3" placeholder="Escreva sua descrição..."></textarea>
-
-                                                        <button type="submit">Salvar</button>
-                                                    </form>
-                                                </div>
+                                                        <textarea id="descricao" class="form-control" name="descricao"
+                                                            rows="3" placeholder="Escreva sua descrição..."></textarea>
+                                                    </div>
+                                                    <button type="submit">Salvar</button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
+
+        </div>
         </div>
         <div class="overlay" id="overlay"></div>
         <div class="pop-up-deletar" id="pop-up-deletar">

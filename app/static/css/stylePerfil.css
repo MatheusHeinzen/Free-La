@@ -1,6 +1,6 @@
 /* User Cards */
 .user-box {
-    width: 110px;
+    width: 100px;
     margin: auto;
     margin-bottom: auto;
     padding: auto;
@@ -75,6 +75,17 @@ textarea {
     margin-top: 5px;
     border-radius: 5px;
     border: 1px solid #ccc;
+}
+
+.separador{
+    width: 100%;
+    margin-left: 15px;
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+    width: 100%;
 }
 
 button {

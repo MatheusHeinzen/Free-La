@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-window.editarServico = function(servicoId, nome, descricao, categoria) {
+window.editarServico = function (servicoId, nome, descricao, categoria) {
     Swal.fire({
         title: 'Editar Serviço',
         html: `
@@ -97,23 +97,40 @@ window.editarServico = function(servicoId, nome, descricao, categoria) {
     });
 };
 
-window.avaliarServico = async function(servicoId) {
+window.avaliarServico = async function (servicoId) {
     const { value: formValues } = await Swal.fire({
         title: 'Avaliar Serviço',
         html: `
-            <label for="notaServico">Nota (1-5):</label>
-            <input id="notaServico" type="number" min="1" max="5" class="form-control mb-2">
-            <label for="comentarioServico">Comentário:</label>
-            <textarea id="comentarioServico" class="form-control" rows="3"></textarea>
+        <div class="mb-3">
+            <label class="form-label">Nota:</label><br>
+            <div class="rating">
+            <input type="radio" id="estrela5" name="rating" value="5">
+            <label for="estrela5"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="estrela4" name="rating" value="4">
+            <label for="estrela4"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="estrela3" name="rating" value="3">
+            <label for="estrela3"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="estrela2" name="rating" value="2">
+            <label for="estrela2"><i class="bi bi-star-fill"></i></label>
+            <input type="radio" id="estrela1" name="rating" value="1">
+            <label for="estrela1"><i class="bi bi-star-fill"></i></label>
+            </div>
+        </div>
+        <label for="comentarioServico">Comentário:</label>
+        <textarea id="comentarioServico" class="form-control" rows="3"></textarea>
         `,
         focusConfirm: false,
+
         preConfirm: () => {
-            const nota = document.getElementById('notaServico').value;
+            const checked = document.querySelector('input[name="rating"]:checked');
+            const nota = checked ? checked.value : null;
             const comentario = document.getElementById('comentarioServico').value.trim();
-            if (!nota || nota < 1 || nota > 5) {
-                Swal.showValidationMessage('Por favor, insira uma nota válida entre 1 e 5.');
-                return;
+
+            if (!nota) {
+                Swal.showValidationMessage('Por favor, selecione uma nota de 1 a 5.');
+                return false;
             }
+
             return { nota, comentario };
         }
     });
@@ -147,7 +164,7 @@ window.avaliarServico = async function(servicoId) {
     }
 };
 
-window.deletarServico = async function(servicoId) {
+window.deletarServico = async function (servicoId) {
     const confirm = await Swal.fire({
         title: 'Deletar serviço?',
         text: 'Tem certeza que deseja deletar este serviço?',
