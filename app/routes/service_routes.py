@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from app.utils.db import get_db_connection
-from app.utils.decorators import login_required  # Corrigido aqui
+from app.utils.decorators import login_required
 
 service_bp = Blueprint('service', __name__)
 
@@ -33,6 +33,18 @@ def criar_servico():
             INSERT INTO service (NomeService, Descricao, ID_Cliente, ID_Freelancer)
             VALUES (%s, %s, %s, %s)
         """, (nome, descricao, id_cliente, id_freelancer))
+        service_id = cursor.lastrowid  # Pega o ID do serviço recém-criado
+
+        # Salva a categoria na tabela de ligação
+        cursor.execute("""
+            SELECT ID_Categoria FROM categoria WHERE ID_Categoria = %s OR NomeCategoria = %s
+        """, (categoria, categoria))
+        cat = cursor.fetchone()
+        if cat:
+            cursor.execute("""
+                INSERT INTO service_categoria (ID_Service, ID_Categoria) VALUES (%s, %s)
+            """, (service_id, cat[0]))
+
         conn.commit()
 
         print("[DEBUG] Serviço criado com sucesso")
