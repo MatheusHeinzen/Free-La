@@ -176,11 +176,10 @@
       </div>
     </section>
 
-    <!-- Seção de Resultados -->
-
+    <!-- Seção CarregarFreelancer() -->
     <div class="album py-5 bg-light">
       <div class="container">
-        <div class="row" id="perfis-container">
+        <div class="row mt-4" id="perfis-container">
           <!-- Os cards serão gerados aqui via JavaScript -->
         </div>
       </div>
@@ -196,64 +195,7 @@
     item.classList.toggle('active');
   }
 </script>
-<script>
-  async function carregarCategorias() {
-    try {
-      const response = await fetch('/category');
-      if (!response.ok) throw new Error('Erro ao carregar categorias');
-      const data = await response.json();
 
-      if (data.sucesso && Array.isArray(data.categorias)) {
-        const dropdown = document.getElementById('categoriaDropdown');
-        dropdown.innerHTML = '<option value="">Todas as categorias</option>'; // Reset dropdown
-        data.categorias.forEach(categoria => {
-          const option = document.createElement('option');
-          option.value = categoria.NomeCategoria;
-          option.textContent = categoria.NomeCategoria;
-          dropdown.appendChild(option);
-        });
-      } else {
-        console.error('Categorias inválidas ou não encontradas.');
-      }
-    } catch (error) {
-      console.error('Erro ao carregar categorias:', error);
-    }
-  }
-
-  async function pesquisar() {
-    const termo = document.getElementById('campo-pesquisa').value.trim();
-    const categoria = document.getElementById('categoriaDropdown').value;
-
-    try {
-      const response = await fetch(`/buscarFreelancers?termo=${encodeURIComponent(termo)}&categoria=${encodeURIComponent(categoria)}`);
-      if (!response.ok) throw new Error('Erro ao buscar freelancers');
-      const data = await response.json();
-
-      const container = document.getElementById('freelancersContainer');
-      container.innerHTML = '';
-
-      if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
-        data.freelancers.forEach(freelancer => {
-          container.innerHTML += `
-            <div class="card mb-3">
-              <div class="card-body">
-                <img src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" width="100" height="100">
-                <h5 class="card-title">${freelancer.Nome}</h5>
-                <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
-                <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
-              </div>
-            </div>`;
-        });
-      } else {
-        container.innerHTML = '<p>Nenhum freelancer encontrado.</p>';
-      }
-    } catch (error) {
-      console.error('Erro ao buscar freelancers:', error);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', carregarCategorias);
-</script>
 <script src="{{ url_for('static', filename='js/homepage.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

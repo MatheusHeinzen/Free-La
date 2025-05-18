@@ -186,7 +186,7 @@ def concluir_servico(servico_id):
         if conn:
             conn.close()
 
-@service_bp.route('/servicos/avaliar/<int:servico_id>', methods=['POST'])
+@service_bp.route('/avaliar/<int:servico_id>', methods=['POST'])
 @login_required
 def avaliar_servico(servico_id):
     data = request.get_json()

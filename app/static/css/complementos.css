@@ -1,3 +1,12 @@
+/* Containeer - Freelancers */
+.mt-4{
+    margin-top: 1.5rem !important;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+
 /* Barra de pesquisa */
 .pesquisa {
     margin-top: 15px;

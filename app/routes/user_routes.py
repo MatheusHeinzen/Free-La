@@ -3,8 +3,10 @@ from functools import wraps
 from werkzeug.security import generate_password_hash
 from app.utils.db import get_db_connection
 from app.utils.decorators import login_required
+from flask_cors import CORS
 
 user_bp = Blueprint('user', __name__)
+CORS(user_bp, supports_credentials=True)
 
 # Decorador para verificar autenticação 
 def login_required(func):
@@ -162,4 +164,54 @@ def atualizar_usuario(user_id):
         if cursor:
             cursor.close()
         if conn:
+            conn.close()
+
+@user_bp.route('/deletarUsuario', methods=['DELETE'])
+@login_required 
+def deletar_usuario():
+    if 'user_id' not in session:
+        return jsonify({"sucesso": False, "erro": "Não autorizado"}), 401
+    
+    user_id = session['user_id']
+
+    if not user_id:
+        return jsonify({
+            "sucesso": False,
+            "erro": "Usuário não está logado."
+        }), 401
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verifica se o usuário existe
+        cursor.execute("SELECT * FROM Usuario WHERE ID_User = %s", (user_id,))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            return jsonify({
+                "sucesso": False,
+                "erro": "Usuário não encontrado."
+            }), 404
+        
+        # Deleta o Usuario logado
+        cursor.execute("DELETE FROM Usuario WHERE ID_User = %s", (user_id,))
+        conn.commit()
+
+        session.clear()
+
+        return jsonify({
+            "sucesso": True,
+            "mensagem": "Conta deletada com sucesso."
+        }), 200
+
+    except Exception as err:
+        return jsonify({
+            "sucesso": False,
+            "erro": f"Erro no banco de dados: {str(err)}"
+        }), 500
+
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
             conn.close()

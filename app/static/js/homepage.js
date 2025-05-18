@@ -30,6 +30,7 @@ async function exibirTodosFreelancers() {
                 container.innerHTML += `
                     <div class="card mb-3">
                         <div class="card-body">
+                            <img src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" width="100" height="100">
                             <h5 class="card-title">${freelancer.Nome}</h5>
                             <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
                             <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
@@ -40,8 +41,14 @@ async function exibirTodosFreelancers() {
             container.innerHTML = '<p>Nenhum freelancer encontrado.</p>';
         }
     } catch (error) {
-        console.error('Erro ao carregar freelancers:', error);
-    }
+        console.error('Erro ao carregar perfis:', error);
+            document.getElementById('perfis-container').innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
+                </div>
+            `;
+        };
+        
 }
 
 //Função para pesquisar freelancers
@@ -95,9 +102,13 @@ function fecharPopUpDeletar() {
 }
 
 function confirmarDelecao() {
-    fetch('/DeletarUsuario', {
-        method: 'DELETE'
-    })
+    fetch('user/deletarUsuario', {
+        method: 'DELETE',
+        headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include' 
+        })
         .then(response => response.json())
         .then(data => {
             if (data.sucesso) {
@@ -150,103 +161,24 @@ function limparErros() {
 // Função para carregar categorias
 async function carregarCategorias() {
     try {
-        const response = await fetch('/category');
+        const response = await fetch('/profile/obter-categorias');
         if (!response.ok) throw new Error('Erro ao carregar categorias');
-        const data = await response.json();
+            console.log("categorias não estão sendo chamadas")
 
-        if (data.sucesso && Array.isArray(data.categorias)) {
-            const dropdown = document.getElementById('categoriaDropdown');
-            dropdown.innerHTML = '<option value="">Todas as categorias</option>'; // Reset dropdown
-            data.categorias.forEach(categoria => {
+        const categorias = await response.json();
+        const select = document.getElementById('categoriaDropdown');
+        if (select) {
+            categorias.forEach(categoria => {
                 const option = document.createElement('option');
-                option.value = categoria.NomeCategoria;
+                option.value = categoria.ID_Categoria;
                 option.textContent = categoria.NomeCategoria;
-                dropdown.appendChild(option);
+                select.appendChild(option);
             });
-        } else {
-            console.error('Categorias inválidas ou não encontradas.');
         }
     } catch (error) {
         console.error('Erro ao carregar categorias:', error);
     }
 }
-
-async function carregarFreelancers() {
-    try {
-        const response = await fetch('/freelancers', { method: 'GET' });
-        if (!response.ok) throw new Error('Erro ao carregar freelancers');
-
-        const data = await response.json();
-        if (data.sucesso) {
-            exibirFreelancers(data.freelancers);
-        } else {
-            throw new Error(data.erro || 'Erro ao carregar freelancers');
-        }
-    } catch (error) {
-        console.error('Erro ao carregar freelancers:', error);
-        document.getElementById('resultados-pesquisa').innerHTML = '<p>Erro ao carregar freelancers.</p>';
-    }
-}
-
-function exibirFreelancers(freelancers) {
-    const section = document.getElementById('resultados-pesquisa');
-    section.innerHTML = '';
-
-    freelancers.forEach(freelancer => {
-        section.innerHTML += `
-            <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <img class="card-img-top" src="data:image/jpeg;base64,${freelancer.Foto || ''}" alt="${freelancer.Username}">
-                    <div class="card-body">
-                        <h5 class="card-title">${freelancer.Username || freelancer.Nome}</h5>
-                        <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
-                        <a href="/perfil/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/api/perfis')
-        .then(response => response.json())
-        .then(perfis => {
-            const container = document.getElementById('perfis-container');
-            
-            perfis.forEach(perfil => {
-                const cardHtml = `
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100 shadow-sm">
-                            <img class="card-img-top" 
-                                 src="${perfil.Foto ? '' + perfil.Foto : ''}" 
-                                 alt="Foto de ${perfil.Nome}"
-                                 style="height: 200px; object-fit: cover;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${perfil.Nome}</h5>
-                                <p class="card-text flex-grow-1">${perfil.Bio || 'Sem descrição'}</p>
-                                ${perfil.Categorias ? `<small class="text-muted mb-2">Categorias: ${perfil.Categorias}</small>` : ''}
-                                <div class="d-flex justify-content-between align-items-center mt-auto">
-                                    <a href="/perfil/${perfil.ID_User}" class="btn btn-sm btn-outline-primary">Ver Perfil</a>
-                                    <small class="text-muted">Novo</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                container.innerHTML += cardHtml;
-            });
-        })
-        .catch(error => {
-            console.error('Erro ao carregar perfis:', error);
-            document.getElementById('perfis-container').innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
-                </div>
-            `;
-        });
-});
 
 // Chama a função ao carregar a página
 document.addEventListener('DOMContentLoaded', async () => {

@@ -130,10 +130,12 @@ window.avaliarServico = async function (servicoId) {
                 Swal.showValidationMessage('Por favor, selecione uma nota de 1 a 5.');
                 return false;
             }
-
+            console.log("Enviando para:", `/servicos/avaliar/${servicoId}`);
+            console.log("Dados:", { nota, comentario });
             return { nota, comentario };
         }
     });
+    
 
     if (formValues) {
         try {
