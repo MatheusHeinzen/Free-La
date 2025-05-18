@@ -395,8 +395,12 @@ function fecharPopUpDeletar() {
 }
 
 function confirmarDelecao() {
-    fetch('/DeletarUsuario', {
-        method: 'DELETE'
+    fetch('user/deletarUsuario', {
+    method: 'DELETE',
+    headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include' 
     })
         .then(response => response.json())
         .then(data => {

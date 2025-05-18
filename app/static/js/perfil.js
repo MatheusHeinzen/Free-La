@@ -1,10 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const usuario = await carregarUsuario();
-        const preferencias = await carregarPreferencias() || {
-            mostrarTelefone: true,
-            mostrarEmail: true
-        };
+        const preferencias = await carregarPreferencias();
 
         atualizarInterface(usuario, preferencias);
 
@@ -116,7 +113,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (!response.ok) throw new Error('Erro ao salvar bio e categoria');
 
-                
+
                 const categoria = document.getElementById("categoria").value;
                 const descricao = document.getElementById("descricao").value;
 
@@ -126,7 +123,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 } catch (error) {
                     console.error("Erro ao salvar perfil:", error);
                 };
-    
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Bio e categoria atualizadas com sucesso!',
@@ -157,8 +154,14 @@ async function carregarUsuario() {
 
 async function carregarPreferencias() {
     try {
-        const response = await fetch('/preferences', { method: 'GET' });
-        if (!response.ok) throw new Error('Erro ao carregar preferências');
+        const response = await fetch('/preference/get', { method: 'GET', credentials: 'include' });
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.warn('Preferências não encontradas, usando padrão');
+                return { mostrarTelefone: true, mostrarEmail: true };
+            }
+            throw new Error('Erro ao carregar preferências');
+        }
 
         const data = await response.json();
         if (data.sucesso) {
@@ -175,12 +178,14 @@ async function carregarPreferencias() {
 
 async function atualizarPreferencias(userId, preferencias) {
     try {
-        const response = await fetch(`/preferences/${userId}`, {
+        const response = await fetch(`/preference/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ preferencias })
         });
         const data = await response.json();
+        console.log('Preferências recebidas:', preferencias);
+        console.log('Dados do usuário:', usuario);
         if (data.sucesso) {
             Swal.fire({
                 icon: 'success',
@@ -206,7 +211,7 @@ async function atualizarPreferencias(userId, preferencias) {
 
 function atualizarInterface(usuario, preferencias) {
 
-    console.log('Dados do usuário:', usuario.Email, usuario.Telefone); 
+    console.log('Dados do usuário:', usuario.Email, usuario.Telefone);
 
     const nomeEl = document.getElementById('nomeUsuario');
     const profissaoEl = document.getElementById('profissaoUsuario');
@@ -277,19 +282,32 @@ function mostrarModalContatos(preferencias) {
 
         try {
             await salvarPreferencias(novasPrefs);
-            document.getElementById('modalContatos').remove(); // Fecha o modal
-            
+            document.getElementById('modalContatos').remove();
+
+            // Recarrega as preferências e atualiza a interface
+            const usuario = await carregarUsuario();
+            const preferenciasAtualizadas = await carregarPreferencias();
+            atualizarInterface(usuario, preferenciasAtualizadas);
+
         } catch (error) {
             console.error("Erro ao salvar preferências:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao salvar preferências'
+            });
         }
-    });
-}
+    }
+    )
+};
+
 
 async function salvarPreferencias(preferencias) {
     try {
-        const response = await fetch('/preferences/', { 
+        const response = await fetch('/preference/put', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ preferencias }) // Enviar como objeto com chave 'preferencias'
         });
 
@@ -317,89 +335,20 @@ async function salvarPreferencias(preferencias) {
     }
 }
 
-// // Habilidades
-// async function carregarHabilidades() {
-//     try {
-//         const response = await fetch('/habilidades');
-//         if (!response.ok) throw new Error('Erro ao carregar habilidades');
 
-//         const habilidades = await response.json();
-//         renderizarHabilidades(habilidades);
-//     } catch (error) {
-//         console.error('[perfil] erro ao carregar habilidades:', error);
-//     }
-// }
+// Para aparecer as avaliações no perfil
+const lista = document.getElementById('lista-avaliacoes');
+function gerarEstrelasHTML(qtd) {
+      let html = '';
+      for (let i = 0; i < qtd; i++) {
+        html += '<i class="bi bi-star-fill text-warning"></i>';
+      }
+      for (let i = qtd; i < 5; i++) {
+        html += '<i class="bi bi-star text-secondary"></i>';
+      }
+      return html;
+    }
 
-// function renderizarHabilidades(habilidades) {
-//     const container = document.getElementById('checkboxContainer');
-//     if (!container) return;
-
-//     container.innerHTML = habilidades.map(hab => `
-//         <label class="habilidade-item">
-//             <input type="checkbox" value="${hab}">
-//             ${hab}
-//         </label>`).join('');
-// }
-
-// function mostrarOpcoesHabilidades() {
-//     document.getElementById('showOpcoesHabilidades').style.display = 'block';
-//     document.getElementById('overlay').style.display = 'block';
-//     carregarHabilidades();
-// }
-
-// function fecharOpcoes() {
-//     document.getElementById('showOpcoesHabilidades').style.display = 'none';
-//     document.getElementById('overlay').style.display = 'none';
-// }
-
-// async function adicionarHabilidade() {
-//     const input = document.getElementById('novaHabilidade');
-//     const habilidade = input.value.trim();
-
-//     if (!habilidade) {
-//         return Swal.fire({
-//             icon: 'error',
-//             title: 'Erro!',
-//             text: 'Digite uma habilidade válida.'
-//         });
-//     }
-
-//     try {
-//         const response = await fetch('/habilidades/adicionar', {
-//             method: 'POST',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ novaHabilidade: habilidade })
-//         });
-
-//         if (!response.ok) throw new Error('Erro ao adicionar habilidade');
-
-//         input.value = '';
-//         await carregarHabilidades();
-//         Swal.fire({
-//             icon: 'success',
-//             title: 'Sucesso!',
-//             text: 'Habilidade adicionada com sucesso!'
-//         });
-//     } catch (error) {
-//         console.error('[perfil] erro ao adicionar habilidade:', error);
-//         Swal.fire({
-//             icon: 'error',
-//             title: 'Erro!',
-//             text: 'Erro ao adicionar habilidade.'
-//         });
-//     }
-// }
-
-// function salvarHabilidades() {
-//     const checkboxes = document.querySelectorAll('#checkboxContainer input[type="checkbox"]');
-//     const botao = document.querySelector('.btn-primary');
-
-//     checkboxes.forEach(checkbox => {
-//         checkbox.addEventListener('change', () => {
-//             botao.disabled = !Array.from(checkboxes).some(cb => cb.checked);
-//         });
-//     });
-// }
 
 function formatarTelefone(telefone) {
     const nums = telefone.replace(/\D/g, '');
@@ -515,15 +464,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     text: 'Não foi possível atualizar o seu perfil! Por favor, Tente novamente.'
                 });
             }
-                
-            } catch (error) {
-                console.error("Erro ao enviar imagem:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro!',
-                    text: 'Erro ao enviar imagem! Tente novamente.'
-        });
-        
+
+        } catch (error) {
+            console.error("Erro ao enviar imagem:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: 'Erro ao enviar imagem! Tente novamente.'
+            });
+
         }
     });
 
@@ -566,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: 'Erro!',
                 text: 'Erro ao salvar alterações! Tente novamente.'
             });
-            }
+        }
     });
 
 });
@@ -623,8 +572,12 @@ function fecharPopUpDeletar() {
 }
 
 function confirmarDelecao() {
-    fetch('/DeletarUsuario', {
-        method: 'DELETE'
+    fetch('user/deletarUsuario', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include'
     })
         .then(response => response.json())
         .then(data => {

@@ -28,14 +28,15 @@ async function exibirTodosFreelancers() {
         if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
             data.freelancers.forEach(freelancer => {
                 container.innerHTML += `
-                    <div class="card mb-3">
+                    <div class="card mb-4 shadow-sm .col-sm-4">
+                        <img class="card-img-top" src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" style="height: 200px; width: 200px; object-fit: cover;">
                         <div class="card-body">
-                            <img src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" width="100" height="100">
                             <h5 class="card-title">${freelancer.Nome}</h5>
                             <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
                             <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                         </div>
-                    </div>`;
+                    </div>
+                `;
             });
         } else {
             container.innerHTML = '<p>Nenhum freelancer encontrado.</p>';

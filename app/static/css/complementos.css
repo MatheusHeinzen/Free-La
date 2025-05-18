@@ -120,7 +120,6 @@
 /* Elementos para responsividade: */
 img {
     max-width: 510px;
-
 }
 
 @media(max-width: 328px) {

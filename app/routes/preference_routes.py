@@ -4,7 +4,7 @@ from app.utils.decorators import login_required
 
 preference_bp = Blueprint('preference', __name__)
 
-@preference_bp.route('/', methods=['GET'])
+@preference_bp.route('/get', methods=['GET'])
 @login_required
 def obter_preferencias():
     user_id = session.get('user_id')
@@ -17,7 +17,7 @@ def obter_preferencias():
     else:
         return jsonify({'sucesso': False, 'mensagem': 'Preferências não encontradas'}), 404
 
-@preference_bp.route('/', methods=['PUT'])
+@preference_bp.route('/put', methods=['PUT'])
 @login_required
 def salvar_preferencias():
     try:

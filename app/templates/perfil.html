@@ -149,7 +149,7 @@
                                 </li>
                             </ul>
 
-                            <!-- Descrição, habilidades e avaliação -->
+                            <!-- Descrição e avaliação -->
                             <div class="tab-content p-3">
                                 <div class="tab-pane active show" id="profile">
                                     <br>
@@ -160,47 +160,22 @@
                                         <p>
                                             <!-- Categoria e Profissão com uma pequena descrição -->
                                         </p>
-
                                         <!-- pular linhas -->
                                         <br><br><br>
-
                                     </div>
-                                    <!-- <div class="col-md-6">
-                                        <h6>Habilidades <i class="bi bi-pencil-square"
-                                                onclick="mostrarOpcoesHabilidades()"></i></h6> -->
 
-                                    <!-- Selecionar skills -->
                                     <div class="overlay" id="overlay"></div>
-
-                                    <!-- <div class="custom-alert" id="showOpcoesHabilidades" on>
-                                            <h2>Selecione suas habilidades</h2>
-                                            <div id="checkboxContainer"></div>
-
-                                            <h6>Outro:</h6>
-                                            <div style="display: flex;">
-                                                <input type="text" id="novaHabilidade"
-                                                    placeholder="Digite uma nova habilidade">
-                                                <button onclick="adicionarHabilidade()">Adicionar</button>
-                                            </div>
-                                            <br>
-                                            <button onclick="fecharOpcoes()">OK</button>
-                                        </div> -->
-
-                                    <!-- Apagar fututuramente e deixar com inner.html provavelmente
-                                        <a href="#" class="badge badge-dark badge-pill">exemplo</a>
-                                        <a href="#" class="badge badge-dark badge-pill">de</a>
-                                        <a href="#" class="badge badge-dark badge-pill">futuras</a>
-                                        <a href="#" class="badge badge-dark badge-pill">habilidades</a>
-                                        <hr> -->
 
                                     <!-- Avaliações -->
                                     <hr>
                                     <span>
-                                        futuro das avaliações ⭐⭐⭐⭐⭐
-                                        <button>Clique para ver mais</button>
+                                        <div class="estrelasHTML">⭐⭐⭐⭐⭐
+                                            <h3 style="display: none;">Lista de Avaliações</h3>
+                                            <ul id="lista-avaliacoes" class="list-group"></ul>
+                                        </div>
+                                        <button onclick="gerarEstrelasHTML()">Ver Avaliações</button>
                                     </span>
                                 </div>
-
 
                                 <!-- Editar dados -->
 
@@ -247,7 +222,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
