@@ -30,12 +30,15 @@
               <span class="link">Perfil</span>
             </a>
           </li>
+          {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
+          {% if tipo_usuario == 'freelancer' %}
           <li class="item_menu">
             <a href="/servicos_freelancer">
               <span class="icon"><i class="#"></i></span>
               <span class="link">Meus Serviços</span>
             </a>
           </li>
+          {% endif %}
           <li class="item_menu">
             <a href="/servicos_cliente">
               <span class="icon"><i class="#"></i></span>
@@ -103,8 +106,13 @@
             Login
           </a>
           {% endif %}
-          <a href="/servicosFreelancer" class="phone-hidden">Meus Serviços</a>
-          <a href="/servicosCliente" class="phone-hidden">Serviços Pedidos</a>
+          {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
+          {% if tipo_usuario == 'freelancer' %}
+          <a href="/servicos_freelancer" class="phone-hidden">Meus Serviços</a>
+          {% else %}
+          <a href="/alterarDados" class="phone-hidden">Torne-se Freelancer</a>
+          {% endif %}
+          <a href="/servicos_cliente" class="phone-hidden">Serviços Pedidos</a>
           <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">Configurações</a>
           <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
@@ -198,44 +206,41 @@
           <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
           <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
         </svg>
-        <small class="d-block mb-3 text-muted">&copy; &Tab;  2017-2018</small>
+        <small class="d-block mb-3 text-muted">&copy; &Tab;  2025-2025</small>
       </div>
       <div class="col-6 col-md">
         <h5>Features</h5>
         <ul class="list-unstyled text-small">
-          <li><a class="text-muted" href="#">Algo legal</a></li>
-          <li><a class="text-muted" href="#">Feature aleatória</a></li>
-          <li><a class="text-muted" href="#">Recursos para times</a></li>
-          <li><a class="text-muted" href="#">Coisas para desenvolvedores</a></li>
-          <li><a class="text-muted" href="#">Outra coisa legal</a></li>
-          <li><a class="text-muted" href="#">Último item</a></li>
+          <li><a class="text-muted" href="#">Projeto Desenvolvido</a></li>
+          <li><a class="text-muted" href="#">Para matéria de</a></li>
+          <li><a class="text-muted" href="#">Experiência Criativa</a></li>
+          <li><a class="text-muted" href="#">Terceiro Semestre</a></li>
+          <li><a class="text-muted" href="#">PUCPR</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Instrução</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Com o apoio de:</a></li>
+          <li><a class="text-muted" href="#">Cristina Verçosa</a></li>
+          <li><a class="text-muted" href="#">Geucimar Briatore</a></li>
         </ul>
       </div>
       <div class="col-6 col-md">
         <h5>Fontes</h5>
         <ul class="list-unstyled text-small">
-          <li><a class="text-muted" href="#">Fonte</a></li>
-          <li><a class="text-muted" href="#">Nome da fonte</a></li>
-          <li><a class="text-muted" href="#">Outra fonte</a></li>
-          <li><a class="text-muted" href="#">Fonte final</a></li>
-        </ul>
-      </div>
-      <div class="col-6 col-md">
-        <h5>Fontes</h5>
-        <ul class="list-unstyled text-small">
-          <li><a class="text-muted" href="#">Negócios</a></li>
-          <li><a class="text-muted" href="#">Educação</a></li>
-          <li><a class="text-muted" href="#">Governo</a></li>
-          <li><a class="text-muted" href="#">Jogos</a></li>
+          <li><a class="text-muted" href="#">Bruna da Silva</a></li>
+          <li><a class="text-muted" href="#">Edmund Soares</a></li>
+          <li><a class="text-muted" href="#">Matheus Heinzen</a></li>
+          <li><a class="text-muted" href="#">Vinicius Lima</a></li>
         </ul>
       </div>
       <div class="col-6 col-md">
         <h5>Sobre</h5>
         <ul class="list-unstyled text-small">
           <li><a class="text-muted" href="#">Equipe</a></li>
-          <li><a class="text-muted" href="#">Locais</a></li>
-          <li><a class="text-muted" href="#">Privacidade</a></li>
-          <li><a class="text-muted" href="#">Termos</a></li>
+          <li><a class="text-muted" href="#">Documentação</a></li>
+          <li><a class="text-muted" href="/termos">Termos</a></li>
         </ul>
       </div>
     </div>
@@ -248,8 +253,39 @@
     const item = event.currentTarget.closest('.has-submenu');
     item.classList.toggle('active');
   }
-</script>
 
+  // Exibe/oculta "Meus Serviços" conforme tipo do usuário na sessão (via JS)
+  document.addEventListener('DOMContentLoaded', function () {
+    // O valor é sempre injetado como string pelo Jinja2, nunca precisa de if/elif JS
+    var tipoUsuario = "{{ session['TipoUsuario'] if session and session.get('TipoUsuario') else '' }}";
+    // DEBUG: Mostra o valor no console para depuração
+    console.log('TipoUsuario da sessão:', tipoUsuario, typeof tipoUsuario);
+
+    // Menu lateral (mobile)
+    var meusServicosMenu = document.querySelectorAll('a[href="/servicos_freelancer"]');
+    meusServicosMenu.forEach(function(link) {
+      if (tipoUsuario.trim().toLowerCase() !== 'freelancer') {
+        link.parentElement.style.display = 'none';
+      } else {
+        link.parentElement.style.display = '';
+      }
+    });
+
+    // Menu desktop
+    var menuDesktop = document.querySelector('.desktop-version');
+    if (menuDesktop) {
+      var meusServicosDesktop = menuDesktop.querySelector('a[href="/servicos_freelancer"]');
+      var torneSeFreelancer = menuDesktop.querySelector('a[href="/alterarDados"].phone-hidden');
+      if (tipoUsuario.trim().toLowerCase() === 'freelancer') {
+        if (meusServicosDesktop) meusServicosDesktop.style.display = '';
+        if (torneSeFreelancer) torneSeFreelancer.style.display = 'none';
+      } else {
+        if (meusServicosDesktop) meusServicosDesktop.style.display = 'none';
+        if (torneSeFreelancer) torneSeFreelancer.style.display = '';
+      }
+    }
+  });
+</script>
 <script src="{{ url_for('static', filename='js/homepage.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

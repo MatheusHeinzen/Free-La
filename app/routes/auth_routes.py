@@ -19,6 +19,7 @@ def autenticar():
 
         if usuario and check_password_hash(usuario['Senha'], senha):
             session['user_id'] = usuario['ID_User']
+            session['TipoUsuario'] = usuario['TipoUsuario']
             return jsonify({"sucesso": True, "mensagem": "Login realizado com sucesso!"})
         else:
             return jsonify({"sucesso": False, "mensagem": "Email ou senha incorretos."})

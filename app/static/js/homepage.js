@@ -164,14 +164,13 @@ async function carregarCategorias() {
     try {
         const response = await fetch('/profile/obter-categorias');
         if (!response.ok) throw new Error('Erro ao carregar categorias');
-            console.log("categorias não estão sendo chamadas")
-
         const categorias = await response.json();
         const select = document.getElementById('categoriaDropdown');
         if (select) {
+            select.innerHTML = '<option value="">Todas as categorias</option>';
             categorias.forEach(categoria => {
                 const option = document.createElement('option');
-                option.value = categoria.ID_Categoria;
+                option.value = categoria.NomeCategoria;
                 option.textContent = categoria.NomeCategoria;
                 select.appendChild(option);
             });

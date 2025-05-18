@@ -31,6 +31,7 @@ def create_app():
     from app.routes.profile_routes import profile
     from app.routes.search_routes import search
     from app.routes.service_routes import service_bp  # Importando o blueprint de serviços
+    from app.routes.servicos_freelancer_routes import servicos_freelancer_bp
 
     app.register_blueprint(user_bp, url_prefix='/user')
     app.register_blueprint(auth_bp, url_prefix='/auth')
@@ -41,6 +42,7 @@ def create_app():
     app.register_blueprint(profile, url_prefix='/profile')
     app.register_blueprint(search, url_prefix='/search')
     app.register_blueprint(service_bp, url_prefix='/servicos')  # Registrando o blueprint de serviços
+    app.register_blueprint(servicos_freelancer_bp)
     app.context_processor(lambda: {'obter_nome_usuario': obter_nome_usuario})
 
     return app
