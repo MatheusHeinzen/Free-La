@@ -62,20 +62,18 @@ async function pesquisar() {
         if (!response.ok) throw new Error('Erro ao buscar freelancers');
         const data = await response.json();
 
-        const section = document.getElementById("resultados-pesquisa") || document.getElementById('freelancersContainer');
+        const section = document.getElementById("freelancersContainer");
         section.innerHTML = '';
 
         if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
             data.freelancers.forEach(freelancer => {
                 section.innerHTML += `
-                    <div class="col-md-4">
-                        <div class="card mb-4 shadow-sm">
-                            <img class="card-img-top" src="/profile/imagem/${freelancer.ID_User}" alt="${freelancer.Nome}" style="height: 200px; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title">${freelancer.Nome}</h5>
-                                <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
-                                <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
-                            </div>
+                    <div class="card mb-4 shadow-sm .col-sm-4">
+                        <img class="card-img-top" src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" style="height: 200px; width: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">${freelancer.Nome}</h5>
+                            <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
+                            <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                         </div>
                     </div>
                 `;
@@ -85,7 +83,7 @@ async function pesquisar() {
         }
     } catch (error) {
         console.error('Erro ao buscar freelancers:', error);
-        const section = document.getElementById("resultados-pesquisa") || document.getElementById('freelancersContainer');
+        const section = document.getElementById("freelancersContainer");
         section.innerHTML = '<p>Erro ao buscar freelancers.</p>';
     }
 }
@@ -185,6 +183,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         await carregarCategorias();
         await exibirTodosFreelancers();
+
+        // Carregar categorias (caso não esteja no HTML)
+        const select = document.getElementById('categoriaDropdown');
+        if (select) {
+            const response = await fetch('/category');
+            const data = await response.json();
+            if (data.sucesso && Array.isArray(data.categorias)) {
+                select.innerHTML = '<option value="">Todas as categorias</option>';
+                data.categorias.forEach(cat => {
+                    select.innerHTML += `<option value="${cat.NomeCategoria}">${cat.NomeCategoria}</option>`;
+                });
+            }
+        }
     } catch (error) {
         console.error('Erro ao carregar a homepage:', error);
     }

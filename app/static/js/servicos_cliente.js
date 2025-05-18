@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
                         <p>${servico.Descricao}</p>
-                        <small>Categoria: ${servico.Categoria}</small>
+                        <small>Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small>
                         <small>Status: ${servico.Status}</small>
                         <div class="mt-2">
                             <button class="btn btn-danger btn-sm" onclick="deletarServico(${servico.ID_Service})">Deletar</button>
@@ -28,14 +28,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             pedidos.innerHTML = '<li class="list-group-item">Nenhum serviço requisitado encontrado.</li>';
         }
 
-        // Corrigido: garantir que a listagem de concluídos aparece
+        // Serviços concluídos
         if (pedidosConcluidos && data.servicosPedidosConcluidos && data.servicosPedidosConcluidos.length > 0) {
             data.servicosPedidosConcluidos.forEach(servico => {
                 pedidosConcluidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
                         <p>${servico.Descricao}</p>
-                        <small>Categoria: ${servico.Categoria}</small>
+                        <small>Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small>
                         <small>Status: ${servico.Status}</small>
                         <div class="mt-2">
                             <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>

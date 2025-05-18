@@ -147,7 +147,7 @@
             <input class="pesquisa" type="text" placeholder="Pesquise por nome ou descrição..." id="campo-pesquisa">
           </div>
           <div>
-            <select id="categoriaDropdown categoriaServico" class="form-control mx-2" style="width: 200px;">
+            <select id="categoriaDropdown" class="form-control mx-2" style="width: 200px;">
               <option value="">Todas as categorias</option>
               <!-- As opções serão preenchidas dinamicamente -->
             </select>
@@ -283,6 +283,25 @@
         if (meusServicosDesktop) meusServicosDesktop.style.display = 'none';
         if (torneSeFreelancer) torneSeFreelancer.style.display = '';
       }
+    }
+
+    // Carregar categorias no dropdown ao abrir a página
+    fetch('/category')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('categoriaDropdown');
+        if (select && data.sucesso && Array.isArray(data.categorias)) {
+          select.innerHTML = '<option value="">Todas as categorias</option>';
+          data.categorias.forEach(cat => {
+            select.innerHTML += `<option value="${cat.NomeCategoria}">${cat.NomeCategoria}</option>`;
+          });
+        }
+      });
+
+    // Pesquisa ao mudar categoria
+    const categoriaDropdown = document.getElementById('categoriaDropdown');
+    if (categoriaDropdown) {
+      categoriaDropdown.addEventListener('change', pesquisar);
     }
   });
 </script>

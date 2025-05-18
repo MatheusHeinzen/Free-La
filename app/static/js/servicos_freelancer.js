@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         recebidos.innerHTML = '';
         if (recebidosConcluidos) recebidosConcluidos.innerHTML = '';
 
-        // Corrige categoria nula e garante exibição
         function renderCategoria(servico) {
             return servico.Categoria && servico.Categoria !== 'null' ? servico.Categoria : '<span class="text-danger">Sem categoria</span>';
         }
@@ -32,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             recebidos.innerHTML = '<li class="list-group-item">Nenhum serviço recebido encontrado.</li>';
         }
 
+        // Serviços concluídos
         if (recebidosConcluidos && Array.isArray(data.servicosRecebidosConcluidos) && data.servicosRecebidosConcluidos.length > 0) {
             data.servicosRecebidosConcluidos.forEach(servico => {
                 recebidosConcluidos.innerHTML += `
