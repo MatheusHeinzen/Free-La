@@ -129,6 +129,7 @@
                                 </div>
                                 <h5 class="mb-1 text-white" id="nomeUsuario">Nome do Usuário</h5>
                                 <h6 class="text-light" id="profissaoUsuario">Profissão ou Categoria</h6>
+                                <div id="mediaAvaliacoes" class="mb-2"></div>
                             </div>
                             <div class="card-body">
                                 <ul class="list-group shadow-none" id="listaContatos">
@@ -168,6 +169,37 @@
             const item = event.currentTarget.closest('.has-submenu');
             item.classList.toggle('active');
         }
+
+        // Exibir média de avaliações no perfil público
+        async function exibirMediaAvaliacoes(userId) {
+            try {
+                const resp = await fetch(`/profile/obter_perfil/${userId}`);
+                if (resp.ok) {
+                    const { perfil } = await resp.json();
+                    const mediaDiv = document.getElementById('mediaAvaliacoes');
+                    if (perfil && perfil.MediaAvaliacoes !== null && perfil.TotalAvaliacoes > 0) {
+                        const media = Number(perfil.MediaAvaliacoes);
+                        const total = perfil.TotalAvaliacoes || 0;
+                        let estrelas = '';
+                        for (let i = 1; i <= 5; i++) {
+                            estrelas += i <= Math.round(media)
+                                ? '<i class="bi bi-star-fill text-warning"></i>'
+                                : '<i class="bi bi-star text-secondary"></i>';
+                        }
+                        mediaDiv.innerHTML =
+                            estrelas + ` <span class="ml-2">${media.toFixed(2)} / 5.0</span><br><span class="text-muted" style="font-size:0.95em">${total} ${total === 1 ? 'avaliação' : 'avaliações'}</span>`;
+                    } else {
+                        mediaDiv.innerHTML = '<span class="text-muted" style="font-size:0.95em">Sem avaliações</span>';
+                    }
+                }
+            } catch (e) {
+                const mediaDiv = document.getElementById('mediaAvaliacoes');
+                if (mediaDiv) mediaDiv.innerHTML = '<span class="text-muted" style="font-size:0.95em">Sem avaliações</span>';
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            exibirMediaAvaliacoes({{ user_id|tojson }});
+        });
     </script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXK3YfRvH+8abtTE1Pi6jizo"

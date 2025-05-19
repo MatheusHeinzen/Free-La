@@ -182,6 +182,24 @@
           <h3>{{ perfil.Nome }}</h3>
           <p><strong>Categoria:</strong> {{ perfil.NomeCategoria or 'Não informado' }}</p>
           <p><strong>Bio:</strong> {{ perfil.Bio or 'Sem descrição' }}</p>
+          <div>
+            {% if perfil.TotalAvaliacoes > 0 %}
+              {% set media = perfil.MediaAvaliacoes|float %}
+              {% for i in range(1,6) %}
+                {% if i <= media|round(0, 'half_even') %}
+                  <i class="bi bi-star-fill text-warning"></i>
+                {% else %}
+                  <i class="bi bi-star text-secondary"></i>
+                {% endif %}
+              {% endfor %}
+              <span class="ml-2">{{ "%.2f"|format(perfil.MediaAvaliacoes) }}/5.0</span>
+              <span class="text-muted" style="font-size:0.95em">
+                ({{ perfil.TotalAvaliacoes }} {{ 'avaliação' if perfil.TotalAvaliacoes == 1 else 'avaliações' }})
+              </span>
+            {% else %}
+              <span class="text-muted" style="font-size:0.95em">Sem avaliações</span>
+            {% endif %}
+          </div>
           <a href="/perfilPublico/{{ perfil.ID_User }}">Ver Perfil</a>
         </div>
         {% endfor %}

@@ -26,13 +26,71 @@ async function exibirTodosFreelancers() {
         container.innerHTML = '';
 
         if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
+            // Ordena por avaliação média (desc), depois total avaliações (desc), depois ID_User (desc)
+            data.freelancers.sort((a, b) => {
+                const ma = Number(a.MediaAvaliacoes) || 0;
+                const mb = Number(b.MediaAvaliacoes) || 0;
+                const ta = Number(a.TotalAvaliacoes) || 0;
+                const tb = Number(b.TotalAvaliacoes) || 0;
+                if (tb > 0 || ta > 0) {
+                    if (mb !== ma) return mb - ma;
+                    if (tb !== ta) return tb - ta;
+                }
+                return (b.ID_User || 0) - (a.ID_User || 0);
+            });
+
+            // Para cada freelancer, busca a média de avaliações via AJAX (garante dados atualizados)
+            await Promise.all(data.freelancers.map(async (freelancer) => {
+                try {
+                    const resp = await fetch(`/profile/obter_perfil/${freelancer.ID_User}`);
+                    if (resp.ok) {
+                        const { perfil } = await resp.json();
+                        if (perfil) {
+                            freelancer.MediaAvaliacoes = perfil.MediaAvaliacoes;
+                            freelancer.TotalAvaliacoes = perfil.TotalAvaliacoes;
+                        }
+                    }
+                } catch (e) {
+                    // Se der erro, mantém os dados originais
+                }
+            }));
+
+            // Reordena após atualizar médias
+            data.freelancers.sort((a, b) => {
+                const ma = Number(a.MediaAvaliacoes) || 0;
+                const mb = Number(b.MediaAvaliacoes) || 0;
+                const ta = Number(a.TotalAvaliacoes) || 0;
+                const tb = Number(b.TotalAvaliacoes) || 0;
+                if (tb > 0 || ta > 0) {
+                    if (mb !== ma) return mb - ma;
+                    if (tb !== ta) return tb - ta;
+                }
+                return (b.ID_User || 0) - (a.ID_User || 0);
+            });
+
             data.freelancers.forEach(freelancer => {
+                let estrelasHtml = '';
+                const media = Number(freelancer.MediaAvaliacoes) || 0;
+                const total = Number(freelancer.TotalAvaliacoes) || 0;
+                if (total > 0 && media > 0) {
+                    for (let i = 1; i <= 5; i++) {
+                        estrelasHtml += i <= Math.round(media)
+                            ? '<i class="bi bi-star-fill text-warning"></i>'
+                            : '<i class="bi bi-star text-secondary"></i>';
+                    }
+                    estrelasHtml += ` <span class="ml-2">${media.toFixed(2)}/5.0</span>`;
+                    estrelasHtml += ` <span class="text-muted" style="font-size:0.95em">(${total} ${total === 1 ? 'avaliação' : 'avaliações'})</span>`;
+                } else {
+                    estrelasHtml = '<span class="text-muted" style="font-size:0.95em">Sem avaliações</span>';
+                }
+
                 container.innerHTML += `
                     <div class="card mb-4 shadow-sm .col-sm-4">
                         <img class="card-img-top" src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" style="height: 200px; width: 200px; object-fit: cover;">
                         <div class="card-body">
                             <h5 class="card-title">${freelancer.Nome}</h5>
                             <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
+                            <div>${estrelasHtml}</div>
                             <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                         </div>
                     </div>
@@ -44,7 +102,6 @@ async function exibirTodosFreelancers() {
                     <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
                 </div>
             `;
-    
         }
     } catch (error) {
         console.error('Erro ao carregar perfis:', error);
@@ -53,8 +110,7 @@ async function exibirTodosFreelancers() {
                     <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
                 </div>
             `;
-    };
-
+    }
 }
 
 //Função para pesquisar freelancers

@@ -301,3 +301,29 @@ def editar_servico(servico_id):
             cursor.close()
         if conn:
             conn.close()
+
+@service_bp.route('/avaliacoes/freelancer/<int:freelancer_id>', methods=['GET'])
+def listar_avaliacoes_freelancer(freelancer_id):
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("""
+            SELECT a.Nota, a.Comentario, a.DataAvaliacao, u.Nome, s.NomeService
+            FROM avaliacao a
+            JOIN usuario u ON a.ID_Avaliador = u.ID_User
+            JOIN service s ON a.ID_Service = s.ID_Service
+            WHERE s.ID_Freelancer = %s AND a.TipoAvaliador = 'cliente'
+            ORDER BY a.DataAvaliacao DESC
+        """, (freelancer_id,))
+        avaliacoes = cursor.fetchall()
+        return jsonify({"sucesso": True, "avaliacoes": avaliacoes}), 200
+    except Exception as e:
+        print(f"[ERROR] Erro ao listar avaliações do freelancer: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao listar avaliações"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

@@ -308,34 +308,22 @@ def salvar_bio_categoria():
 @profile.route('/obter_perfil/<int:user_id>', methods=['GET'])
 @login_required
 def obter_perfil(user_id):
-    conn = None
-    cursor = None
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # Consulta para obter bio e categoria do perfil
-        cursor.execute("""
-            SELECT p.Bio, c.NomeCategoria
-            FROM perfil p
-            LEFT JOIN perfil_categoria pc ON p.IdPerfil = pc.ID_Perfil
-            LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
-            WHERE p.ID_Usuario = %s
-        """, (user_id,))
-        perfil = cursor.fetchone()
-
-        if not perfil:
-            return jsonify({"sucesso": False, "erro": "Perfil não encontrado"}), 404
-
-        return jsonify({"sucesso": True, "perfil": perfil}), 200
-    except Exception as e:
-        print(f"Erro ao obter perfil: {e}")
-        return jsonify({"sucesso": False, "erro": "Erro ao obter perfil"}), 500
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT u.Nome, p.Bio, c.NomeCategoria, 
+               IFNULL(p.MediaAvaliacoes, 0) AS MediaAvaliacoes, 
+               IFNULL(p.TotalAvaliacoes, 0) AS TotalAvaliacoes
+        FROM perfil p
+        JOIN usuario u ON p.ID_Usuario = u.ID_User
+        LEFT JOIN perfil_categoria pc ON pc.ID_Perfil = p.IdPerfil
+        LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
+        WHERE p.ID_Usuario = %s
+    """, (user_id,))
+    perfil = cursor.fetchone()
+    cursor.close()
+    conn.close()
+    return jsonify({"perfil": perfil, "sucesso": True})
 
 @profile.route('/api/perfis', methods=['GET'])
 def obter_perfis():
@@ -361,3 +349,29 @@ def obter_perfis():
             cursor.close()
         if conn:
             conn.close()
+
+@profile.route('/homepage')
+def exibir_homepage():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT 
+            u.ID_User, 
+            u.Nome, 
+            c.NomeCategoria, 
+            p.Bio, 
+            IFNULL(p.MediaAvaliacoes, 0) AS MediaAvaliacoes, 
+            IFNULL(p.TotalAvaliacoes, 0) AS TotalAvaliacoes
+        FROM perfil p
+        JOIN usuario u ON p.ID_Usuario = u.ID_User
+        LEFT JOIN perfil_categoria pc ON pc.ID_Perfil = p.IdPerfil
+        LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
+        WHERE u.TipoUsuario = 'freelancer'
+        ORDER BY u.ID_User DESC
+    """)
+    perfis = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    # DEBUG: Veja o que está sendo enviado para o template
+    print("[DEBUG] Perfis enviados para homepage:", perfis)
+    return render_template('homepage.html', perfis=perfis)

@@ -119,6 +119,7 @@
                                 </div>
                                 <h5 class="mb-1 text-white" id="nomeUsuario">Nome do Usuário</h5>
                                 <h6 class="text-light" id="profissaoUsuario">Profissão ou Categoria</h6>
+                                <div id="mediaAvaliacoes" class="mb-2"></div>
                             </div>
                             <div id="contatos">
                                 <button id="btnAdicionarContatos" class="btn btn-primary">
@@ -169,11 +170,13 @@
                                     <!-- Avaliações -->
                                     <hr>
                                     <span>
-                                        <div class="estrelasHTML">⭐⭐⭐⭐⭐
+                                        <div class="estrelasHTML">
+                                            <div id="mediaEstrelas"></div>
+                                            <div id="qtdAvaliacoes" class="text-muted" style="font-size:0.95em"></div>
                                             <h3 style="display: none;">Lista de Avaliações</h3>
                                             <ul id="lista-avaliacoes" class="list-group"></ul>
+                                            <button onclick="gerarEstrelasHTML()">Ver Avaliações</button>
                                         </div>
-                                        <button onclick="gerarEstrelasHTML()">Ver Avaliações</button>
                                     </span>
                                 </div>
 
@@ -257,6 +260,72 @@
         event.preventDefault();
         const item = event.currentTarget.closest('.has-submenu');
         item.classList.toggle('active');
+    }
+
+    // Exibir média de avaliações no perfil (estrelas e quantidade)
+    async function exibirMediaAvaliacoes(userId) {
+        try {
+            const resp = await fetch(`/profile/obter_perfil/${userId}`);
+            if (resp.ok) {
+                const { perfil } = await resp.json();
+                if (perfil && perfil.MediaAvaliacoes !== null && perfil.MediaAvaliacoes !== undefined) {
+                    // Estrelas médias
+                    const media = Number(perfil.MediaAvaliacoes);
+                    const total = perfil.TotalAvaliacoes || 0;
+                    let estrelas = '';
+                    for (let i = 1; i <= 5; i++) {
+                        estrelas += i <= Math.round(media)
+                            ? '<i class="bi bi-star-fill text-warning"></i>'
+                            : '<i class="bi bi-star text-secondary"></i>';
+                    }
+                    document.getElementById('mediaEstrelas').innerHTML = estrelas + ` <span class="ml-2">${media.toFixed(2)} / 5.0</span>`;
+                    document.getElementById('qtdAvaliacoes').innerText = total + (total === 1 ? ' avaliação' : ' avaliações');
+                } else {
+                    document.getElementById('mediaEstrelas').innerHTML = '';
+                    document.getElementById('qtdAvaliacoes').innerText = '';
+                }
+            }
+        } catch (e) {
+            document.getElementById('mediaEstrelas').innerHTML = '';
+            document.getElementById('qtdAvaliacoes').innerText = '';
+        }
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        exibirMediaAvaliacoes({{ session.user_id|tojson }});
+    });
+
+    // Lista de avaliações detalhadas (ao clicar no botão)
+    async function gerarEstrelasHTML() {
+        const userId = {{ session.user_id|tojson }};
+        const lista = document.getElementById('lista-avaliacoes');
+        if (!lista) return;
+        lista.innerHTML = '<li class="list-group-item">Carregando avaliações...</li>';
+        try {
+            const resp = await fetch(`/servicos/avaliacoes/freelancer/${userId}`);
+            const result = await resp.json();
+            if (result.sucesso && Array.isArray(result.avaliacoes) && result.avaliacoes.length > 0) {
+                lista.innerHTML = '';
+                result.avaliacoes.forEach(av => {
+                    lista.innerHTML += `
+                        <li class="list-group-item">
+                            <div>
+                                <span class="text-warning">${'★'.repeat(av.Nota)}${'☆'.repeat(5-av.Nota)}</span>
+                                <b>${av.NomeService || 'Serviço'}</b>
+                                <small class="text-muted">por ${av.Nome} em ${new Date(av.DataAvaliacao).toLocaleDateString()}</small>
+                            </div>
+                            <div>${av.Comentario ? av.Comentario : ''}</div>
+                        </li>
+                    `;
+                });
+            } else {
+                lista.innerHTML = '<li class="list-group-item">Nenhuma avaliação de cliente encontrada.</li>';
+            }
+            // Exibe o título se estiver oculto
+            const h3 = lista.closest('.estrelasHTML').querySelector('h3');
+            if (h3) h3.style.display = 'block';
+        } catch {
+            lista.innerHTML = '<li class="list-group-item text-danger">Erro ao carregar avaliações.</li>';
+        }
     }
 </script>
 
