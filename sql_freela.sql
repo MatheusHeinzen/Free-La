@@ -192,9 +192,7 @@ FOR EACH ROW
 BEGIN
 	DECLARE freelancer_id INT;
     IF NEW.TipoAvaliador = 'cliente' THEN
-        
         SELECT ID_Freelancer INTO freelancer_id FROM service WHERE ID_Service = NEW.ID_Service;
-        
         IF freelancer_id IS NOT NULL THEN
             UPDATE perfil p
             SET 
@@ -222,10 +220,8 @@ AFTER UPDATE ON avaliacao
 FOR EACH ROW
 BEGIN
     DECLARE freelancer_id INT;
-    
     IF NEW.TipoAvaliador = 'cliente' OR OLD.TipoAvaliador = 'cliente' THEN
         SELECT ID_Freelancer INTO freelancer_id FROM service WHERE ID_Service = NEW.ID_Service;
-        
         IF freelancer_id IS NOT NULL THEN
             UPDATE perfil p
             SET 
@@ -253,10 +249,8 @@ AFTER DELETE ON avaliacao
 FOR EACH ROW
 BEGIN
     DECLARE freelancer_id INT;
-    
     IF OLD.TipoAvaliador = 'cliente' THEN
         SELECT ID_Freelancer INTO freelancer_id FROM service WHERE ID_Service = OLD.ID_Service;
-        
         IF freelancer_id IS NOT NULL THEN
             UPDATE perfil p
             SET 

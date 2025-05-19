@@ -22,14 +22,28 @@
           <i class="bi bi-list"></i>
         </div>
         <ul>
+          {% if session.user_id %}
           <img src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px"
             style="margin-left: 1rem;">
+          {% else %}
+          <img src="../static/imgs/perfil.png" alt="nenhum usuario logado" width="140px">
+          {% endif %}
           <li class="item_menu">
             <a href="/perfil">
               <span class="icon"></span>
               <span class="link">Perfil</span>
             </a>
           </li>
+          {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
+          {% if tipo_usuario == 'cliente' %}
+          <li class="item_menu">
+            <a href="/alterarDados" >
+              <span class="icon"><i class="#"></i></span>
+              <span class="link">Tornar-se Freelancer</span>
+            </a>
+          </li>
+          {% endif %}
+
           {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
           {% if tipo_usuario == 'freelancer' %}
           <li class="item_menu">
@@ -177,7 +191,7 @@
     <!-- Seção de Resultados da Pesquisa -->
     <section>
       <div class="container" style="margin-top: 30px;">
-        <h2>Resultados da Pesquisa</h2>
+        <h2>Freelancers:</h2>
       </div>
       <div id="freelancersContainer" class="container mt-4">
         <!-- Freelancers serão carregados dinamicamente aqui -->

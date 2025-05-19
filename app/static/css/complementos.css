@@ -1,93 +1,202 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+a {
+    color: #7b2cbf;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+a:hover {
+    color: #15153f;
+}
+
+/* Nav */
+#toggleSidebar{
+    background-color: #ffffff;
+    color: #212529;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #6a0dad 0%, #8440d6 100%) !important;
+    box-shadow: 0 4px 12px rgba(106, 13, 173, 0.2);
+}
+
+.navbar-brand {
+    font-weight: 600;
+    color: white !important;
+    font-size: 1.2rem;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.85);
+    padding: 0.5rem 1rem;
+    transition: all 0.3s;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: white;
+    transform: translateY(-2px);
+}
+
+.logo {
+    height: auto;
+    margin-bottom: 20px;
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+}
+
 /* Containeer - Freelancers */
-.mt-4{
+.mt-4 {
     margin-top: 1.5rem !important;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
 }
 
+/* Barra de Pesquisa */
+#grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+}
 
-/* Barra de pesquisa */
 .pesquisa {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    border-radius: 25px;
-    border: 1px solid black;
-    width: 300px;
-    text-align: left;
-    padding-left: 18px;
-    padding-right: 15px;
-    height: 40px;
+    border-radius: 50px;
+    border: 2px solid #d9b3ff;
+    width: 400px;
+    max-width: 500px;
+    padding: 10px 20px;
+    height: 50px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    box-shadow: 0 2px 10px rgba(106, 13, 173, 0.1);
 }
 
 .pesquisa:focus {
-    text-decoration: none;
-    border-radius: 1px solid silver;
+    outline: none;
+    border-color:  #8440d6;
+    box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
 }
 
 .pesquisar_btn {
-    height: 40px;
+    height: 50px;
     width: 70px;
-    border: 0px;
-    background-color: rgb(175, 88, 179);
-    color: rgb(255, 255, 255);
-    border-radius: 25px;
+    border: none;
+    background: linear-gradient(135deg, #b99bce 0%, #8440d6 100%);
+    color: white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+.pesquisar_btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(106, 13, 173, 0.3);
+}
+
+#categoriaDropdown {
+    height: 50px;
+    border-radius: 10px;
+    border: 2px solid #d9b3ff;
+    padding: 0 20px;
+    font-size: 1rem;
+    transition: all 0.3s;
+}
+
+#categoriaDropdown:focus {
+    border-color: #6a0dad;
+    box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
+    outline: none;
+}
 
 .jumbotron {
     margin-bottom: 0rem;
 }
 
 
-/* Para deletar perfil: */
+/* Pop-up Deletar */
 .overlay {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 999;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: none;
 }
 
 .pop-up-deletar {
-    display: none;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: white;
-    border: 1px solid #70058683;
-    border-radius: 10px;
-    padding: 20px;
-    width: 55vw;
-    height: 35vh;
-    box-shadow: 1 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    border-radius: 15px;
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    display: none;
     text-align: center;
-    font-size: 18px;
+}
+
+.pop-up-deletar h3 {
+    color: #6a0dad;
+    margin-bottom: 20px;
 }
 
 .pop-up-deletar p {
-    margin-bottom: 15px;
-    padding: 10px;
-    padding-left: 25px;
-    text-align: justify;
+    margin-bottom: 25px;
+    color: #555;
+    line-height: 1.6;
 }
 
 .pop-up-deletar button {
-    padding: 8px 16px;
-    background-color: #540768;
-    border-color: transparent;
-    color: white;
+    margin: 10px;
+    padding: 10px 28px;
     border: none;
-    border-radius: 5px;
+    border-radius: 50px;
+    font-weight: 500;
     cursor: pointer;
-    margin-left: 15px;
-    font-size: 16px;
-    width: 250px;
+    transition: all 0.3s;
+}
+
+.pop-up-deletar button:first-child {
+    background: #f0e6ff;
+    color: #6a0dad;
+}
+
+.pop-up-deletar button:last-child {
+    background: linear-gradient(135deg, #6a0dad 0%, #4a148c 100%);
+    color: white;
+}
+
+.pop-up-deletar button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(106, 13, 173, 0.3);
 }
 
 /* Dropdown menu */
@@ -117,31 +226,126 @@
     left: 83%;
 }
 
+/* Seção de Perfis */
+.perfil-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin: 40px 0;
+}
+
+.perfil-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    text-align: center;
+    border-top: 4px solid #6a0dad;
+}
+
+.perfil-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(106, 13, 173, 0.15);
+}
+
+.perfil-card img {
+    width: 150px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f0e6ff;
+    margin-bottom: 15px;
+}
+
+.perfil-card h3 {
+    color: #6a0dad;
+    margin: 10px 0;
+}
+
+.perfil-card p {
+    color: #666;
+    margin: 8px 0;
+    font-size: 0.95rem;
+}
+
+.perfil-card a {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #6a0dad 0%, #4a148c 100%);
+    color: white;
+    border-radius: 50px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.perfil-card a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(106, 13, 173, 0.3);
+    color: white;
+}
+
+
 /* Elementos para responsividade: */
 img {
     max-width: 510px;
 }
 
-@media(max-width: 328px) {
-    .pesquisa {
-        width: 90%;
+/* Responsividade */
+@media (max-width: 768px) {
+    .jumbotron {
+        padding: 2rem 1rem;
     }
     
+    .logo {
+        max-width: 500px;
+    }
+    
+    #grid {
+        flex-direction: column;
+    }
+        
+    .perfil-lista {
+        grid-template-columns: 1fr;
+    }
+    
+    .navbar-nav {
+        padding-top: 10px;
+    }
+
+    .pesquisa, #categoriaDropdown {
+        width: 100%;
+        max-width: none;
+    }
 }
 
-@media screen and (max-width: 768px) {
-    .d-flex{
-        display: grid;
+@media (max-width: 576px) {
+    .pop-up-deletar {
+        width: 95%;
+        padding: 20px;
     }
-    #grid{
-        display: grid;
-        grid-gap: 20px;
-        justify-content: center;
+    
+    .pop-up-deletar button {
+        width: 100%;
+        margin: 5px 0;
     }
+
+}
+/* Efeitos e Animações */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-@media(max-width: 590px) {
-    img .logo {
-        margin: auto;
-    }
+.perfil-card, .jumbotron {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Ajuste para o container de freelancers */
+#freelancersContainer, #perfis-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
 }

@@ -39,17 +39,22 @@ async function exibirTodosFreelancers() {
                 `;
             });
         } else {
-            container.innerHTML = '<p>Nenhum freelancer encontrado.</p>';
-        }
-    } catch (error) {
-        console.error('Erro ao carregar perfis:', error);
             document.getElementById('perfis-container').innerHTML = `
                 <div class="col-12 text-center py-5">
                     <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
                 </div>
             `;
-        };
-        
+    
+        }
+    } catch (error) {
+        console.error('Erro ao carregar perfis:', error);
+        document.getElementById('perfis-container').innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
+                </div>
+            `;
+    };
+
 }
 
 //Função para pesquisar freelancers
@@ -104,10 +109,10 @@ function confirmarDelecao() {
     fetch('user/deletarUsuario', {
         method: 'DELETE',
         headers: {
-                'Content-Type': 'application/json',
-            },
-            credentials: 'include' 
-        })
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+    })
         .then(response => response.json())
         .then(data => {
             if (data.sucesso) {

@@ -252,47 +252,6 @@ input[type="checkbox"] {
     box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.14), 0 7px 10px -5px rgba(49, 16, 42, 0.5);
 }
 
-.nav-pills-success .nav-link.active,
-.nav-pills-success .show>.nav-link {
-    color: #fff;
-    background-color: #15ca20;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(21, 202, 32, .5);
-}
-
-.nav-pills-info .nav-link.active,
-.nav-pills-info .show>.nav-link {
-    color: #fff;
-    background-color: #0dceec;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(13, 206, 236, 0.5);
-}
-
-.nav-pills-danger .nav-link.active,
-.nav-pills-danger .show>.nav-link {
-    color: #fff;
-    background-color: #fd3550;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(253, 53, 80, .5);
-}
-
-.nav-pills-warning .nav-link.active,
-.nav-pills-warning .show>.nav-link {
-    color: #fff;
-    background-color: #ff9700;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(255, 151, 0, .5);
-}
-
-.nav-pills-dark .nav-link.active,
-.nav-pills-dark .show>.nav-link {
-    color: #fff;
-    background-color: #223035;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(34, 48, 53, .5);
-}
-
-.nav-pills-secondary .nav-link.active,
-.nav-pills-secondary .show>.nav-link {
-    color: #fff;
-    background-color: #75808a;
-    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, .14), 0 7px 10px -5px rgba(117, 128, 138, .5);
-}
 
 .card .tab-content {
     padding: 1rem 0 0 0;
@@ -372,44 +331,6 @@ input[type="checkbox"] {
     z-index: 999;
 }
 
-.pop-up-deletar {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border: 1px solid #70058683;
-    border-radius: 10px;
-    padding: 20px;
-    width: 55vw;
-    height: 35vh;
-    box-shadow: 1 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    text-align: center;
-    font-size: 18px;
-}
-
-.pop-up-deletar p {
-    margin-bottom: 15px;
-    padding: 10px;
-    padding-left: 25px;
-    text-align: justify;
-}
-
-.pop-up-deletar button {
-    padding: 8px 16px;
-    background-color: #540768;
-    border-color: transparent;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 15px;
-    font-size: 16px;
-    width: 250px;
-}
-
 #fotoPerfil{
     object-fit: cover;
 }
@@ -434,5 +355,8 @@ input[type="checkbox"] {
     #preview img {
         justify-content: center;
         object-fit: cover; 
+    }
+    .pop-up-deletar {
+        width: 70%;
     }
 }
