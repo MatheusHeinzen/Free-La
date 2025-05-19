@@ -210,26 +210,37 @@ def avaliar_servico(servico_id):
     cursor = None
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         # Descobre se o usuário é cliente ou freelancer do serviço
         cursor.execute("SELECT ID_Cliente, ID_Freelancer FROM service WHERE ID_Service = %s", (servico_id,))
         result = cursor.fetchone()
         if not result:
             return jsonify({"sucesso": False, "erro": "Serviço não encontrado."}), 404
 
-        id_cliente, id_freelancer = result
+        id_cliente = result['ID_Cliente']
+        id_freelancer = result['ID_Freelancer']
+
         if str(user_id) == str(id_cliente):
-            cursor.execute("""
-                INSERT INTO avaliacao (ID_Service, ID_Cliente, Nota, Comentario)
-                VALUES (%s, %s, %s, %s)
-            """, (servico_id, user_id, nota, comentario))
+            tipo_avaliador = 'cliente'
+            id_avaliador = user_id
         elif str(user_id) == str(id_freelancer):
-            cursor.execute("""
-                INSERT INTO avaliacao (ID_Service, ID_Freelancer, Nota, Comentario)
-                VALUES (%s, %s, %s, %s)
-            """, (servico_id, user_id, nota, comentario))
+            tipo_avaliador = 'freelancer'
+            id_avaliador = user_id
         else:
             return jsonify({"sucesso": False, "erro": "Não autorizado a avaliar este serviço."}), 403
+
+        # Verifica se já existe avaliação desse usuário para esse serviço
+        cursor.execute("""
+            SELECT 1 FROM avaliacao 
+            WHERE ID_Service = %s AND ID_Avaliador = %s AND TipoAvaliador = %s
+        """, (servico_id, id_avaliador, tipo_avaliador))
+        if cursor.fetchone():
+            return jsonify({"sucesso": False, "erro": "Você já avaliou este serviço."}), 400
+
+        cursor.execute("""
+            INSERT INTO avaliacao (ID_Service, ID_Avaliador, TipoAvaliador, Nota, Comentario)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (servico_id, id_avaliador, tipo_avaliador, nota, comentario))
 
         conn.commit()
         return jsonify({"sucesso": True, "mensagem": "Serviço avaliado com sucesso!"}), 201

@@ -120,7 +120,6 @@ window.avaliarServico = async function (servicoId) {
         <textarea id="comentarioServico" class="form-control" rows="3"></textarea>
         `,
         focusConfirm: false,
-
         preConfirm: () => {
             const checked = document.querySelector('input[name="rating"]:checked');
             const nota = checked ? checked.value : null;
@@ -130,12 +129,9 @@ window.avaliarServico = async function (servicoId) {
                 Swal.showValidationMessage('Por favor, selecione uma nota de 1 a 5.');
                 return false;
             }
-            console.log("Enviando para:", `/servicos/avaliar/${servicoId}`);
-            console.log("Dados:", { nota, comentario });
             return { nota, comentario };
         }
     });
-    
 
     if (formValues) {
         try {
