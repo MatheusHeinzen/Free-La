@@ -43,28 +43,58 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('profissaoUsuario').textContent = data.perfil.Categoria || 'Categoria não informada';
             document.getElementById('descricaoUsuario').textContent = data.perfil.Bio || 'Sem descrição disponível.';
 
-            // Atualiza os contatos
+            // Atualiza os contatos conforme preferências do perfil público
             const listaContatos = document.getElementById('listaContatos');
-            listaContatos.innerHTML = '';
-            if (data.perfil.Telefone) {
-                listaContatos.innerHTML += `
-                    <li class="list-group-item">
-                        <div class="list-icon"><i class="bi bi-telephone"></i></div>
-                        <div class="list-details">
-                            <span>${data.perfil.Telefone}</span>
-                            <small>Telefone</small>
-                        </div>
-                    </li>`;
-            }
-            if (data.perfil.Email) {
-                listaContatos.innerHTML += `
-                    <li class="list-group-item">
-                        <div class="list-icon"><i class="bi bi-envelope"></i></div>
-                        <div class="list-details">
-                            <span>${data.perfil.Email}</span>
-                            <small>Email</small>
-                        </div>
-                    </li>`;
+            if (listaContatos) {
+                listaContatos.innerHTML = '';
+
+                // Busca preferências de contato do usuário do perfil público
+                let preferencias = { mostrarTelefone: true, mostrarEmail: true };
+                try {
+                    const prefResp = await fetch(`/preferences/preference/${userId}`);
+                    if (prefResp.ok) {
+                        const prefData = await prefResp.json();
+                        if (prefData && prefData.preferencias) {
+                            preferencias = {
+                                mostrarTelefone: prefData.preferencias.mostrarTelefone === true || prefData.preferencias.mostrarTelefone === 1,
+                                mostrarEmail: prefData.preferencias.mostrarEmail === true || prefData.preferencias.mostrarEmail === 1
+                            };
+                        }
+                    }
+                } catch (e) {
+                    // Se erro, mantém padrão
+                }
+
+                // Lógica igual ao perfil normal
+                if (preferencias.mostrarTelefone && data.perfil.Telefone) {
+                    listaContatos.innerHTML += `
+                        <li class="list-group-item">
+                            <div class="list-icon"><i class="bi bi-telephone"></i></div>
+                            <div class="list-details">
+                                <span>${formatarTelefone(data.perfil.Telefone)}</span>
+                                <small>Telefone</small>
+                            </div>
+                        </li>`;
+                }
+                if (preferencias.mostrarEmail && data.perfil.Email) {
+                    listaContatos.innerHTML += `
+                        <li class="list-group-item">
+                            <div class="list-icon"><i class="bi bi-envelope"></i></div>
+                            <div class="list-details">
+                                <span>${data.perfil.Email}</span>
+                                <small>Email</small>
+                            </div>
+                        </li>`;
+                }
+                // Se nenhum contato for mostrado, exibe mensagem
+                if (listaContatos.innerHTML === '') {
+                    listaContatos.innerHTML = `
+                        <li class="list-group-item">
+                            <div class="list-details">
+                                <span>Nenhum contato disponível</span>
+                            </div>
+                        </li>`;
+                }
             }
 
             // Atualiza as habilidades
@@ -215,3 +245,15 @@ document.addEventListener('click', resetarInatividade);
 
 // Inicializa o timer ao carregar a página
 resetarInatividade();
+
+// Adicione esta função utilitária para formatação igual ao perfil normal:
+function formatarTelefone(telefone) {
+    const nums = (telefone || '').replace(/\D/g, '');
+    if (nums.length === 11) {
+        return nums.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    }
+    if (nums.length === 10) {
+        return nums.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+    }
+    return telefone;
+}

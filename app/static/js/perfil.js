@@ -153,32 +153,27 @@ async function carregarUsuario() {
 }
 
 async function carregarPreferencias() {
-    try {
-        const response = await fetch('/preference/get', { method: 'GET', credentials: 'include' });
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.warn('Preferências não encontradas, usando padrão');
-                return { mostrarTelefone: true, mostrarEmail: true };
-            }
-            throw new Error('Erro ao carregar preferências');
-        }
-
-        const data = await response.json();
-        if (data.sucesso) {
-            return data.preferencias; // Retorna as preferências do servidor
-        } else {
-            console.warn('Preferências não encontradas, usando padrão.');
-            return { mostrarTelefone: true, mostrarEmail: true }; // Valores padrão
-        }
-    } catch (error) {
-        console.error('Erro ao carregar preferências:', error);
-        return { mostrarTelefone: true, mostrarEmail: true }; // Valores padrão
+    // Busca preferências do usuário logado
+    const usuario = await carregarUsuario();
+    const response = await fetch(`/preferences/preference/${usuario.ID_User}`, { method: 'GET', credentials: 'include' });
+    if (!response.ok) {
+        // Sempre retorna padrão se não encontrar
+        return { mostrarTelefone: true, mostrarEmail: true };
     }
+    const data = await response.json();
+    // Corrige possíveis valores undefined/null/0/1 para boolean
+    if (data && data.preferencias) {
+        return {
+            mostrarTelefone: data.preferencias.mostrarTelefone === true || data.preferencias.mostrarTelefone === 1,
+            mostrarEmail: data.preferencias.mostrarEmail === true || data.preferencias.mostrarEmail === 1
+        };
+    }
+    return { mostrarTelefone: true, mostrarEmail: true };
 }
 
 async function atualizarPreferencias(userId, preferencias) {
     try {
-        const response = await fetch(`/preference/${userId}`, {
+        const response = await fetch(`/preferences/preference/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ preferencias })
@@ -304,11 +299,12 @@ function mostrarModalContatos(preferencias) {
 
 async function salvarPreferencias(preferencias) {
     try {
-        const response = await fetch('/preference/put', {
+        const usuario = await carregarUsuario();
+        const response = await fetch(`/preferences/preference/${usuario.ID_User}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ preferencias }) // Enviar como objeto com chave 'preferencias'
+            body: JSON.stringify({ preferencias })
         });
 
         if (!response.ok) {
@@ -316,15 +312,15 @@ async function salvarPreferencias(preferencias) {
             throw new Error(errorData.error || 'Falha ao salvar preferências');
         }
 
+        // Sempre recarrega as preferências do backend após salvar
+        const novasPreferencias = await carregarPreferencias();
+        atualizarInterface(await carregarUsuario(), novasPreferencias);
+
         Swal.fire({
             icon: 'success',
             title: 'Preferências salvas!',
             text: 'Suas preferências foram atualizadas com sucesso.'
         });
-
-        // Recarregar as preferências do backend e atualizar a interface
-        const novasPreferencias = await carregarPreferencias();
-        atualizarInterface(await carregarUsuario(), novasPreferencias);
     } catch (error) {
         console.error('Erro ao salvar preferências:', error);
         Swal.fire({

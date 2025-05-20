@@ -4,41 +4,37 @@ from app.utils.decorators import login_required
 
 preference_bp = Blueprint('preference', __name__)
 
-@preference_bp.route('/get', methods=['GET'])
+@preference_bp.route('/preference/<int:user_id>', methods=['GET', 'PUT'])
 @login_required
-def obter_preferencias():
-    user_id = session.get('user_id')
-    if not user_id:
-        return jsonify({'error': 'Usuário não autenticado'}), 401
-
-    preferencias = buscar_preferencias(user_id)
-    if preferencias:
-        return jsonify({'sucesso': True, 'preferencias': preferencias}), 200
-    else:
-        return jsonify({'sucesso': False, 'mensagem': 'Preferências não encontradas'}), 404
-
-@preference_bp.route('/put', methods=['PUT'])
-@login_required
-def salvar_preferencias():
-    try:
-        user_id = session.get('user_id')
+def preference(user_id):
+    if request.method == 'GET':
         if not user_id:
             return jsonify({'error': 'Usuário não autenticado'}), 401
 
-        data = request.get_json()
-        preferencias = data.get('preferencias', {})
-        
-        # Validar se 'preferencias' é um dicionário
-        if not isinstance(preferencias, dict):
-            return jsonify({'error': 'Formato inválido para preferencias'}), 400
-        
-        # Validar as chaves esperadas
-        if 'mostrarTelefone' not in preferencias or 'mostrarEmail' not in preferencias:
-            return jsonify({'error': 'Chaves ausentes em preferencias'}), 400
+        preferencias = buscar_preferencias(user_id)
+        # Garante sempre um dicionário simples
+        if not preferencias:
+            preferencias = {'mostrarTelefone': True, 'mostrarEmail': True}
+        return jsonify({'sucesso': True, 'preferencias': preferencias}), 200
 
-        atualizar_preferencias(user_id, preferencias)
-        preferencias_atualizadas = buscar_preferencias(user_id)
-        return jsonify({'sucesso': True, 'preferencias': preferencias_atualizadas}), 200
-    except Exception as e:
-        print(f"Erro ao salvar preferências: {e}")
-        return jsonify({'error': 'Erro interno no servidor'}), 500
+    if request.method == 'PUT':
+        try:
+            if not user_id:
+                return jsonify({'error': 'Usuário não autenticado'}), 401
+
+            data = request.get_json()
+            preferencias = data.get('preferencias', {})
+            if not isinstance(preferencias, dict):
+                return jsonify({'error': 'Formato inválido para preferencias'}), 400
+            if 'mostrarTelefone' not in preferencias or 'mostrarEmail' not in preferencias:
+                return jsonify({'error': 'Chaves ausentes em preferencias'}), 400
+
+            ok = atualizar_preferencias(user_id, preferencias)
+            preferencias_atualizadas = buscar_preferencias(user_id)
+            if ok:
+                return jsonify({'sucesso': True, 'preferencias': preferencias_atualizadas}), 200
+            else:
+                return jsonify({'sucesso': False, 'erro': 'Erro ao atualizar preferências'}), 500
+        except Exception as e:
+            print(f"Erro ao salvar preferências: {e}")
+            return jsonify({'error': 'Erro interno no servidor'}), 500

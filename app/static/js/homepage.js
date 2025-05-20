@@ -390,3 +390,29 @@ document.addEventListener('click', resetarInatividade);
 // Inicializa o timer ao carregar a página
 resetarInatividade();
 
+function atualizarMenusTipoUsuario(tipoUsuario) {
+    // Menu lateral (mobile)
+    var meusServicosMenu = document.querySelectorAll('a[href="/servicos_freelancer"]');
+    meusServicosMenu.forEach(function(link) {
+        if (tipoUsuario.trim().toLowerCase() !== 'freelancer') {
+            link.parentElement.style.display = 'none';
+        } else {
+            link.parentElement.style.display = '';
+        }
+    });
+
+    // Menu desktop
+    var menuDesktop = document.querySelector('.desktop-version');
+    if (menuDesktop) {
+        var meusServicosDesktop = menuDesktop.querySelector('a[href="/servicos_freelancer"]');
+        var torneSeFreelancer = menuDesktop.querySelector('a[href="/alterarDados"].phone-hidden');
+        if (tipoUsuario.trim().toLowerCase() === 'freelancer') {
+            if (meusServicosDesktop) meusServicosDesktop.style.display = '';
+            if (torneSeFreelancer) torneSeFreelancer.style.display = 'none';
+        } else {
+            if (meusServicosDesktop) meusServicosDesktop.style.display = 'none';
+            if (torneSeFreelancer) torneSeFreelancer.style.display = '';
+        }
+    }
+}
+

@@ -115,6 +115,8 @@ async function atualizarDadosUsuario(userId) {
 
         const data = await response.json();
         if (data.sucesso) {
+            // Atualiza o formulário com os dados mais recentes antes de redirecionar
+            await carregarDadosUsuario(userId);
             Swal.fire({
                 icon: 'success',
                 title: 'Atualização bem sucedida',

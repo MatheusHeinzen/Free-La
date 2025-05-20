@@ -4,8 +4,8 @@ def salvar_preferencias(user_id, preferencias):
     conn = get_db_connection()
     cursor = conn.cursor()
     try:
-        mostrar_telefone = bool(preferencias.get('mostrarTelefone', True))
-        mostrar_email = bool(preferencias.get('mostrarEmail', True))
+        mostrar_telefone = int(bool(preferencias.get('mostrarTelefone', True)))
+        mostrar_email = int(bool(preferencias.get('mostrarEmail', True)))
 
         cursor.execute("""
             INSERT INTO preferenciacontato (fk_Usuario_ID_User, MostrarTelefone, MostrarEmail)
@@ -29,7 +29,15 @@ def obter_preferencias_por_usuario(user_id):
         cursor.execute("""
             SELECT MostrarTelefone, MostrarEmail FROM preferenciacontato WHERE fk_Usuario_ID_User = %s
         """, (user_id,))
-        return cursor.fetchone()
+        prefs = cursor.fetchone()
+        if prefs is None:
+            # Retorna padrão se não existir
+            return {'mostrarTelefone': True, 'mostrarEmail': True}
+        # Garante retorno como boolean
+        return {
+            'mostrarTelefone': bool(prefs.get('MostrarTelefone', True)),
+            'mostrarEmail': bool(prefs.get('MostrarEmail', True))
+        }
     finally:
         cursor.close()
         conn.close()
