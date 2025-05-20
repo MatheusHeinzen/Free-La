@@ -6,6 +6,10 @@ body {
     margin: 0;
     padding: 0;
 }
+.lead {
+    text-align: justify;
+    padding: 25px;
+}
 
 .container {
     max-width: 1200px;
@@ -318,6 +322,12 @@ img {
         width: 100%;
         max-width: none;
     }
+    .lead {
+        font-size: 1.0rem;
+        font-weight: 100;
+        text-align: justify;
+    }
+
 }
 
 @media (max-width: 576px) {

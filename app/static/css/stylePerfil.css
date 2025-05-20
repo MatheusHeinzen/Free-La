@@ -12,6 +12,34 @@ header{
 }
 
 /* Modal -Edit */
+/* Container responsivo para a navegação */
+.nav-responsive-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 5px; 
+}
+
+/* Estilo para mobile */
+@media (max-width: 767.98px) {
+    .nav-responsive-container {
+        white-space: nowrap;
+    }
+    
+    .nav-pills.nav-justified .nav-item {
+        min-width: 48%; 
+    }
+    
+    .nav-link {
+        font-size: 0.875rem;
+        padding: 0.5rem !important;
+    }
+    
+    .nav-link i {
+        margin-right: 0;
+    }
+}
+
 .modal {
     display: none;
     position: fixed;
@@ -36,17 +64,21 @@ header{
 
 /* Para pré- visualização da imagem */
 form {
-    width: 80%;
+    width: 100%;
+    justify-content: center;
+
 }
 #preview-container {
-    height: 32vh;
-    width: 35vw;;
+    min-width: 35vw;
     margin-top: 20px;
     text-align: center;
+    justify-content: center;
+    margin-bottom: 30px;
 }
 
 #preview {
     width: 30vw;
+    max-width: 250px;
     height: 30vh;
     object-fit: cover;
     border: 2px solid #ccc;
@@ -55,7 +87,22 @@ form {
     border: 2px solid #ccc;
     border-radius: 5px;
 }
-/*  */
+
+/* Preferencias de contato */
+#listaContatos {
+    position: relative;
+    z-index: 1; 
+}
+
+.card-body {
+    padding: 1.25rem;
+    overflow: visible; 
+
+}
+.list-group-item {
+    position: relative;
+    z-index: 2; /* Valor maior que o do card-body */
+}
 
 .close {
     color: #aaa;
@@ -83,13 +130,28 @@ textarea {
 
 .separador{
     width: 100%;
-    margin-left: 15px;
+    display: flex;
+    margin-left: 2px;
+    margin-right: 10px;
+    margin-bottom: 1.5rem;
+    padding: 0.6rem;
+    justify-content: center;
 }
 
 textarea.form-control {
     min-height: 150px;
     resize: vertical;
     width: 100%;
+}
+
+.form-control-lg {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
 }
 
 button {
@@ -122,48 +184,20 @@ input[type="checkbox"] {
     grid-gap: 20px
 }
 
-.custom-alert {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    border: 1px solid #70058683;
-    border-radius: 10px;
-    padding: 20px;
-    width: 60vw;
-    height: auto;
-    box-shadow: 1 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
-    text-align: center;
-    font-size: 18px;
+
+/* Estilo específico para a lista de avaliações */
+#lista-avaliacoes {
+    position: relative;
+    z-index: 1;
+    margin-top: 15px;
 }
 
-.custom-alert p {
-    margin-bottom: 15px;
+#lista-avaliacoes .list-group-item {
+    padding: 1rem 1.25rem;
 }
 
-.custom-alert button {
-    padding: 8px 16px;
-    background-color: #540768;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
 
-.overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    z-index: 999;
-}
-
+/* Cards */
 .bg-primary {
     background-color: #7a067abe !important;
 }
@@ -267,7 +301,7 @@ input[type="checkbox"] {
     flex: 0 0 50%;
     max-width: 100%;
 }
-
+/* Modal para contatos */
 .modal-contatos {
     position: fixed;
     top: 0;
@@ -319,6 +353,7 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
+
 /* Para deletar perfil: */
 .overlay {
     display: none;
@@ -347,10 +382,11 @@ input[type="checkbox"] {
     }
     .separador{
         margin-top: 20px;
+        display:flow-root;
     }
     #preview {
-        width: 40vw;
-        height: 30vh;
+        
+        justify-content: center;
     }
     #preview img {
         justify-content: center;
