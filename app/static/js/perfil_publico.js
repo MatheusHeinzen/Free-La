@@ -65,23 +65,39 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // Se erro, mantém padrão
                 }
 
+                // Busca os dados completos do usuário para pegar Email/Telefone reais
+                let emailContato = data.perfil.Email;
+                let telefoneContato = data.perfil.Telefone;
+                try {
+                    const userResp = await fetch(`/user/${userId}`);
+                    if (userResp.ok) {
+                        const userData = await userResp.json();
+                        if (userData && userData.usuario) {
+                            emailContato = userData.usuario.Email;
+                            telefoneContato = userData.usuario.Telefone;
+                        }
+                    }
+                } catch (e) {
+                    // Se erro, usa o que veio do perfil
+                }
+
                 // Lógica igual ao perfil normal
-                if (preferencias.mostrarTelefone && data.perfil.Telefone) {
+                if (preferencias.mostrarTelefone && telefoneContato) {
                     listaContatos.innerHTML += `
                         <li class="list-group-item">
                             <div class="list-icon"><i class="bi bi-telephone"></i></div>
                             <div class="list-details">
-                                <span>${formatarTelefone(data.perfil.Telefone)}</span>
+                                <span>${formatarTelefone(telefoneContato)}</span>
                                 <small>Telefone</small>
                             </div>
                         </li>`;
                 }
-                if (preferencias.mostrarEmail && data.perfil.Email) {
+                if (preferencias.mostrarEmail && emailContato) {
                     listaContatos.innerHTML += `
                         <li class="list-group-item">
                             <div class="list-icon"><i class="bi bi-envelope"></i></div>
                             <div class="list-details">
-                                <span>${data.perfil.Email}</span>
+                                <span>${emailContato}</span>
                                 <small>Email</small>
                             </div>
                         </li>`;
