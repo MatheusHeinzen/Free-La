@@ -79,7 +79,7 @@ body {
     #toggleSidebar{
         display: absolute;
         right: 0px;
-        background-color: rgb(157, 11, 194);
+        background-color: rgb(161 59 188);
         color: white;
         border: none;
         padding: 8px 15px;
@@ -112,7 +112,7 @@ body {
     nav.menu_lateral {
         width: 0px;
         height: 100%;
-        background-color: rgb(175, 96, 169);
+        background-color: rgb(161 59 188);
         position: fixed;
         padding: 10px 0 10px;
         top: 0px;
@@ -149,7 +149,7 @@ body {
     }
 
     ul li.item_menu:hover {
-        background-color: rgb(137, 61, 139);
+        background-color: rgba(121, 54, 140, 0.73);
         transition: .2s;
     }
 

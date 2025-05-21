@@ -44,6 +44,7 @@
 
             .list-group-item {
                 padding: 0.8rem;
+                height: 50vh;
             }
 
             .list-group-item .btn {
@@ -199,6 +200,15 @@
             </nav>
         </div>
 
+        <div class="overlay" id="overlay"></div>
+        <div class="pop-up-deletar" id="pop-up-deletar">
+          <h3>Deletar Perfil?</h3>
+          <p>Tem certeza que deseja excluir seu perfil? <br>
+            Você perderá todos seus dados e não poderá executar todas as funcionalidades do Site</p>
+          <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
+          <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
+        </div>
+    
 
         <!-- Par desktops -->
         <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">

@@ -188,6 +188,61 @@ async function logout() {
     }
 }
 
+
+
+
+// Para deletar Usuario:
+
+function showPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function fecharPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function confirmarDelecao() {
+    fetch('user/deletarUsuario', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Perfil deletado com sucesso.',
+                    text: "Redirecionando...",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops, algo deu errado.',
+                    text: 'Ocorreu um problema para deletar.'
+                });
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops, algo deu errado.',
+                text: 'Contate o suporte, por favor!'
+            });
+            return false;
+        });
+}
+
 let inatividadeTimer;
 
 // Função para redefinir o timer de inatividade

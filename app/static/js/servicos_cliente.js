@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                     <small class="d-block">Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small> 
                                     <small class="d-block mb-2">Status: ${servico.Status}</small>
                                 </div>
-                                <div class="service-actions d-flex flex-column flex-md-row justify-content-end" style="gap: 20px">
+                                <div class="d-flex mt-2" style="gap: 20px">
                                     <button class="btn btn-danger btn-sm" onclick="deletarServico(${servico.ID_Service})">Deletar</button>
                                     <button class="btn btn-info btn-sm" onclick="editarServico(${servico.ID_Service}, '${servico.Nome.replace(/'/g, "\\'")}', '${servico.Descricao.replace(/'/g, "\\'")}', '${servico.Categoria ? servico.Categoria.replace(/'/g, "\\'") : ''}')">Editar</button>
                                 </div>
@@ -260,6 +260,62 @@ function resetarInatividade() {
         })
     }, 10 * 60 * 1000); // 10 minutos
 }
+
+
+
+// Para deletar Usuario:
+
+function showPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function fecharPopUpDeletar() {
+    document.getElementById('pop-up-deletar').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+}
+
+function confirmarDelecao() {
+    fetch('user/deletarUsuario', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.sucesso) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Perfil deletado com sucesso.',
+                    text: "Redirecionando...",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops, algo deu errado.',
+                    text: 'Ocorreu um problema para deletar.'
+                });
+                return false;
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops, algo deu errado.',
+                text: 'Contate o suporte, por favor!'
+            });
+            return false;
+        });
+}
+
+
 
 // Adiciona eventos para monitorar a atividade do usuário
 document.addEventListener('mousemove', resetarInatividade);
