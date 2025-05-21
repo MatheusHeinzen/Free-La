@@ -5,11 +5,15 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="../static/imgs/icon.png">
     <title>Serviços Recebidos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <style>
+        .mt-4 {
+            display: block;
+        }
         .rating {
             direction: rtl;
             unicode-bidi: bidi-override;
@@ -126,8 +130,9 @@
             </div>
         </nav>
     </header>
+<main>
     <div class="container mt-4">
-        <h2>Serviços Requisitados para Mim</h2>
+        <h2 class="mb-0">Serviços Requisitados para Mim</h2>
         <ul id="servicosRecebidos" class="list-group">
             <!-- Serviços recebidos serão preenchidos via JS -->
         </ul>
@@ -136,6 +141,7 @@
             <!-- Serviços concluídos serão preenchidos via JS -->
         </ul>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ url_for('static', filename='js/servicos_freelancer.js') }}"></script>
 </body>

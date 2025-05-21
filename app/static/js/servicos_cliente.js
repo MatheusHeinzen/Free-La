@@ -12,20 +12,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data.servicosPedidos && data.servicosPedidos.length > 0) {
             data.servicosPedidos.forEach(servico => {
                 pedidos.innerHTML += `
-                    <li class="list-group-item">
-                        <strong>${servico.Nome}</strong>
-                        <p>${servico.Descricao}</p>
-                        <small>Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small>
-                        <small>Status: ${servico.Status}</small>
-                        <div class="mt-2">
-                            <button class="btn btn-danger btn-sm" onclick="deletarServico(${servico.ID_Service})">Deletar</button>
-                            <button class="btn btn-info btn-sm" onclick="editarServico(${servico.ID_Service}, '${servico.Nome.replace(/'/g, "\\'")}', '${servico.Descricao.replace(/'/g, "\\'")}', '${servico.Categoria ? servico.Categoria.replace(/'/g, "\\'") : ''}')">Editar</button>
-                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
-                        </div>
-                    </li>`;
+                        <li class="list-group-item">
+                            <div class="service-item">
+                                <h5 class="service-title mb-2">${servico.Nome}</h5>
+                                <p class="service-description mb-2">${servico.Descricao}</p>
+                                <div class="service-meta d-flex flex-wrap mb-3" style="gap: 20px">
+                                    <small class="d-block">Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small> 
+                                    <small class="d-block mb-2">Status: ${servico.Status}</small>
+                                </div>
+                                <div class="service-actions d-flex flex-column flex-md-row justify-content-end" style="gap: 20px">
+                                    <button class="btn btn-danger btn-sm" onclick="deletarServico(${servico.ID_Service})">Deletar</button>
+                                    <button class="btn btn-info btn-sm" onclick="editarServico(${servico.ID_Service}, '${servico.Nome.replace(/'/g, "\\'")}', '${servico.Descricao.replace(/'/g, "\\'")}', '${servico.Categoria ? servico.Categoria.replace(/'/g, "\\'") : ''}')">Editar</button>
+                                </div>
+                            </div>
+                        </li>
+                    `;
+                // Adicionar botão para ver informações??
             });
         } else {
-            pedidos.innerHTML = '<li class="list-group-item">Nenhum serviço requisitado encontrado.</li>';
+            pedidos.innerHTML = `
+            <li class="list-group-item py-3">
+                <i class="bi bi-exclamation-circle text-muted" style="font-size: 2rem;"></i>
+                Nenhum serviço requisitado encontrado.
+            </li>`;
         }
 
         // Serviços concluídos
@@ -34,16 +43,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pedidosConcluidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
-                        <p>${servico.Descricao}</p>
-                        <small>Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small>
-                        <small>Status: ${servico.Status}</small>
+                        <p class="mb-2" style="word-break: break-word">${servico.Descricao}</p>
+                        <small class="d-block">Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small>
+                        <small class="d-block mb-2">Status: ${servico.Status}</small>
                         <div class="mt-2">
                             <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
                         </div>
                     </li>`;
             });
         } else if (pedidosConcluidos) {
-            pedidosConcluidos.innerHTML = '<li class="list-group-item">Nenhum serviço concluído encontrado.</li>';
+            pedidosConcluidos.innerHTML = `
+            <li class="list-group-item">
+                <i class="bi bi-check-circle text-muted mb-2" style="font-size: 2rem;"></i>
+                Nenhum serviço concluído encontrado.
+            </li>`;
         }
     } catch (error) {
         console.error('Erro ao carregar serviços:', error);

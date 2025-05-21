@@ -5,11 +5,105 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" href="../static/imgs/icon.png">
     <title>Meus Serviços Requisitados</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <style>
+        /* Estilos específicos para a lista de serviços */
+        .list-group-item {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px !important;
+        }
+
+        .list-group-item p {
+            margin: 0.5rem 0;
+        }
+
+        .list-group-item small {
+            display: block;
+            margin: 0.3rem 0;
+        }
+
+        /* Ajustes para mobile */
+        @media (max-width: 767.98px) {
+            #toggleSidebar {
+                background-color: rgb(255, 255, 255);
+                color: black;
+            }
+
+            .service-actions {
+                flex-direction: column !important;
+            }
+
+            .service-description {
+                font-size: 0.9rem;
+            }
+
+            .list-group-item {
+                padding: 0.8rem;
+            }
+
+            .list-group-item .btn {
+                margin-top: 0.5rem;
+            }
+
+            .list-group-item>div {
+                flex-direction: column !important;
+                gap: 0.5rem !important;
+            }
+
+            .list-group-item strong {
+                font-size: 1.1rem;
+            }
+
+            .list-group-item p {
+                font-size: 0.9rem;
+            }
+
+            .list-group-item small {
+                font-size: 0.8rem;
+            }
+        }
+
+        .mt-4 {
+            display: block;
+            overflow-x: hidden
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .dropdown-menu {
+            border: none;
+            left: -50px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h2,
+        h4 {
+            color: var(--roxo-principal);
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        h2::after,
+        h4::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(to right, var(--roxo-principal), var(--roxo-hover));
+            margin: 10px 0;
+            border-radius: 3px;
+        }
+
         .rating {
             direction: rtl;
             unicode-bidi: bidi-override;
@@ -127,16 +221,53 @@
             </div>
         </nav>
     </header>
-    <div class="container mt-4">
-        <h2>Meus Serviços Requisitados</h2>
-        <ul id="servicosPedidos" class="list-group">
-            <!-- Serviços requisitados serão preenchidos via JS -->
-        </ul>
-        <h4 class="mt-4">Serviços Concluídos</h4>
-        <ul id="servicosPedidosConcluidos" class="list-group">
-            <!-- Serviços concluídos serão preenchidos via JS -->
-        </ul>
-    </div>
+    <main>
+        <div class="container mt-4 px-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h2 class="mb-0">Meus Serviços Requisitados</h2>
+                </div>
+                <div class="card-body p-0">
+                    <ul id="servicosPedidos" class="list-group list-group-flush">
+                        <!-- Serviços serão preenchidos via JS -->
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h4 class="mb-0">Serviços Concluídos</h4>
+                </div>
+                <div class="card-body p-0">
+                    <ul id="servicosPedidosConcluidos" class="list-group list-group-flush">
+                        <!-- Serviços concluídos serão preenchidos via JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>//SideBar (Entra e sai da tela)
+        document.addEventListener("DOMContentLoaded", function () {
+            const sidebar = document.querySelector(".menu_lateral");
+            const toggleButton = document.getElementById("toggleSidebar");
+
+            toggleButton.addEventListener("click", function (event) {
+                sidebar.classList.toggle("ativo");
+                event.stopPropagation();
+            });
+
+            document.addEventListener("click", function (event) {
+                if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                    sidebar.classList.remove("ativo");
+                }
+            });
+        });
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const item = event.currentTarget.closest('.has-submenu');
+            item.classList.toggle('active');
+        }
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ url_for('static', filename='js/avaliar_servico.js')}}"></script>
     <script src="{{ url_for('static', filename='js/servicos_cliente.js') }}"></script>

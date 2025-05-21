@@ -7,12 +7,6 @@ body {
     margin: 0;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
 h1, h2, h3 {
     color: #6a0dad;
     margin-bottom: 15px;
@@ -94,6 +88,10 @@ textarea.form-control {
 
 .form-control{
     width: 90%;
+}
+
+.mt-4 {
+    display:block;
 }
 
 /* Botão */

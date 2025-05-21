@@ -316,8 +316,7 @@
 
     // Lista de avaliações detalhadas (ao clicar no botão)
     async function gerarEstrelasHTML() {
-        const userId = {{ session.user_id| tojson
-    }};
+        const userId = {{ session.user_id| tojson }};
     const lista = document.getElementById('lista-avaliacoes');
     if (!lista) return;
     lista.innerHTML = '<li class="list-group-item">Carregando avaliações...</li>';

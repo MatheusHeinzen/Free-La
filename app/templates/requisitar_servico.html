@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="../static/imgs/icon.png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-        integrity="sha384-LtrjvnR4/J57f8z8N8A6z+Jp6U6pga5K5Q5p6XK5p6XK5p6XK5p6XK5p6XK5p6XK5p6XK" crossorigin="anonymous">
+        integrity="sha384-LtrjvnR4/J57f8z8N8A6z+Jp6U6pga5K5Q5p6XK5p6XK5p6XK5p6XK5p6XK5p6XK5p6XK"
+        crossorigin="anonymous">
     <title>Requisitar Serviço</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
@@ -14,124 +15,147 @@
 </head>
 
 <body>
-<body>
-    {% if not session.user_id %}
+
+    <body>
+        {% if not session.user_id %}
         <script>window.location.href = "/";</script>
-    {% endif %}
-    <header>
-        <div class="container">
-            <!-- Navbar para dispositivos móveis -->
-            <nav class="menu_lateral" id="menu_lateral">
-                <div class="expandir">
-                    <i class=""></i>
-                </div>
-                <ul>
-                    <li class="item_menu">
-                        <a href="/perfil">
-                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px" >
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Sobre</span>
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Contato</span>
-                        </a>
-                    </li>
-                    <li class="item_menu has-submenu">
-                        <a href="#" onclick="toggleSubmenu(event)">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Configurações</span>
-                        </a>
-                        <ul class="submenu">
-                            <ul class="submenu">
-                                <li class="item_menu" id="submenu">
-                                    <a href="/alterarDados">
-                                        <span class="icon"><i class="#"></i></span>
-                                        <span class="link">Atualizar Dados</span>
-                                    </a>
-                                </li>
-                                <li class="item_menu" id="submenu">
-                                    <a href="#" onclick="showPopUpDeletar()">
-                                        <span class="icon"><i class="#"></i></span>
-                                        <span class="link">Deletar Perfil</span>
-                                    </a>
-                                </li>
-                                <li class="item_menu" id="submenu">
-                                    {% if session.user_id %}
-                                    <a href="/" onclick="logout()">
-                                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
-                                        <span class="link">Logout</span>
-                                    </a>
-                                    {% else %}
-                                    <a href="/">
-                                        <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
-                                        <span class="link">Login</span>
-                                    </a>
-                                    {% endif %}
-                                </li>
-                            </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-
-        <!-- Par desktops -->
-        <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">
-            <div class="container d-flex justify-content-between">
-                <a href="/homepage" class="navbar-brand">Menu</a>
-                <div class="dropdown">
-                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Configurações</a>
-                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
-                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
-                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
-                        {% if session.user_id %}
-                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
-                        {% else %}
-                        <a class="dropdown-item" href="/">Login</a>
-                        {% endif %}
+        {% endif %}
+        <header>
+            <div class="">
+                <!-- Navbar para dispositivos móveis -->
+                <nav class="menu_lateral" id="menu_lateral">
+                    <div class="expandir">
+                        <i class=""></i>
                     </div>
-                </div>
-                <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
+                    <ul>
+                        <li class="item_menu">
+                            <a href="/perfil">
+                                <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar"
+                                    alt="Perfil" width="140px">
+                            </a>
+                        </li>
+                        <li class="item_menu">
+                            <a href="#">
+                                <span class="icon"><i class="#"></i></span>
+                                <span class="link">Sobre</span>
+                            </a>
+                        </li>
+                        <li class="item_menu">
+                            <a href="#">
+                                <span class="icon"><i class="#"></i></span>
+                                <span class="link">Contato</span>
+                            </a>
+                        </li>
+                        <li class="item_menu has-submenu">
+                            <a href="#" onclick="toggleSubmenu(event)">
+                                <span class="icon"><i class="#"></i></span>
+                                <span class="link">Configurações</span>
+                            </a>
+                            <ul class="submenu">
+                                <ul class="submenu">
+                                    <li class="item_menu" id="submenu">
+                                        <a href="/alterarDados">
+                                            <span class="icon"><i class="#"></i></span>
+                                            <span class="link">Atualizar Dados</span>
+                                        </a>
+                                    </li>
+                                    <li class="item_menu" id="submenu">
+                                        <a href="#" onclick="showPopUpDeletar()">
+                                            <span class="icon"><i class="#"></i></span>
+                                            <span class="link">Deletar Perfil</span>
+                                        </a>
+                                    </li>
+                                    <li class="item_menu" id="submenu">
+                                        {% if session.user_id %}
+                                        <a href="/" onclick="logout()">
+                                            <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                                            <span class="link">Logout</span>
+                                        </a>
+                                        {% else %}
+                                        <a href="/">
+                                            <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                                            <span class="link">Login</span>
+                                        </a>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-        </nav>
-    </header>
 
-    <main>
-        <div class="container mt-4">
-            <h1>Requisitar Serviço</h1>
-            <form id="form-requisitar-servico">
-                <input type="hidden" id="freelancerId" value="{{ freelancer_id }}">
-                <input type="hidden" id="userId" value="{{ session.user_id }}">
-                <div class="form-group">
-                    <label for="nomeServico">Título do Serviço</label>
-                    <input type="text" class="form-control" id="nomeServico" placeholder="Digite o nome do serviço" required>
-                </div>
-                <div class="form-group">
-                    <label for="descricaoServico">Descrição</label>
-                    <textarea class="form-control" id="descricaoServico" rows="3" placeholder="Descreva o serviço" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="categoriaServico">Categoria</label>
-                    <select class="form-control" id="categoriaServico" required>
-                        <option value="" disabled selected>Selecione uma categoria</option>
-                        <!-- As opções serão preenchidas dinamicamente -->
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">Requisitar Serviço</button>
-            </form>
-        </div>
-    </main>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-    <script src="{{ url_for('static', filename='js/requisitar_servico.js') }}"></script>
-</body>
+            <!-- Par desktops -->
+            <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">
+                <div class="container d-flex justify-content-between">
+                    <a href="/homepage" class="navbar-brand">Menu</a>
+                    <div class="dropdown">
+                        <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Configurações</a>
+                        <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
+                            <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
+                            <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
+                            {% if session.user_id %}
+                            <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
+                            {% else %}
+                            <a class="dropdown-item" href="/">Login</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <div class="container mt-4">
+                <h1>Requisitar Serviço</h1>
+                <form id="form-requisitar-servico">
+                    <input type="hidden" id="freelancerId" value="{{ freelancer_id }}">
+                    <input type="hidden" id="userId" value="{{ session.user_id }}">
+                    <div class="form-group">
+                        <label for="nomeServico">Título do Serviço</label>
+                        <input type="text" class="form-control" id="nomeServico" placeholder="Digite o nome do serviço"
+                            required autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="descricaoServico">Descrição</label>
+                        <textarea class="form-control" id="descricaoServico" rows="3" placeholder="Descreva o serviço"
+                            required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoriaServico">Categoria</label>
+                        <select class="form-control" id="categoriaServico" required>
+                            <option value="" disabled selected>Selecione uma categoria</option>
+                            <!-- As opções serão preenchidas dinamicamente -->
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Requisitar Serviço</button>
+                </form>
+            </div>
+        </main>
+
+        <script>
+            //SideBar (Entra e sai da tela)
+            document.addEventListener("DOMContentLoaded", function () {
+                const sidebar = document.querySelector(".menu_lateral");
+                const toggleButton = document.getElementById("toggleSidebar");
+
+                toggleButton.addEventListener("click", function (event) {
+                    sidebar.classList.toggle("ativo");
+                    event.stopPropagation();
+                });
+
+                document.addEventListener("click", function (event) {
+                    if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
+                        sidebar.classList.remove("ativo");
+                    }
+                });
+            });
+        </script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+        <script src="{{ url_for('static', filename='js/requisitar_servico.js') }}"></script>
+    </body>
+
 </html>
