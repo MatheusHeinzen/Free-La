@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <small>Status: ${servico.Status}</small>
                         <div class="mt-2">
                             <button class="btn btn-success btn-sm" onclick="concluirServico(${servico.ID_Service})">Concluir</button>
-                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
                         </div>
                     </li>`;
             });

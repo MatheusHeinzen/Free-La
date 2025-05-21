@@ -215,3 +215,20 @@ def deletar_usuario():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@user_bp.route('/endereco/<int:endereco_id>', methods=['GET'])
+@login_required
+def obter_endereco(endereco_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM Endereco WHERE ID_Endereco = %s", (endereco_id,))
+        endereco = cursor.fetchone()
+        if endereco:
+            return jsonify({'sucesso': True, 'endereco': endereco})
+        else:
+            return jsonify({'sucesso': False, 'erro': 'Endereço não encontrado'}), 404
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()

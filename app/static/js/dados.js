@@ -115,7 +115,7 @@ async function atualizarDadosUsuario(userId) {
 
         const data = await response.json();
         if (data.sucesso) {
-            // Atualiza o formulário com os dados mais recentes antes de redirecionar
+            // Após atualizar, recarrega tudo (inclusive endereço)
             await carregarDadosUsuario(userId);
             Swal.fire({
                 icon: 'success',
@@ -158,6 +158,21 @@ async function carregarDadosUsuario(userId) {
 
         if (data.sucesso) {
             preencherFormulario(data.usuario);
+
+            // Busca endereço atualizado se ID_Endereco existir
+            if (data.usuario.ID_Endereco) {
+                try {
+                    const enderecoResp = await fetch(`/user/endereco/${data.usuario.ID_Endereco}`);
+                    if (enderecoResp.ok) {
+                        const enderecoData = await enderecoResp.json();
+                        if (enderecoData.sucesso && enderecoData.endereco) {
+                            preencherEnderecoFormulario(enderecoData.endereco);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[DADOS] Não foi possível buscar endereço detalhado:', e);
+                }
+            }
         } else {
             throw new Error(data.erro || "Erro ao carregar dados");
         }
@@ -168,6 +183,17 @@ async function carregarDadosUsuario(userId) {
             text: 'Erro ao carregar dados: ' + error.message
         });
     }
+}
+
+// NOVA FUNÇÃO PARA PREENCHER CAMPOS DE ENDEREÇO
+function preencherEnderecoFormulario(endereco) {
+    setValue('cep', endereco.CEP, 'name');
+    setValue('logradouro', endereco.Logradouro, 'name');
+    setValue('cidade', endereco.Cidade, 'name');
+    setValue('bairro', endereco.Bairro, 'name');
+    setValue('estado', endereco.Estado, 'name');
+    setValue('numero', endereco.Numero, 'name');
+    setValue('complemento', endereco.Complemento, 'name');
 }
 
 // FUNÇÃO PARA PREENCHER FORMULÁRIO
