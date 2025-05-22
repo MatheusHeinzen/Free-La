@@ -11,10 +11,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (data.servicosPedidos && data.servicosPedidos.length > 0) {
             data.servicosPedidos.forEach(servico => {
+                // Se não tem freelancer, marca como indisponível
+                const nomeServico = servico.ID_Freelancer === null || servico.ID_Freelancer === undefined
+                    ? `${servico.Nome} <span class="text-danger font-italic">- Indisponível*</span>`
+                    : servico.Nome;
                 pedidos.innerHTML += `
                         <li class="list-group-item">
                             <div class="service-item">
-                                <h5 class="service-title mb-2">${servico.Nome}</h5>
+                                <h5 class="service-title mb-2">${nomeServico}</h5>
                                 <p class="service-description mb-2">${servico.Descricao}</p>
                                 <div class="service-meta d-flex flex-wrap mb-3" style="gap: 20px">
                                     <small class="d-block">Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small> 
@@ -27,7 +31,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                             </div>
                         </li>
                     `;
-                // Adicionar botão para ver informações??
             });
         } else {
             pedidos.innerHTML = `

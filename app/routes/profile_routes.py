@@ -265,65 +265,111 @@ def obter_categorias():
 @profile.route('/salvar_bio_categoria', methods=['POST'])
 @login_required
 def salvar_bio_categoria():
-    conn = None
-    cursor = None
+    data = request.get_json()
+    user_id = data.get('user_id')
+    bio = data.get('bio')
+    categoria_id = data.get('categoria_id')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
     try:
-        dados = request.get_json()
-        user_id = dados.get('user_id')
-        bio = dados.get('bio')
-        categoria_id = dados.get('categoria_id')
+        # Atualiza bio
+        cursor.execute("UPDATE perfil SET Bio = %s WHERE ID_Usuario = %s", (bio, user_id))
 
-        if not user_id:
-            return jsonify({"sucesso": False, "erro": "ID do usuário não fornecido"}), 400
-
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        # Atualizar a bio na tabela Perfil
+        # Remove todas as categorias antigas do perfil
         cursor.execute("""
-            UPDATE perfil
-            SET Bio = %s
-            WHERE ID_Usuario = %s
-        """, (bio, user_id))
+            DELETE FROM perfil_categoria
+            WHERE ID_Perfil = (SELECT IdPerfil FROM perfil WHERE ID_Usuario = %s)
+        """, (user_id,))
 
-        # Atualizar ou inserir a categoria na tabela perfil_categoria
-        if categoria_id:
-            cursor.execute("""
-                INSERT INTO perfil_categoria (ID_Perfil, ID_Categoria)
-                VALUES ((SELECT IdPerfil FROM perfil WHERE ID_Usuario = %s), %s)
-                ON DUPLICATE KEY UPDATE ID_Categoria = VALUES(ID_Categoria)
-            """, (user_id, categoria_id))
+        # Adiciona a nova categoria (ou várias, se vier como lista)
+        id_perfil = None
+        cursor.execute("SELECT IdPerfil FROM perfil WHERE ID_Usuario = %s", (user_id,))
+        row = cursor.fetchone()
+        if row:
+            id_perfil = row[0]
+
+        if id_perfil:
+            # Permite múltiplas categorias se categoria_id for lista
+            if isinstance(categoria_id, list):
+                for cat_id in categoria_id:
+                    cursor.execute("""
+                        INSERT IGNORE INTO perfil_categoria (ID_Perfil, ID_Categoria) VALUES (%s, %s)
+                    """, (id_perfil, cat_id))
+            elif categoria_id:
+                cursor.execute("""
+                    INSERT IGNORE INTO perfil_categoria (ID_Perfil, ID_Categoria) VALUES (%s, %s)
+                """, (id_perfil, categoria_id))
 
         conn.commit()
-        return jsonify({"sucesso": True, "mensagem": "Bio e categoria atualizadas com sucesso!"}), 200
+        return jsonify({'sucesso': True, 'mensagem': 'Bio e categoria(s) atualizadas com sucesso!'})
     except Exception as e:
-        print(f"Erro ao salvar bio e categoria: {e}")
-        return jsonify({"sucesso": False, "erro": "Erro ao salvar bio e categoria"}), 500
+        conn.rollback()
+        print(f"Erro ao salvar bio/categoria: {e}")
+        return jsonify({'sucesso': False, 'erro': 'Erro ao salvar bio/categoria.'}), 500
     finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
+        cursor.close()
+        conn.close()
 
-@profile.route('/obter_perfil/<int:user_id>', methods=['GET'])
-@login_required
+@profile.route('/obter_perfil/<int:user_id>')
 def obter_perfil(user_id):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("""
-        SELECT u.Nome, p.Bio, c.NomeCategoria, 
-               IFNULL(p.MediaAvaliacoes, 0) AS MediaAvaliacoes, 
-               IFNULL(p.TotalAvaliacoes, 0) AS TotalAvaliacoes
-        FROM perfil p
-        JOIN usuario u ON p.ID_Usuario = u.ID_User
-        LEFT JOIN perfil_categoria pc ON pc.ID_Perfil = p.IdPerfil
-        LEFT JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
-        WHERE p.ID_Usuario = %s
-    """, (user_id,))
-    perfil = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return jsonify({"perfil": perfil, "sucesso": True})
+    try:
+        # Busca dados principais do perfil
+        cursor.execute("""
+            SELECT 
+                u.Nome, 
+                u.Email,
+                u.Telefone,
+                p.Bio, 
+                IFNULL(p.MediaAvaliacoes, 0) AS MediaAvaliacoes, 
+                IFNULL(p.TotalAvaliacoes, 0) AS TotalAvaliacoes
+            FROM perfil p
+            JOIN usuario u ON p.ID_Usuario = u.ID_User
+            WHERE p.ID_Usuario = %s
+            LIMIT 1
+        """, (user_id,))
+        perfil = cursor.fetchone()
+
+        # Busca até duas categorias
+        cursor.execute("""
+            SELECT c.NomeCategoria
+            FROM perfil_categoria pc
+            JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
+            WHERE pc.ID_Perfil = (SELECT IdPerfil FROM perfil WHERE ID_Usuario = %s)
+            LIMIT 2
+        """, (user_id,))
+        categorias = [row['NomeCategoria'] for row in cursor.fetchall()]
+
+        # Monta frase amigável para categoria
+        if categorias:
+            if len(categorias) == 1:
+                perfil['Categoria'] = categorias[0]
+            else:
+                perfil['Categoria'] = f"{categorias[0]} e {categorias[1]}"
+        else:
+            perfil['Categoria'] = 'Categoria não informada'
+
+        # Todas as habilidades (para o badge)
+        cursor.execute("""
+            SELECT c.NomeCategoria
+            FROM perfil_categoria pc
+            JOIN categoria c ON pc.ID_Categoria = c.ID_Categoria
+            WHERE pc.ID_Perfil = (SELECT IdPerfil FROM perfil WHERE ID_Usuario = %s)
+        """, (user_id,))
+        habilidades = [row['NomeCategoria'] for row in cursor.fetchall()]
+        perfil['Habilidades'] = habilidades
+
+        if perfil is None:
+            return jsonify({"sucesso": False, "erro": "Perfil não encontrado"}), 404
+        return jsonify({"perfil": perfil, "sucesso": True})
+    except Exception as e:
+        print(f"[ERRO obter_perfil] {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao obter perfil"}), 500
+    finally:
+        cursor.close()
+        conn.close()
 
 @profile.route('/api/perfis', methods=['GET'])
 def obter_perfis():

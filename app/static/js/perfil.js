@@ -382,7 +382,21 @@ async function carregarPerfil(userId) {
 
         const profissaoEl = document.getElementById('profissaoUsuario');
         if (profissaoEl) {
-            profissaoEl.textContent = perfil.NomeCategoria || 'Categoria não informada.';
+            // Mostra frase amigável com até duas categorias
+            profissaoEl.textContent = perfil.Categoria || 'Categoria não informada.';
+        }
+
+        // Atualiza as habilidades (badges)
+        const habilidadesContainer = document.getElementById('habilidadesContainer');
+        if (habilidadesContainer) {
+            habilidadesContainer.innerHTML = '';
+            if (perfil.Habilidades && perfil.Habilidades.length > 0) {
+                perfil.Habilidades.forEach(hab => {
+                    habilidadesContainer.innerHTML += `<span class="badge badge-dark badge-pill">${hab}</span> `;
+                });
+            } else {
+                habilidadesContainer.innerHTML = '<p>Sem habilidades cadastradas.</p>';
+            }
         }
     } catch (error) {
         console.error('Erro ao carregar perfil:', error);
