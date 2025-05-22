@@ -17,17 +17,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             data.servicosRecebidos.forEach(servico => {
                 recebidos.innerHTML += `
                     <li class="list-group-item">
-                        <strong>${servico.Nome}</strong>
-                        <p>${servico.Descricao}</p>
-                        <small>Categoria: ${renderCategoria(servico)}</small>
-                        <small>Status: ${servico.Status}</small>
-                        <div class="mt-2">
-                            <button class="btn btn-success btn-sm" onclick="concluirServico(${servico.ID_Service})">Concluir</button>
+                        <div class="service-item">
+                            <h5 class="service-title mb-2">${servico.Nome}</h5>
+                            <p class="service-description mb-2">${servico.Descricao}</p>
+                            <div class="service-meta d-flex flex-wrap mb-3" style="gap: 20px">
+                                <small>Categoria: ${renderCategoria(servico)}</small>
+                                <small>Status: ${servico.Status}</small>
+                            </div>
+                            <div class="mt-2">
+                                <button class="btn btn-success btn-sm" onclick="concluirServico(${servico.ID_Service})">Concluir</button>
+                            </div>
                         </div>
                     </li>`;
             });
         } else {
-            recebidos.innerHTML = '<li class="list-group-item">Nenhum serviço recebido encontrado.</li>';
+            recebidos.innerHTML = `
+            <li class="list-group-item py-3">
+                <i class="bi bi-exclamation-circle text-muted" style="font-size: 2rem;"></i>
+                Nenhum serviço requisitado encontrado.
+            </li>`;
         }
 
         // Serviços concluídos
@@ -36,16 +44,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 recebidosConcluidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
-                        <p>${servico.Descricao}</p>
-                        <small>Categoria: ${renderCategoria(servico)}</small>
-                        <small>Status: ${servico.Status}</small>
+                        <p class="mb-2" style="word-break: break-word">${servico.Descricao}</p>
+                        <small class="d-block">Categoria: ${renderCategoria(servico)}</small>
+                        <small class="d-block mb-2">Status: ${servico.Status}</small>
                         <div class="mt-2">
                             <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
                         </div>
                     </li>`;
             });
         } else if (recebidosConcluidos) {
-            recebidosConcluidos.innerHTML = '<li class="list-group-item">Nenhum serviço concluído encontrado.</li>';
+            recebidosConcluidos.innerHTML = `
+            <li class="list-group-item"> 
+                <i class="bi bi-check-circle text-muted mb-2" style="font-size: 2rem;"></i>
+                Nenhum serviço concluído encontrado.
+            </li>`;
         }
     } catch (error) {
         console.error('Erro ao carregar serviços:', error);
