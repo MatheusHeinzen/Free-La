@@ -1,8 +1,9 @@
-# Ambiente Virtual -> Bruna
+# Ambientes Virtuais
 /freela 
 /ambiente
 /venv
 # testes :P
-/templates/teste.html
-/get-ping.py
+/templates-tests
 __pycache__/
+get-pip.py
+/habilidades.json

@@ -1,10 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const usuario = await carregarUsuario();
-        const preferencias = await carregarPreferencias() || {
-            mostrarTelefone: true,
-            mostrarEmail: true
-        };
+        const preferencias = await carregarPreferencias();
 
         atualizarInterface(usuario, preferencias);
 
@@ -115,6 +112,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
 
                 if (!response.ok) throw new Error('Erro ao salvar bio e categoria');
+
+
+                const categoria = document.getElementById("categoria").value;
+                const descricao = document.getElementById("descricao").value;
+
+                try {
+                    await salvarPerfil(categoria, descricao);
+                    modal.style.display = "none"; // Fecha o modal após salvar
+                } catch (error) {
+                    console.error("Erro ao salvar perfil:", error);
+                };
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Bio e categoria atualizadas com sucesso!',
@@ -132,21 +141,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    const form = document.getElementById("editForm");
-    if (form) {
-        form.addEventListener("submit", async function (e) {
-            e.preventDefault();
-            const categoria = document.getElementById("categoria").value;
-            const descricao = document.getElementById("descricao").value;
-
-            try {
-                await salvarPerfil(categoria, descricao);
-                modal.style.display = "none"; // Fecha o modal após salvar
-            } catch (error) {
-                console.error("Erro ao salvar perfil:", error);
-            }
-        });
-    }
 });
 
 // Funções principais
@@ -159,31 +153,34 @@ async function carregarUsuario() {
 }
 
 async function carregarPreferencias() {
-    try {
-        const response = await fetch('/preferences/', { method: 'GET' });
-        if (!response.ok) throw new Error('Erro ao carregar preferências');
-
-        const data = await response.json();
-        if (data.sucesso) {
-            return data.preferencias; // Retorna as preferências do servidor
-        } else {
-            console.warn('Preferências não encontradas, usando padrão.');
-            return { mostrarTelefone: true, mostrarEmail: true }; // Valores padrão
-        }
-    } catch (error) {
-        console.error('Erro ao carregar preferências:', error);
-        return { mostrarTelefone: true, mostrarEmail: true }; // Valores padrão
+    // Busca preferências do usuário logado
+    const usuario = await carregarUsuario();
+    const response = await fetch(`/preferences/preference/${usuario.ID_User}`, { method: 'GET', credentials: 'include' });
+    if (!response.ok) {
+        // Sempre retorna padrão se não encontrar
+        return { mostrarTelefone: true, mostrarEmail: true };
     }
+    const data = await response.json();
+    // Corrige possíveis valores undefined/null/0/1 para boolean
+    if (data && data.preferencias) {
+        return {
+            mostrarTelefone: data.preferencias.mostrarTelefone === true || data.preferencias.mostrarTelefone === 1,
+            mostrarEmail: data.preferencias.mostrarEmail === true || data.preferencias.mostrarEmail === 1
+        };
+    }
+    return { mostrarTelefone: true, mostrarEmail: true };
 }
 
 async function atualizarPreferencias(userId, preferencias) {
     try {
-        const response = await fetch(`/preferences/${userId}`, {
+        const response = await fetch(`/preferences/preference/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ preferencias })
         });
         const data = await response.json();
+        console.log('Preferências recebidas:', preferencias);
+        console.log('Dados do usuário:', usuario);
         if (data.sucesso) {
             Swal.fire({
                 icon: 'success',
@@ -208,6 +205,9 @@ async function atualizarPreferencias(userId, preferencias) {
 }
 
 function atualizarInterface(usuario, preferencias) {
+
+    console.log('Dados do usuário:', usuario.Email, usuario.Telefone);
+
     const nomeEl = document.getElementById('nomeUsuario');
     const profissaoEl = document.getElementById('profissaoUsuario');
     const listaContatos = document.getElementById('listaContatos');
@@ -239,10 +239,20 @@ function atualizarInterface(usuario, preferencias) {
                     </div>
                 </li>`;
         }
+
+        // Se nenhum contato for mostrado, exibe mensagem
+        if (listaContatos.innerHTML === '') {
+            listaContatos.innerHTML = `
+                <li class="list-group-item">
+                    <div class="list-details">
+                        <span>Nenhum contato disponível</span>
+                    </div>
+                </li>`;
+        }
     }
 }
 
-// Atualizei a função para fechar o modal de preferências corretamente
+// Função para fechar o modal de preferências corretamente
 function mostrarModalContatos(preferencias) {
     const existente = document.getElementById("modalContatos");
     if (existente) existente.remove();
@@ -267,20 +277,34 @@ function mostrarModalContatos(preferencias) {
 
         try {
             await salvarPreferencias(novasPrefs);
-            document.getElementById('modalContatos').remove(); // Fecha o modal
-            location.reload(); // Recarrega a página para atualizar a interface
+            document.getElementById('modalContatos').remove();
+
+            // Recarrega as preferências e atualiza a interface
+            const usuario = await carregarUsuario();
+            const preferenciasAtualizadas = await carregarPreferencias();
+            atualizarInterface(usuario, preferenciasAtualizadas);
+
         } catch (error) {
             console.error("Erro ao salvar preferências:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao salvar preferências'
+            });
         }
-    });
-}
+    }
+    )
+};
+
 
 async function salvarPreferencias(preferencias) {
     try {
-        const response = await fetch('/preferences/', { 
+        const usuario = await carregarUsuario();
+        const response = await fetch(`/preferences/preference/${usuario.ID_User}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ preferencias }) // Enviar como objeto com chave 'preferencias'
+            credentials: 'include',
+            body: JSON.stringify({ preferencias })
         });
 
         if (!response.ok) {
@@ -288,15 +312,15 @@ async function salvarPreferencias(preferencias) {
             throw new Error(errorData.error || 'Falha ao salvar preferências');
         }
 
+        // Sempre recarrega as preferências do backend após salvar
+        const novasPreferencias = await carregarPreferencias();
+        atualizarInterface(await carregarUsuario(), novasPreferencias);
+
         Swal.fire({
             icon: 'success',
             title: 'Preferências salvas!',
             text: 'Suas preferências foram atualizadas com sucesso.'
         });
-
-        // Recarregar as preferências do backend e atualizar a interface
-        const novasPreferencias = await carregarPreferencias();
-        atualizarInterface(await carregarUsuario(), novasPreferencias);
     } catch (error) {
         console.error('Erro ao salvar preferências:', error);
         Swal.fire({
@@ -307,121 +331,24 @@ async function salvarPreferencias(preferencias) {
     }
 }
 
-// Habilidades
-async function carregarHabilidades() {
-    try {
-        const response = await fetch('/habilidades');
-        if (!response.ok) throw new Error('Erro ao carregar habilidades');
 
-        const habilidades = await response.json();
-        renderizarHabilidades(habilidades);
-    } catch (error) {
-        console.error('[perfil] erro ao carregar habilidades:', error);
-    }
-}
-
-function renderizarHabilidades(habilidades) {
-    const container = document.getElementById('checkboxContainer');
-    if (!container) return;
-
-    container.innerHTML = habilidades.map(hab => `
-        <label class="habilidade-item">
-            <input type="checkbox" value="${hab}">
-            ${hab}
-        </label>`).join('');
-}
-
-function mostrarOpcoesHabilidades() {
-    document.getElementById('showOpcoesHabilidades').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-    carregarHabilidades();
-}
-
-function fecharOpcoes() {
-    document.getElementById('showOpcoesHabilidades').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
-}
-
-async function adicionarHabilidade() {
-    const input = document.getElementById('novaHabilidade');
-    const habilidade = input.value.trim();
-
-    if (!habilidade) {
-        return Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Digite uma habilidade válida.'
-        });
+// Para aparecer as avaliações no perfil
+const lista = document.getElementById('lista-avaliacoes');
+function gerarEstrelasHTML(qtd) {
+      let html = '';
+      for (let i = 0; i < qtd; i++) {
+        html += '<i class="bi bi-star-fill text-warning"></i>';
+      }
+      for (let i = qtd; i < 5; i++) {
+        html += '<i class="bi bi-star text-secondary"></i>';
+      }
+      return html;
     }
 
-    try {
-        const response = await fetch('/habilidades/adicionar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ novaHabilidade: habilidade })
-        });
-
-        if (!response.ok) throw new Error('Erro ao adicionar habilidade');
-
-        input.value = '';
-        await carregarHabilidades();
-        Swal.fire({
-            icon: 'success',
-            title: 'Sucesso!',
-            text: 'Habilidade adicionada com sucesso!'
-        });
-    } catch (error) {
-        console.error('[perfil] erro ao adicionar habilidade:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Erro ao adicionar habilidade.'
-        });
-    }
-}
-
-function salvarHabilidades() {
-    const checkboxes = document.querySelectorAll('#checkboxContainer input[type="checkbox"]');
-    const botao = document.querySelector('.btn-primary');
-
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
-            botao.disabled = !Array.from(checkboxes).some(cb => cb.checked);
-        });
-    });
-}
 
 function formatarTelefone(telefone) {
     const nums = telefone.replace(/\D/g, '');
     return nums.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
-}
-
-// Deletar usuário
-function showPopUpDeletar() {
-    document.getElementById('pop-up-deletar').style.display = 'block';
-    document.getElementById('overlay').style.display = 'block';
-}
-
-function fecharPopUpDeletar() {
-    document.getElementById('pop-up-deletar').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
-}
-
-function confirmarDelecao() {
-    fetch('/DeletarUsuario', { method: 'DELETE' })
-        .then(response => response.json())
-        .then(data => {
-            if (data.sucesso) {
-                alert("Perfil deletado com sucesso.");
-                window.location.href = "/";
-            } else {
-                alert(data.erro || "Erro ao deletar.");
-            }
-        })
-        .catch(error => {
-            console.error("Erro:", error);
-            alert("Erro interno.");
-        });
 }
 
 function mostrarErroInput(input, mensagem) {
@@ -455,7 +382,21 @@ async function carregarPerfil(userId) {
 
         const profissaoEl = document.getElementById('profissaoUsuario');
         if (profissaoEl) {
-            profissaoEl.textContent = perfil.NomeCategoria || 'Categoria não informada.';
+            // Mostra frase amigável com até duas categorias
+            profissaoEl.textContent = perfil.Categoria || 'Categoria não informada.';
+        }
+
+        // Atualiza as habilidades (badges)
+        const habilidadesContainer = document.getElementById('habilidadesContainer');
+        if (habilidadesContainer) {
+            habilidadesContainer.innerHTML = '';
+            if (perfil.Habilidades && perfil.Habilidades.length > 0) {
+                perfil.Habilidades.forEach(hab => {
+                    habilidadesContainer.innerHTML += `<span class="badge badge-dark badge-pill">${hab}</span> `;
+                });
+            } else {
+                habilidadesContainer.innerHTML = '<p>Sem habilidades cadastradas.</p>';
+            }
         }
     } catch (error) {
         console.error('Erro ao carregar perfil:', error);
@@ -498,41 +439,6 @@ async function salvarPerfil(userId, dadosPerfil) {
     }
 }
 
-async function logout() {
-    try {
-        const response = await fetch('/auth/logout', { // Rota de logout no backend
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        const data = await response.json();
-        if (data.sucesso) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Logout realizado!',
-                text: data.mensagem,
-                timer: 2000
-                }).then(() => {
-                // Redireciona para a página inicial ou de login
-                window.location.href = "/";
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'Não foi possível encerrar a sessão. Tente novamente.'
-            });
-        }
-    } catch (error) {
-        console.error("Erro ao realizar logout:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Erro ao realizar logout. Tente novamente.'
-        });
-    }
-}
-
 // Para editar perfil
 document.addEventListener('DOMContentLoaded', function () {
 
@@ -568,15 +474,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     text: 'Não foi possível atualizar o seu perfil! Por favor, Tente novamente.'
                 });
             }
-                
-            } catch (error) {
-                console.error("Erro ao enviar imagem:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Erro!',
-                    text: 'Erro ao enviar imagem! Tente novamente.'
-        });
-        
+
+        } catch (error) {
+            console.error("Erro ao enviar imagem:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: 'Erro ao enviar imagem! Tente novamente.'
+            });
+
         }
     });
 
@@ -619,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 title: 'Erro!',
                 text: 'Erro ao salvar alterações! Tente novamente.'
             });
-            }
+        }
     });
 
 });
@@ -664,9 +570,9 @@ async function carregarCategorias() {
     }
 }
 
+// Deletar usuário
 function showPopUpDeletar() {
     document.getElementById('pop-up-deletar').style.display = 'block';
-    // document.getElementById("")
     document.getElementById('overlay').style.display = 'block';
 }
 
@@ -676,8 +582,12 @@ function fecharPopUpDeletar() {
 }
 
 function confirmarDelecao() {
-    fetch('/DeletarUsuario', {
-        method: 'DELETE'
+    fetch('user/deletarUsuario', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include'
     })
         .then(response => response.json())
         .then(data => {

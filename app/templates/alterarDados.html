@@ -23,7 +23,7 @@
 
         @media screen and (max-width: 768px) {
             body {
-                margin: 20px;
+                margin: 0px;
             }
 
         }
@@ -62,6 +62,9 @@
 </head>
 
 <body>
+    {% if not session.user_id %}
+    <script>window.location.href = "/";</script>
+    {% endif %}
     <header>
         <div class="container">
             <!-- Para celulares -->
@@ -70,8 +73,7 @@
                     <i class="bi bi-list"></i>
                 </div>
                 <ul>
-                    <span class="icon"><img src="/static/imgs/perfil.png" width="140px"
-                            style="margin-left: 20px;"></span>
+                    <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar" style="margin-left: 1rem;">
                     <li class="item_menu">
                         <a href="/perfil">
                             <span class="icon"></span>
@@ -160,8 +162,9 @@
         </nav>
     </header>
     <main>
-        <div class="tab-pane" id="edit">
+        <div class="tab-pane container" id="edit">
             <form id="form-edicao">
+                <input type="hidden" id="userId" value="{{ session.user_id }}">
                 <!-- Dados Básicos -->
                 <div class="form-group row">
                     <label class="col-lg-3 col-form-label form-control-label">Nome Completo</label>
@@ -262,9 +265,15 @@
             $('#cpf').mask('000.000.000-00');
             $('#cep').mask('00000-000');
         });
+          function toggleSubmenu(event) {
+            event.preventDefault();
+            const item = event.currentTarget.closest('.has-submenu');
+            item.classList.toggle('active');
+        }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 </body>
 
 </html>
+``` 

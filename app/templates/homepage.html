@@ -22,23 +22,41 @@
           <i class="bi bi-list"></i>
         </div>
         <ul>
-          <span class="icon"><img src="/static/imgs/perfil.png" width="140px" style="margin-left: 20px;"></span>
+          {% if session.user_id %}
+          <img src="/profile/imagem/{{ session.user_id }}" class="img_sidebar" alt="Perfil" width="140px"
+            style="margin-left: 1rem;">
+          {% else %}
+          <img src="../static/imgs/perfil.png" alt="nenhum usuario logado" width="140px">
+          {% endif %}
           <li class="item_menu">
             <a href="/perfil">
               <span class="icon"></span>
               <span class="link">Perfil</span>
             </a>
           </li>
+          {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
+          {% if tipo_usuario == 'cliente' %}
           <li class="item_menu">
-            <a href="/perfilPublico/1">
+            <a href="/alterarDados" >
               <span class="icon"><i class="#"></i></span>
-              <span class="link">Sobre</span>
+              <span class="link">Tornar-se Freelancer</span>
             </a>
           </li>
+          {% endif %}
+
+          {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
+          {% if tipo_usuario == 'freelancer' %}
           <li class="item_menu">
-            <a href="#">
+            <a href="/servicos_freelancer">
               <span class="icon"><i class="#"></i></span>
-              <span class="link">Contato</span>
+              <span class="link">Meus Serviços</span>
+            </a>
+          </li>
+          {% endif %}
+          <li class="item_menu">
+            <a href="/servicos_cliente">
+              <span class="icon"><i class="#"></i></span>
+              <span class="link">Serviços Pedidos</span>
             </a>
           </li>
           <li class="item_menu has-submenu">
@@ -102,8 +120,13 @@
             Login
           </a>
           {% endif %}
-          <a href="/perfilPublico/1" class="phone-hidden">Sobre</a>
-          <a href="#" class="phone-hidden">Contato</a>
+          {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
+          {% if tipo_usuario == 'freelancer' %}
+          <a href="/servicos_freelancer" class="phone-hidden">Meus Serviços</a>
+          {% else %}
+          <a href="/alterarDados" class="phone-hidden">Torne-se Freelancer</a>
+          {% endif %}
+          <a href="/servicos_cliente" class="phone-hidden">Serviços Pedidos</a>
           <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">Configurações</a>
           <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
@@ -133,40 +156,120 @@
           ajuda, aqui você encontra profissionais qualificados e serviços sob medida para suas necessidades. Com um
           sistema intuitivo e seguro, o Free'la facilita negociações e entrega de trabalhos, garantindo agilidade e
           qualidade para todos. Encontre, contrate e colabore com os melhores do mercado em um só lugar!</p>
-        <input class="pesquisa" type="text" placeholder="Pesquise aqui!" id="campo-pesquisa">
-        <button class="pesquisar_btn" onclick="pesquisar()">
-          <img src="/static/imgs/pesquisa-de-lupa.png" width="20px">
-        </button>
+        <div class="d-flex justify-content-center align-items-center" id="grid">
+          <div>
+            <input class="pesquisa" type="text" placeholder="Pesquise por nome ou descrição..." id="campo-pesquisa">
+          </div>
+          <div>
+            <select id="categoriaDropdown" class="form-control mx-2" style="width: 200px;">
+              <option value="">Todas as categorias</option>
+              <!-- As opções serão preenchidas dinamicamente -->
+            </select>
+          </div>
+          <button class="pesquisar_btn" onclick="pesquisar()">
+            <img src="/static/imgs/pesquisa-de-lupa.png" width="20px">
+          </button>
+        </div>
       </div>
     </section>
 
     <!-- Seção de Perfis Ativos -->
     <section>
-      <h2>Perfis Ativos</h2>
       <div class="perfil-lista">
         {% for perfil in perfis %}
         <div class="perfil-card">
+          <img src="/profile/imagem/{{ perfil.ID_User }}" alt="Foto de Perfil" width="100" height="100">
           <h3>{{ perfil.Nome }}</h3>
           <p><strong>Categoria:</strong> {{ perfil.NomeCategoria or 'Não informado' }}</p>
           <p><strong>Bio:</strong> {{ perfil.Bio or 'Sem descrição' }}</p>
-          <a href="/perfil/{{ perfil.ID_User }}">Ver Perfil</a>
+          <div>
+            {% if perfil.TotalAvaliacoes > 0 %}
+              {% set media = perfil.MediaAvaliacoes|float %}
+              {% for i in range(1,6) %}
+                {% if i <= media|round(0, 'half_even') %}
+                  <i class="bi bi-star-fill text-warning"></i>
+                {% else %}
+                  <i class="bi bi-star text-secondary"></i>
+                {% endif %}
+              {% endfor %}
+              <span class="ml-2">{{ "%.2f"|format(perfil.MediaAvaliacoes) }}/5.0</span>
+              <span class="text-muted" style="font-size:0.95em">
+                ({{ perfil.TotalAvaliacoes }} {{ 'avaliação' if perfil.TotalAvaliacoes == 1 else 'avaliações' }})
+              </span>
+            {% else %}
+              <span class="text-muted" style="font-size:0.95em">Sem avaliações</span>
+            {% endif %}
+          </div>
+          <a href="/perfilPublico/{{ perfil.ID_User }}">Ver Perfil</a>
         </div>
         {% endfor %}
       </div>
     </section>
 
-    <!-- Seção de Resultados -->
-     
+    <!-- Seção de Resultados da Pesquisa -->
+    <section>
+      <div class="container" style="margin-top: 30px;">
+        <h2>Freelancers:</h2>
+      </div>
+      <div id="freelancersContainer" class="container mt-4">
+        <!-- Freelancers serão carregados dinamicamente aqui -->
+      </div>
+    </section>
+
+    <!-- Seção CarregarFreelancer() -->
     <div class="album py-5 bg-light">
       <div class="container">
-        <div class="row" id="perfis-container">
+        <div class="row mt-4" id="perfis-container">
           <!-- Os cards serão gerados aqui via JavaScript -->
         </div>
       </div>
     </div>
-
-
   </main>
+
+  <footer class="container py-5">
+    <div class="row">
+      <div class="col-12 col-md">
+          <img src="../static/imgs/free'la.png" alt="logo" width="100px" class="mb-2">
+          <small class="d-block mb-3 text-muted">&copy; 2025</small>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Features</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Projeto Desenvolvido</a></li>
+          <li><a class="text-muted" href="#">Para matéria de</a></li>
+          <li><a class="text-muted" href="#">Experiência Criativa</a></li>
+          <li><a class="text-muted" href="#">Terceiro Semestre</a></li>
+          <li><a class="text-muted" href="#">PUCPR</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Instrução</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Com o apoio de:</a></li>
+          <li><a class="text-muted" href="#">Cristina Verçosa</a></li>
+          <li><a class="text-muted" href="#">Geucimar Briatore</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Fontes</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Bruna da Silva</a></li>
+          <li><a class="text-muted" href="#">Edmund Soares</a></li>
+          <li><a class="text-muted" href="#">Matheus Heinzen</a></li>
+          <li><a class="text-muted" href="#">Vinicius Lima</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-md">
+        <h5>Sobre</h5>
+        <ul class="list-unstyled text-small">
+          <li><a class="text-muted" href="#">Equipe</a></li>
+          <li><a class="text-muted" href="#">Documentação</a></li>
+          <li><a class="text-muted" href="/termos">Termos</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
 </body>
 <script>
   function toggleSubmenu(event) {
@@ -174,6 +277,57 @@
     const item = event.currentTarget.closest('.has-submenu');
     item.classList.toggle('active');
   }
+
+  // Exibe/oculta "Meus Serviços" conforme tipo do usuário na sessão (via JS)
+  document.addEventListener('DOMContentLoaded', function () {
+    // O valor é sempre injetado como string pelo Jinja2, nunca precisa de if/elif JS
+    var tipoUsuario = "{{ session['TipoUsuario'] if session and session.get('TipoUsuario') else '' }}";
+    // DEBUG: Mostra o valor no console para depuração
+    console.log('TipoUsuario da sessão:', tipoUsuario, typeof tipoUsuario);
+
+    // Menu lateral (mobile)
+    var meusServicosMenu = document.querySelectorAll('a[href="/servicos_freelancer"]');
+    meusServicosMenu.forEach(function(link) {
+      if (tipoUsuario.trim().toLowerCase() !== 'freelancer') {
+        link.parentElement.style.display = 'none';
+      } else {
+        link.parentElement.style.display = '';
+      }
+    });
+
+    // Menu desktop
+    var menuDesktop = document.querySelector('.desktop-version');
+    if (menuDesktop) {
+      var meusServicosDesktop = menuDesktop.querySelector('a[href="/servicos_freelancer"]');
+      var torneSeFreelancer = menuDesktop.querySelector('a[href="/alterarDados"].phone-hidden');
+      if (tipoUsuario.trim().toLowerCase() === 'freelancer') {
+        if (meusServicosDesktop) meusServicosDesktop.style.display = '';
+        if (torneSeFreelancer) torneSeFreelancer.style.display = 'none';
+      } else {
+        if (meusServicosDesktop) meusServicosDesktop.style.display = 'none';
+        if (torneSeFreelancer) torneSeFreelancer.style.display = '';
+      }
+    }
+
+    // Carregar categorias no dropdown ao abrir a página
+    fetch('/category')
+      .then(res => res.json())
+      .then(data => {
+        const select = document.getElementById('categoriaDropdown');
+        if (select && data.sucesso && Array.isArray(data.categorias)) {
+          select.innerHTML = '<option value="">Todas as categorias</option>';
+          data.categorias.forEach(cat => {
+            select.innerHTML += `<option value="${cat.NomeCategoria}">${cat.NomeCategoria}</option>`;
+          });
+        }
+      });
+
+    // Pesquisa ao mudar categoria
+    const categoriaDropdown = document.getElementById('categoriaDropdown');
+    if (categoriaDropdown) {
+      categoriaDropdown.addEventListener('change', pesquisar);
+    }
+  });
 </script>
 <script src="{{ url_for('static', filename='js/homepage.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>

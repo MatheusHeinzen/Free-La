@@ -78,6 +78,8 @@ CREATE TABLE perfil (
     Foto LONGBLOB,
     Bio TEXT,
     ID_Usuario INT NOT NULL UNIQUE,
+    MediaAvaliacoes DECIMAL(3,2) DEFAULT NULL,
+    TotalAvaliacoes INT DEFAULT 0,
     DataAtualizacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (ID_Usuario) REFERENCES usuario(ID_User)
         ON DELETE CASCADE
@@ -95,14 +97,19 @@ CREATE TABLE service (
     Descricao TEXT NOT NULL,
     DataCriacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     Status ENUM('disponivel', 'em_andamento', 'concluido', 'cancelado', 'pausado') NOT NULL DEFAULT 'disponivel',
-    ID_Usuario INT NOT NULL,
+    ID_Cliente INT NOT NULL,
+    ID_Freelancer INT,
     DataConclusao DATETIME,
-    FOREIGN KEY (ID_Usuario) REFERENCES usuario(ID_User)
+    FOREIGN KEY (ID_Cliente) REFERENCES usuario(ID_User)
         ON DELETE CASCADE  
+        ON UPDATE CASCADE,
+    FOREIGN KEY (ID_Freelancer) REFERENCES usuario(ID_User)
+        ON DELETE SET NULL  
         ON UPDATE CASCADE,
     CONSTRAINT chk_nome_service_valido CHECK (LENGTH(NomeService) >= 5),
     CONSTRAINT chk_data_conclusao_valida CHECK (DataConclusao IS NULL OR DataConclusao >= DataCriacao)
 );
+
 
 -- =============================================
 -- Tabela: perfil_categoria
@@ -144,22 +151,19 @@ CREATE TABLE service_categoria (
 -- =============================================
 CREATE TABLE avaliacao (
     ID_Avaliacao INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Cliente INT,
-    ID_Freelancer INT,
+    ID_Service INT NOT NULL,
+    ID_Avaliador INT NOT NULL,  -- Quem está fazendo a avaliação (pode ser cliente ou freelancer)
+    TipoAvaliador ENUM('cliente', 'freelancer') NOT NULL,  -- Tipo de quem está avaliando
     Nota TINYINT NOT NULL,
     Comentario TEXT,
     DataAvaliacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    Resposta TEXT,
-    DataResposta DATETIME,
-    FOREIGN KEY (ID_Cliente) REFERENCES usuario(ID_User)
-        ON DELETE SET NULL 
+    FOREIGN KEY (ID_Service) REFERENCES service(ID_Service)
+        ON DELETE CASCADE 
         ON UPDATE CASCADE,
-    FOREIGN KEY (ID_Freelancer) REFERENCES usuario(ID_User)
-        ON DELETE SET NULL  -- Alterado de RESTRICT para SET NULL
+    FOREIGN KEY (ID_Avaliador) REFERENCES usuario(ID_User)
+        ON DELETE CASCADE
         ON UPDATE CASCADE,
-    CONSTRAINT chk_nota_valida CHECK (Nota BETWEEN 1 AND 5),
-    CONSTRAINT uc_avaliacao_unica UNIQUE (ID_Cliente),
-    CONSTRAINT chk_data_resposta_valida CHECK (DataResposta IS NULL OR DataResposta >= DataAvaliacao)
+    CONSTRAINT chk_nota_valida CHECK (Nota BETWEEN 1 AND 5)
 );
 
 -- =============================================
@@ -178,19 +182,103 @@ END//
 DELIMITER ;
 
 -- =============================================
+-- Trigger para atualizar a média de avaliações
+-- sempre que uma nova avaliação for inserida
+-- =============================================
+DELIMITER //
+CREATE TRIGGER atualizar_media_avaliacoes
+AFTER INSERT ON avaliacao
+FOR EACH ROW
+BEGIN
+	DECLARE freelancer_id INT;
+    IF NEW.TipoAvaliador = 'cliente' THEN
+        SELECT ID_Freelancer INTO freelancer_id FROM service WHERE ID_Service = NEW.ID_Service;
+        IF freelancer_id IS NOT NULL THEN
+            UPDATE perfil p
+            SET 
+                p.MediaAvaliacoes = (
+                    SELECT AVG(a.Nota) 
+                    FROM avaliacao a
+                    JOIN service s ON a.ID_Service = s.ID_Service
+                    WHERE s.ID_Freelancer = freelancer_id AND a.TipoAvaliador = 'cliente'
+                ),
+                p.TotalAvaliacoes = (
+                    SELECT COUNT(*) 
+                    FROM avaliacao a
+                    JOIN service s ON a.ID_Service = s.ID_Service
+                    WHERE s.ID_Freelancer = freelancer_id AND a.TipoAvaliador = 'cliente'
+                )
+            WHERE p.ID_Usuario = freelancer_id;
+        END IF;
+    END IF;
+END//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER atualizar_media_avaliacoes_update
+AFTER UPDATE ON avaliacao
+FOR EACH ROW
+BEGIN
+    DECLARE freelancer_id INT;
+    IF NEW.TipoAvaliador = 'cliente' OR OLD.TipoAvaliador = 'cliente' THEN
+        SELECT ID_Freelancer INTO freelancer_id FROM service WHERE ID_Service = NEW.ID_Service;
+        IF freelancer_id IS NOT NULL THEN
+            UPDATE perfil p
+            SET 
+                p.MediaAvaliacoes = (
+                    SELECT AVG(a.Nota) 
+                    FROM avaliacao a
+                    JOIN service s ON a.ID_Service = s.ID_Service
+                    WHERE s.ID_Freelancer = freelancer_id AND a.TipoAvaliador = 'cliente'
+                ),
+                p.TotalAvaliacoes = (
+                    SELECT COUNT(*) 
+                    FROM avaliacao a
+                    JOIN service s ON a.ID_Service = s.ID_Service
+                    WHERE s.ID_Freelancer = freelancer_id AND a.TipoAvaliador = 'cliente'
+                )
+            WHERE p.ID_Usuario = freelancer_id;
+        END IF;
+    END IF;
+END//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER atualizar_media_avaliacoes_delete
+AFTER DELETE ON avaliacao
+FOR EACH ROW
+BEGIN
+    DECLARE freelancer_id INT;
+    IF OLD.TipoAvaliador = 'cliente' THEN
+        SELECT ID_Freelancer INTO freelancer_id FROM service WHERE ID_Service = OLD.ID_Service;
+        IF freelancer_id IS NOT NULL THEN
+            UPDATE perfil p
+            SET 
+                p.MediaAvaliacoes = (
+                    SELECT AVG(a.Nota) 
+                    FROM avaliacao a
+                    JOIN service s ON a.ID_Service = s.ID_Service
+                    WHERE s.ID_Freelancer = freelancer_id AND a.TipoAvaliador = 'cliente'
+                ),
+                p.TotalAvaliacoes = (
+                    SELECT COUNT(*) 
+                    FROM avaliacao a
+                    JOIN service s ON a.ID_Service = s.ID_Service
+                    WHERE s.ID_Freelancer = freelancer_id AND a.TipoAvaliador = 'cliente'
+                )
+            WHERE p.ID_Usuario = freelancer_id;
+        END IF;
+    END IF;
+END//
+DELIMITER ;
+
+-- =============================================
 -- Inserts iniciais para teste
 -- =============================================
 
 INSERT INTO categoria (NomeCategoria) VALUES 
-("Desenvolvimento WEB"), ("Jardinagem"), ("Eletrica"), ("Mecânica"), ("Limpeza"), ("Fotografia"), ("Design");
+("Desenvolvimento WEB"), ("Jardinagem"), ("Eletrica"), ("Mecânica"), ("Limpeza"), ("Fotografia"), ("Design"), ("Desenvolvimento de Jogos"), ("Marketing Digital"), ("Redação"), ("Tradução"), ("Consultoria"), ("Educação"), ("Saúde e Bem-estar");
 
-
--- INSERT INTO usuario (CPF, Nome, Email, Senha, DataNascimento)
--- VALUES
--- ('123.456.789-00', 'Ana Souza', 'ana.souza@email.com', 'Senha@1234', '1995-04-20'),
--- ('987.654.321-11', 'Bruno Lima', 'bruno.lima@email.com', 'Senha@4321', '1988-10-10'),
--- ('111.222.555-44', 'Beatriz Soares', 'soares.beatriz@email.com', 'Senha@789012', '2000-06-15'),
--- ('111.222.333-44', 'Carla Mendes', 'carla.mendes@email.com', 'Senha@789012', '2000-06-15');
 
 -- Verificação dos dados inseridos
 SELECT * FROM Usuario;
@@ -200,3 +288,4 @@ SELECT * FROM perfil;
 SELECT * FROM avaliacao;
 SELECT * FROM categoria;
 SELECT * FROM perfil_categoria;
+SELECT * FROM service;

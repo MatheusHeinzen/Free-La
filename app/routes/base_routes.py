@@ -25,3 +25,11 @@ def termos():
 @base_bp.route('/perfilPublico/<int:user_id>')
 def perfil_publico(user_id):
     return render_template('perfil_publico.html', user_id=user_id)
+
+@base_bp.route('/requisitarServico/<int:freelancer_id>')
+def requisitar_servicos(freelancer_id):
+    return render_template('requisitar_servico.html', freelancer_id=freelancer_id)
+
+@base_bp.route('/servicos_cliente')
+def servicos_cliente():
+    return render_template('servicos_cliente.html')

@@ -1,31 +1,30 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.querySelector(".menu_lateral");
     const toggleButton = document.getElementById("toggleSidebar");
 
-    toggleButton.addEventListener("click", function(event) {
+    toggleButton.addEventListener("click", function (event) {
         sidebar.classList.toggle("ativo");
-        event.stopPropagation(); 
+        event.stopPropagation();
     });
 
-    document.addEventListener("click", function(event) {
+    document.addEventListener("click", function (event) {
         if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
             sidebar.classList.remove("ativo");
         }
     });
     console.log('[DADOS] Página carregada - Iniciando script');
-    
+
     // Configura máscaras
     $("#telefone").mask("(00) 00000-0000");
     $("#cpf").mask("000.000.000-00");
     $("#cep").mask("00000-000");
 
     // Verifica se o usuário está logado
-    const userId = localStorage.getItem('userId');
-    console.log('[DADOS] ID do usuário no localStorage:', userId);
-    
+    const userId = document.getElementById('userId').value;
+    console.log('[DADOS] ID do usuário logado:', userId);
+
     if (!userId || isNaN(userId)) {
         console.error('[DADOS ERRO] ID de usuário inválido ou não encontrado');
-        //alert('Sessão expirada ou inválida. Redirecionando para login...');
         window.location.href = '/';
         return;
     }
@@ -33,8 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configura o switch Freelancer/Cliente
     const tipoUsuarioSwitch = document.getElementById('tipoUsuarioSwitch');
     if (tipoUsuarioSwitch) {
-        tipoUsuarioSwitch.addEventListener('change', function() {
-            document.getElementById('tipoUsuarioLabel').textContent = 
+        tipoUsuarioSwitch.addEventListener('change', function () {
+            document.getElementById('tipoUsuarioLabel').textContent =
                 this.checked ? 'Freelancer' : 'Cliente';
         });
     }
@@ -45,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configura o envio do formulário
     const form = document.getElementById('form-edicao');
     if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
             atualizarDadosUsuario(userId);
         });
@@ -60,21 +59,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Botão cancelar
     const btnCancelar = document.getElementById('btnCancelar');
     if (btnCancelar) {
-        btnCancelar.addEventListener('click', function() {
-        try{
-            Swal.fire({
-                icon: 'error',
-                title: 'Cancelar Alterações',
-                text: "Você está sendo redirecionado para a Homepage...",
-                timer: 2000,
-                showConfirmButton: true
-            }).then(() => {
-                window.location.href = "/homepage";
-            });
-        } catch {
-            throw new Error(data.erro || "Erro");
-        }
-    });
+        btnCancelar.addEventListener('click', function () {
+            try {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Cancelar Alterações',
+                    text: "Você está sendo redirecionado para a Homepage...",
+                    timer: 2000,
+                    showConfirmButton: true
+                }).then(() => {
+                    window.location.href = "/homepage";
+                });
+            } catch {
+                throw new Error(data.erro || "Erro");
+            }
+        });
     }
 });
 
@@ -116,6 +115,8 @@ async function atualizarDadosUsuario(userId) {
 
         const data = await response.json();
         if (data.sucesso) {
+            // Após atualizar, recarrega tudo (inclusive endereço)
+            await carregarDadosUsuario(userId);
             Swal.fire({
                 icon: 'success',
                 title: 'Atualização bem sucedida',
@@ -141,9 +142,9 @@ async function atualizarDadosUsuario(userId) {
 // FUNÇÃO PARA CARREGAR DADOS DO USUÁRIO
 async function carregarDadosUsuario(userId) {
     console.log('[DADOS] Carregando dados do usuário ID:', userId);
-    
+
     try {
-        const response = await fetch(`/user/${userId}`, { 
+        const response = await fetch(`/user/${userId}`, {
             method: 'GET'
         });
 
@@ -157,6 +158,21 @@ async function carregarDadosUsuario(userId) {
 
         if (data.sucesso) {
             preencherFormulario(data.usuario);
+
+            // Busca endereço atualizado se ID_Endereco existir
+            if (data.usuario.ID_Endereco) {
+                try {
+                    const enderecoResp = await fetch(`/user/endereco/${data.usuario.ID_Endereco}`);
+                    if (enderecoResp.ok) {
+                        const enderecoData = await enderecoResp.json();
+                        if (enderecoData.sucesso && enderecoData.endereco) {
+                            preencherEnderecoFormulario(enderecoData.endereco);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('[DADOS] Não foi possível buscar endereço detalhado:', e);
+                }
+            }
         } else {
             throw new Error(data.erro || "Erro ao carregar dados");
         }
@@ -169,10 +185,21 @@ async function carregarDadosUsuario(userId) {
     }
 }
 
+// NOVA FUNÇÃO PARA PREENCHER CAMPOS DE ENDEREÇO
+function preencherEnderecoFormulario(endereco) {
+    setValue('cep', endereco.CEP, 'name');
+    setValue('logradouro', endereco.Logradouro, 'name');
+    setValue('cidade', endereco.Cidade, 'name');
+    setValue('bairro', endereco.Bairro, 'name');
+    setValue('estado', endereco.Estado, 'name');
+    setValue('numero', endereco.Numero, 'name');
+    setValue('complemento', endereco.Complemento, 'name');
+}
+
 // FUNÇÃO PARA PREENCHER FORMULÁRIO
 function preencherFormulario(usuario) {
     console.log('[DADOS] Preenchendo formulário com dados do usuário');
-    
+
     // Dados básicos
     setValue('nome', usuario.Nome);
     setValue('email', usuario.Email);
@@ -184,7 +211,7 @@ function preencherFormulario(usuario) {
     if (tipoUsuarioSwitch) {
         const isFreelancer = usuario.TipoUsuario === 'freelancer';
         tipoUsuarioSwitch.checked = isFreelancer;
-        document.getElementById('tipoUsuarioLabel').textContent = 
+        document.getElementById('tipoUsuarioLabel').textContent =
             isFreelancer ? 'Freelancer' : 'Cliente';
     }
 
@@ -203,10 +230,10 @@ function preencherFormulario(usuario) {
 
 // FUNÇÃO AUXILIAR PARA PREENCHER CAMPOS
 function setValue(elementId, value, attribute = 'id') {
-    const element = attribute === 'id' 
+    const element = attribute === 'id'
         ? document.getElementById(elementId)
         : document.querySelector(`input[${attribute}="${elementId}"]`);
-    
+
     if (element) {
         element.value = value || '';
     } else {
@@ -219,9 +246,9 @@ async function buscarCEP(event) {
     const cepInput = event.target;
     const cep = cepInput.value.replace(/\D/g, "");
     const cepError = document.getElementById('cep-error');
-    
+
     console.log('[CEP] Buscando endereço para CEP:', cep);
-    
+
     if (cep.length !== 8) {
         cepError.style.display = 'block';
         cepError.textContent = 'CEP inválido! Deve conter 8 dígitos.';
@@ -272,7 +299,7 @@ function validarCPF(cpf) {
 function validarTelefone(telefone) {
     telefone = telefone.replace(/\D/g, '');
     if (!(telefone.length === 10 || telefone.length === 11)) return false;
-    
+
     const dddValido = /^[1-9][0-9]/.test(telefone.substring(0, 2));
     const celularValido = telefone.length === 11 ? telefone[2] === '9' : true;
 
@@ -320,7 +347,7 @@ function validarDadosAtualizacao(dados, tentandoVirarFreelancer) {
 
     if (tentandoVirarFreelancer) {
         const endereco = dados.endereco;
-        if (!endereco.CEP || !endereco.Logradouro || !endereco.Cidade || 
+        if (!endereco.CEP || !endereco.Logradouro || !endereco.Cidade ||
             !endereco.Bairro || !endereco.Estado || !endereco.Numero) {
             Swal.fire({
                 icon: 'error',
@@ -396,8 +423,12 @@ function fecharPopUpDeletar() {
 }
 
 function confirmarDelecao() {
-    fetch('/DeletarUsuario', {
-        method: 'DELETE'
+    fetch('user/deletarUsuario', {
+    method: 'DELETE',
+    headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include' 
     })
         .then(response => response.json())
         .then(data => {
@@ -466,7 +497,6 @@ async function logout() {
         });
     }
 }
-
 
 let inatividadeTimer;
 

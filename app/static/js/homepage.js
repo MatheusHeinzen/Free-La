@@ -15,84 +15,210 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
 //Função para exibir todos os freelancers ao carregar a página
-function exibirTodosFreelancers() {
-    let section = document.getElementById("resultados-pesquisa");
-    section.innerHTML = "";
+async function exibirTodosFreelancers() {
+    try {
+        const response = await fetch('/search/buscarFreelancers');
+        if (!response.ok) throw new Error('Erro ao carregar freelancers');
+        const data = await response.json();
 
-    trabalhosFreelancers.forEach(dado => {
-        section.innerHTML += `
-            <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <img class="card-img-top" src="${dado.imagem}" alt="${dado.nome}">
-                    <div class="card-body">
-                        <h5 class="card-title">${dado.nome}</h5>
-                        <p class="card-text"><strong>${dado.especialidade}</strong></p>
-                        <p class="card-text">${dado.descricao}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="btn-group">
-                                <a href="${dado.link}" class="btn btn-sm btn-outline-secondary">Ver Perfil</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-}
+        const container = document.getElementById('freelancersContainer');
+        container.innerHTML = '';
 
-//Função para pesquisar freelancers
-function pesquisar() {
-    let section = document.getElementById("resultados-pesquisa");
-    let campoPesquisa = document.getElementById("campo-pesquisa").value.toLowerCase();
-    let resultados = "";
+        if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
+            // Ordena por avaliação média (desc), depois total avaliações (desc), depois ID_User (desc)
+            data.freelancers.sort((a, b) => {
+                const ma = Number(a.MediaAvaliacoes) || 0;
+                const mb = Number(b.MediaAvaliacoes) || 0;
+                const ta = Number(a.TotalAvaliacoes) || 0;
+                const tb = Number(b.TotalAvaliacoes) || 0;
+                if (tb > 0 || ta > 0) {
+                    if (mb !== ma) return mb - ma;
+                    if (tb !== ta) return tb - ta;
+                }
+                return (b.ID_User || 0) - (a.ID_User || 0);
+            });
 
-    if (!campoPesquisa) {
-        exibirTodosFreelancers();
-        return;
-    }
+            // Para cada freelancer, busca a média de avaliações via AJAX (garante dados atualizados)
+            await Promise.all(data.freelancers.map(async (freelancer) => {
+                try {
+                    const resp = await fetch(`/profile/obter_perfil/${freelancer.ID_User}`);
+                    if (resp.ok) {
+                        const { perfil } = await resp.json();
+                        if (perfil) {
+                            freelancer.MediaAvaliacoes = perfil.MediaAvaliacoes;
+                            freelancer.TotalAvaliacoes = perfil.TotalAvaliacoes;
+                        }
+                    }
+                } catch (e) {
+                    // Se der erro, mantém os dados originais
+                }
+            }));
 
-    //Filtra os freelancers pelo termo de pesquisa
-    trabalhosFreelancers.forEach(dado => {
-        if (
-            dado.nome.toLowerCase().includes(campoPesquisa) ||
-            dado.especialidade.toLowerCase().includes(campoPesquisa) ||
-            dado.descricao.toLowerCase().includes(campoPesquisa)
-        ) {
-            resultados += `
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <img class="card-img-top" src="${dado.imagem}" alt="${dado.nome}">
+            // Reordena após atualizar médias
+            data.freelancers.sort((a, b) => {
+                const ma = Number(a.MediaAvaliacoes) || 0;
+                const mb = Number(b.MediaAvaliacoes) || 0;
+                const ta = Number(a.TotalAvaliacoes) || 0;
+                const tb = Number(b.TotalAvaliacoes) || 0;
+                if (tb > 0 || ta > 0) {
+                    if (mb !== ma) return mb - ma;
+                    if (tb !== ta) return tb - ta;
+                }
+                return (b.ID_User || 0) - (a.ID_User || 0);
+            });
+
+            data.freelancers.forEach(freelancer => {
+                let estrelasHtml = '';
+                const media = Number(freelancer.MediaAvaliacoes) || 0;
+                const total = Number(freelancer.TotalAvaliacoes) || 0;
+                if (total > 0 && media > 0) {
+                    for (let i = 1; i <= 5; i++) {
+                        estrelasHtml += i <= Math.round(media)
+                            ? '<i class="bi bi-star-fill text-warning"></i>'
+                            : '<i class="bi bi-star text-secondary"></i>';
+                    }
+                    estrelasHtml += ` <span class="ml-2">${media.toFixed(2)}/5.0</span>`;
+                    estrelasHtml += ` <span class="text-muted" style="font-size:0.95em">(${total} ${total === 1 ? 'avaliação' : 'avaliações'})</span>`;
+                } else {
+                    estrelasHtml = '<span class="text-muted" style="font-size:0.95em">Sem avaliações</span>';
+                }
+
+                container.innerHTML += `
+                    <div class="card mb-4 shadow-sm .col-sm-4">
+                        <img class="card-img-top" src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" style="height: 280px; object-fit: cover;">
                         <div class="card-body">
-                            <h5 class="card-title">${dado.nome}</h5>
-                            <p class="card-text"><strong>${dado.especialidade}</strong></p>
-                            <p class="card-text">${dado.descricao}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <a href="${dado.link}" class="btn btn-sm btn-outline-secondary">Ver Perfil</a>
-                                </div>
-                            </div>
+                            <h5 class="card-title">${freelancer.Nome}</h5>
+                            <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
+                            <div>${estrelasHtml}</div>
+                            <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                         </div>
                     </div>
+                `;
+            });
+        } else {
+            document.getElementById('perfis-container').innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
                 </div>
             `;
         }
-    });
-
-    //Se nenhum resultado for encontrado
-    section.innerHTML = resultados || "<p>Nenhum freelancer encontrado.</p>";
+    } catch (error) {
+        console.error('Erro ao carregar perfis:', error);
+        document.getElementById('perfis-container').innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
+                </div>
+            `;
+    }
 }
 
-//Exibe todos os freelancers ao carregar a página
-window.onload = exibirTodosFreelancers;
+//Função para pesquisar freelancers
+async function pesquisar() {
+    try {
+        const termo = document.getElementById("campo-pesquisa").value.trim();
+        const categoria = document.getElementById("categoriaDropdown")?.value || "";
 
+        const response = await fetch(`/search/buscarFreelancers?termo=${encodeURIComponent(termo)}&categoria=${encodeURIComponent(categoria)}`);
+        if (!response.ok) throw new Error('Erro ao buscar freelancers');
+        const data = await response.json();
+
+        const container = document.getElementById('freelancersContainer');
+        container.innerHTML = '';
+
+        if (data.sucesso && Array.isArray(data.freelancers) && data.freelancers.length > 0) {
+            // Ordena por avaliação média (desc), depois total avaliações (desc), depois ID_User (desc)
+            data.freelancers.sort((a, b) => {
+                const ma = Number(a.MediaAvaliacoes) || 0;
+                const mb = Number(b.MediaAvaliacoes) || 0;
+                const ta = Number(a.TotalAvaliacoes) || 0;
+                const tb = Number(b.TotalAvaliacoes) || 0;
+                if (tb > 0 || ta > 0) {
+                    if (mb !== ma) return mb - ma;
+                    if (tb !== ta) return tb - ta;
+                }
+                return (b.ID_User || 0) - (a.ID_User || 0);
+            });
+
+            // Para cada freelancer, busca a média de avaliações via AJAX (garante dados atualizados)
+            await Promise.all(data.freelancers.map(async (freelancer) => {
+                try {
+                    const resp = await fetch(`/profile/obter_perfil/${freelancer.ID_User}`);
+                    if (resp.ok) {
+                        const { perfil } = await resp.json();
+                        if (perfil) {
+                            freelancer.MediaAvaliacoes = perfil.MediaAvaliacoes;
+                            freelancer.TotalAvaliacoes = perfil.TotalAvaliacoes;
+                        }
+                    }
+                } catch (e) {
+                    // Se der erro, mantém os dados originais
+                }
+            }));
+
+            // Reordena após atualizar médias
+            data.freelancers.sort((a, b) => {
+                const ma = Number(a.MediaAvaliacoes) || 0;
+                const mb = Number(b.MediaAvaliacoes) || 0;
+                const ta = Number(a.TotalAvaliacoes) || 0;
+                const tb = Number(b.TotalAvaliacoes) || 0;
+                if (tb > 0 || ta > 0) {
+                    if (mb !== ma) return mb - ma;
+                    if (tb !== ta) return tb - ta;
+                }
+                return (b.ID_User || 0) - (a.ID_User || 0);
+            });
+
+            data.freelancers.forEach(freelancer => {
+                let estrelasHtml = '';
+                const media = Number(freelancer.MediaAvaliacoes) || 0;
+                const total = Number(freelancer.TotalAvaliacoes) || 0;
+                if (total > 0 && media > 0) {
+                    for (let i = 1; i <= 5; i++) {
+                        estrelasHtml += i <= Math.round(media)
+                            ? '<i class="bi bi-star-fill text-warning"></i>'
+                            : '<i class="bi bi-star text-secondary"></i>';
+                    }
+                    estrelasHtml += ` <span class="ml-2">${media.toFixed(2)}/5.0</span>`;
+                    estrelasHtml += ` <span class="text-muted" style="font-size:0.95em">(${total} ${total === 1 ? 'avaliação' : 'avaliações'})</span>`;
+                } else {
+                    estrelasHtml = '<span class="text-muted" style="font-size:0.95em">Sem avaliações</span>';
+                }
+
+                container.innerHTML += `
+                    <div class="card mb-4 shadow-sm .col-sm-4">
+                        <img class="card-img-top" src="/profile/imagem/${freelancer.ID_User}" alt="Foto de Perfil" style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">${freelancer.Nome}</h5>
+                            <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
+                            <div>${estrelasHtml}</div>
+                            <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
+                        </div>
+                    </div>
+                `;
+            });
+        } else {
+            container.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="alert alert-info">Nenhum freelancer encontrado com os critérios de pesquisa.</div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Erro ao buscar freelancers:', error);
+        const container = document.getElementById('freelancersContainer');
+        container.innerHTML = `
+            <div class="col-12 text-center py-5">
+                <div class="alert alert-danger">Erro ao buscar freelancers. Tente novamente.</div>
+            </div>
+        `;
+    }
+}
 
 // Para deletar Usuario:
 
 function showPopUpDeletar() {
     document.getElementById('pop-up-deletar').style.display = 'block';
-    // document.getElementById("")
     document.getElementById('overlay').style.display = 'block';
 }
 
@@ -102,8 +228,12 @@ function fecharPopUpDeletar() {
 }
 
 function confirmarDelecao() {
-    fetch('/DeletarUsuario', {
-        method: 'DELETE'
+    fetch('user/deletarUsuario', {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include'
     })
         .then(response => response.json())
         .then(data => {
@@ -137,7 +267,6 @@ function confirmarDelecao() {
         });
 }
 
-
 function mostrarErroInput(input, mensagem) {
     input.classList.add('erro');
     Swal.fire({
@@ -158,151 +287,46 @@ function limparErros() {
 // Função para carregar categorias
 async function carregarCategorias() {
     try {
-        const response = await fetch('/category/', { //
-            method: 'GET'
-        });
-        const data = await response.json();
-        if (data.sucesso) {
-            console.log("Categorias:", data.categorias);
-            // Renderizar categorias na página
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Erro!',
-                text: 'Erro ao carregar categorias.'
+        const response = await fetch('/profile/obter-categorias');
+        if (!response.ok) throw new Error('Erro ao carregar categorias');
+        const categorias = await response.json();
+        const select = document.getElementById('categoriaDropdown');
+        if (select) {
+            select.innerHTML = '<option value="">Todas as categorias</option>';
+            categorias.forEach(categoria => {
+                const option = document.createElement('option');
+                option.value = categoria.NomeCategoria;
+                option.textContent = categoria.NomeCategoria;
+                select.appendChild(option);
             });
         }
     } catch (error) {
-        console.error("Erro ao carregar categorias:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Erro ao carregar categorias.'
-        });
+        console.error('Erro ao carregar categorias:', error);
     }
 }
-
-// // Função para carregar habilidades
-// async function carregarHabilidades() {
-//     try {
-//         const response = await fetch('/skills/', { //
-//             method: 'GET'
-//         });
-//         const data = await response.json();
-//         if (data.sucesso) {
-//             console.log("Habilidades:", data.habilidades);
-//             // Renderizar habilidades na página
-//         } else {
-//             Swal.fire({
-//                 icon: 'error',
-//                 title: 'Erro!',
-//                 text: 'Erro ao carregar habilidades.'
-//             });
-//         }
-//     } catch (error) {
-//         console.error("Erro ao carregar habilidades:", error);
-//         Swal.fire({
-//             icon: 'error',
-//             title: 'Erro!',
-//             text: 'Erro ao carregar habilidades.'
-//         });
-//     }
-// }
-
-async function carregarFreelancers() {
-    try {
-        const response = await fetch('/freelancers', { method: 'GET' });
-        if (!response.ok) throw new Error('Erro ao carregar freelancers');
-
-        const data = await response.json();
-        if (data.sucesso) {
-            exibirFreelancers(data.freelancers);
-        } else {
-            throw new Error(data.erro || 'Erro ao carregar freelancers');
-        }
-    } catch (error) {
-        console.error('Erro ao carregar freelancers:', error);
-        document.getElementById('resultados-pesquisa').innerHTML = '<p>Erro ao carregar freelancers.</p>';
-    }
-}
-
-function exibirFreelancers(freelancers) {
-    const section = document.getElementById('resultados-pesquisa');
-    section.innerHTML = '';
-
-    freelancers.forEach(freelancer => {
-        section.innerHTML += `
-            <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <img class="card-img-top" src="data:image/jpeg;base64,${freelancer.Foto || ''}" alt="${freelancer.Username}">
-                    <div class="card-body">
-                        <h5 class="card-title">${freelancer.Username || freelancer.Nome}</h5>
-                        <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
-                        <a href="/perfil/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-}
-
-
-// async function carregar_perfis_home() {
-//     fetch('/homepage', {
-//         method: 'GET'
-//     })
-
-//     .then(response => response.json())
-//     .then(data => {
-//             if (data.sucesso) {
-
-//             }});}
-
-document.addEventListener('DOMContentLoaded', function() {
-    fetch('/api/perfis')
-        .then(response => response.json())
-        .then(perfis => {
-            const container = document.getElementById('perfis-container');
-            
-            perfis.forEach(perfil => {
-                const cardHtml = `
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100 shadow-sm">
-                            <img class="card-img-top" 
-                                 src="${perfil.FotoPerfil ? '' + perfil.FotoPerfil : ''}" 
-                                 alt="Foto de ${perfil.Nome}"
-                                 style="height: 200px; object-fit: cover;">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">${perfil.Nome}</h5>
-                                <p class="card-text flex-grow-1">${perfil.Bio || 'Sem descrição'}</p>
-                                ${perfil.Categorias ? `<small class="text-muted mb-2">Categorias: ${perfil.Categorias}</small>` : ''}
-                                <div class="d-flex justify-content-between align-items-center mt-auto">
-                                    <a href="/perfil/${perfil.ID_User}" class="btn btn-sm btn-outline-primary">Ver Perfil</a>
-                                    <small class="text-muted">Novo</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                container.innerHTML += cardHtml;
-            });
-        })
-        .catch(error => {
-            console.error('Erro ao carregar perfis:', error);
-            document.getElementById('perfis-container').innerHTML = `
-                <div class="col-12 text-center py-5">
-                    <div class="alert alert-danger">Erro ao carregar perfis. Tente recarregar a página.</div>
-                </div>
-            `;
-        });
-});
-
-
-
 
 // Chama a função ao carregar a página
-document.addEventListener('DOMContentLoaded', carregarFreelancers);
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await carregarCategorias();
+        await exibirTodosFreelancers();
+
+        // Carregar categorias (caso não esteja no HTML)
+        const select = document.getElementById('categoriaDropdown');
+        if (select) {
+            const response = await fetch('/category');
+            const data = await response.json();
+            if (data.sucesso && Array.isArray(data.categorias)) {
+                select.innerHTML = '<option value="">Todas as categorias</option>';
+                data.categorias.forEach(cat => {
+                    select.innerHTML += `<option value="${cat.NomeCategoria}">${cat.NomeCategoria}</option>`;
+                });
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar a homepage:', error);
+    }
+});
 
 async function logout() {
     try {
@@ -366,9 +390,29 @@ document.addEventListener('click', resetarInatividade);
 // Inicializa o timer ao carregar a página
 resetarInatividade();
 
-// Chamar as funções ao carregar a página
-document.addEventListener('DOMContentLoaded', () => {
-    carregarCategorias();
-    carregarHabilidades();
-});
+function atualizarMenusTipoUsuario(tipoUsuario) {
+    // Menu lateral (mobile)
+    var meusServicosMenu = document.querySelectorAll('a[href="/servicos_freelancer"]');
+    meusServicosMenu.forEach(function(link) {
+        if (tipoUsuario.trim().toLowerCase() !== 'freelancer') {
+            link.parentElement.style.display = 'none';
+        } else {
+            link.parentElement.style.display = '';
+        }
+    });
+
+    // Menu desktop
+    var menuDesktop = document.querySelector('.desktop-version');
+    if (menuDesktop) {
+        var meusServicosDesktop = menuDesktop.querySelector('a[href="/servicos_freelancer"]');
+        var torneSeFreelancer = menuDesktop.querySelector('a[href="/alterarDados"].phone-hidden');
+        if (tipoUsuario.trim().toLowerCase() === 'freelancer') {
+            if (meusServicosDesktop) meusServicosDesktop.style.display = '';
+            if (torneSeFreelancer) torneSeFreelancer.style.display = 'none';
+        } else {
+            if (meusServicosDesktop) meusServicosDesktop.style.display = 'none';
+            if (torneSeFreelancer) torneSeFreelancer.style.display = '';
+        }
+    }
+}
 
