@@ -133,27 +133,57 @@ def atualizar_usuario(user_id):
             WHERE ID_User = %s
         """, (nome, email, telefone, cpf, tipo_usuario, user_id))
 
-        # Atualizar ou criar endereço
+        # Busca se já existe um endereço igual (CEP + Logradouro + Numero)
         cursor.execute("""
-            INSERT INTO endereco (CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                Logradouro = VALUES(Logradouro),
-                Cidade = VALUES(Cidade),
-                Bairro = VALUES(Bairro),
-                Estado = VALUES(Estado),
-                Numero = VALUES(Numero),
-                Complemento = VALUES(Complemento)
-        """, (endereco.get('CEP'), endereco.get('Logradouro'), endereco.get('Cidade'),
-              endereco.get('Bairro'), endereco.get('Estado'), endereco.get('Numero'),
-              endereco.get('Complemento')))
+            SELECT ID_Endereco FROM endereco
+            WHERE CEP = %s AND Logradouro = %s AND Numero = %s
+            LIMIT 1
+        """, (
+            endereco.get('CEP'),
+            endereco.get('Logradouro'),
+            endereco.get('Numero')
+        ))
+        endereco_existente = cursor.fetchone()
 
-        # Associar o endereço ao usuário
+        if endereco_existente:
+            id_endereco = endereco_existente[0]
+            # Atualiza o endereço existente (caso queira atualizar dados de complemento, bairro, etc)
+            cursor.execute("""
+                UPDATE endereco SET
+                    Cidade = %s,
+                    Bairro = %s,
+                    Estado = %s,
+                    Complemento = %s
+                WHERE ID_Endereco = %s
+            """, (
+                endereco.get('Cidade'),
+                endereco.get('Bairro'),
+                endereco.get('Estado'),
+                endereco.get('Complemento'),
+                id_endereco
+            ))
+        else:
+            # Cria novo endereço
+            cursor.execute("""
+                INSERT INTO endereco (CEP, Logradouro, Cidade, Bairro, Estado, Numero, Complemento)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                endereco.get('CEP'),
+                endereco.get('Logradouro'),
+                endereco.get('Cidade'),
+                endereco.get('Bairro'),
+                endereco.get('Estado'),
+                endereco.get('Numero'),
+                endereco.get('Complemento')
+            ))
+            id_endereco = cursor.lastrowid
+
+        # Associa o endereço ao usuário (agora pode ser compartilhado)
         cursor.execute("""
             UPDATE usuario
-            SET ID_Endereco = (SELECT ID_Endereco FROM endereco WHERE CEP = %s AND Logradouro = %s)
+            SET ID_Endereco = %s
             WHERE ID_User = %s
-        """, (endereco.get('CEP'), endereco.get('Logradouro'), user_id))
+        """, (id_endereco, user_id))
 
         conn.commit()
         return jsonify({"sucesso": True, "mensagem": "Dados atualizados com sucesso!"}), 200
