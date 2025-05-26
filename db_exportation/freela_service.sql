@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
 --
--- Host: localhost    Database: freela
+-- Host: 127.0.0.1    Database: freela
 -- ------------------------------------------------------
--- Server version	8.0.42
+-- Server version	8.0.39
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -38,7 +38,7 @@ CREATE TABLE `service` (
   CONSTRAINT `service_ibfk_2` FOREIGN KEY (`ID_Freelancer`) REFERENCES `usuario` (`ID_User`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `chk_data_conclusao_valida` CHECK (((`DataConclusao` is null) or (`DataConclusao` >= `DataCriacao`))),
   CONSTRAINT `chk_nome_service_valido` CHECK ((length(`NomeService`) >= 5))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +47,7 @@ CREATE TABLE `service` (
 
 LOCK TABLES `service` WRITE;
 /*!40000 ALTER TABLE `service` DISABLE KEYS */;
-INSERT INTO `service` VALUES (1,'Adestre a minha capivara chamada Caio','Ela é muito doida e quase matou 3 senhoras aqui da rua.','2025-05-25 14:56:50','concluido',10,2,'2025-05-25 14:57:26');
+INSERT INTO `service` VALUES (1,'Adestre a minha capivara chamada Caio','Ela é muito doida e quase matou 3 senhoras aqui da rua.','2025-05-25 14:56:50','concluido',10,2,'2025-05-25 14:57:26'),(2,'Meteoro da Paixão','Te dei o sol te dei o mar pra ganhar o seu coração vc é raio de saudade meteoro da paixão','2025-05-26 18:59:16','concluido',4,10,'2025-05-26 19:21:35'),(4,'Fotografia','Queria que você tirasse foto do meu gato','2025-05-26 19:10:50','concluido',4,7,'2025-05-26 19:46:40'),(5,'JOGO DE CORRIDA','Quero um jogo de corrida estilo relâmpago marquinhos, utilizando react, com uma ambientação boa e que rode no meu pc','2025-05-26 19:28:26','concluido',4,1,'2025-05-26 19:42:23');
 /*!40000 ALTER TABLE `service` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -60,4 +60,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-25 21:26:44
+-- Dump completed on 2025-05-26 20:14:13

@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             data.servicosPedidos.forEach(servico => {
                 // Se não tem freelancer, marca como indisponível
                 const nomeServico = servico.ID_Freelancer === null || servico.ID_Freelancer === undefined
-                    ? `${servico.Nome} <span class="text-danger font-italic">- Indisponível*</span>`
+                    ? `${servico.Nome} <span class="text-danger font-italic"></span>`
                     : servico.Nome;
                 pedidos.innerHTML += `
                         <li class="list-group-item">

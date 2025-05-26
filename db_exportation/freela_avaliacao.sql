@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
 --
--- Host: localhost    Database: freela
+-- Host: 127.0.0.1    Database: freela
 -- ------------------------------------------------------
--- Server version	8.0.42
+-- Server version	8.0.39
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -36,7 +36,7 @@ CREATE TABLE `avaliacao` (
   CONSTRAINT `avaliacao_ibfk_1` FOREIGN KEY (`ID_Service`) REFERENCES `service` (`ID_Service`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `avaliacao_ibfk_2` FOREIGN KEY (`ID_Avaliador`) REFERENCES `usuario` (`ID_User`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `chk_nota_valida` CHECK ((`Nota` between 1 and 5))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `avaliacao` (
 
 LOCK TABLES `avaliacao` WRITE;
 /*!40000 ALTER TABLE `avaliacao` DISABLE KEYS */;
-INSERT INTO `avaliacao` VALUES (1,1,10,'cliente',4,'Chutou minha capivara','2025-05-25 14:58:04');
+INSERT INTO `avaliacao` VALUES (1,1,10,'cliente',4,'Chutou minha capivara','2025-05-25 14:58:04'),(2,2,10,'freelancer',3,'Me pagou com uma coxinha','2025-05-26 19:21:54'),(3,2,4,'cliente',5,'Serviço bom e barato','2025-05-26 19:22:46'),(4,5,1,'freelancer',5,'Fiquei orgulhoso do trabalho q eu fiz','2025-05-26 19:43:01'),(5,5,4,'cliente',2,'Não roda no meu pc','2025-05-26 19:43:44'),(6,4,7,'freelancer',4,'O gato me mordeu mas ele é fofo','2025-05-26 19:47:00'),(7,4,4,'cliente',5,'Meu gato amou!','2025-05-26 19:47:53');
 /*!40000 ALTER TABLE `avaliacao` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -175,4 +175,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-25 21:26:44
+-- Dump completed on 2025-05-26 20:14:13

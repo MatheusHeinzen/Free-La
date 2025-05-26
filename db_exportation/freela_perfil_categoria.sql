@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.38, for Win64 (x86_64)
 --
--- Host: localhost    Database: freela
+-- Host: 127.0.0.1    Database: freela
 -- ------------------------------------------------------
--- Server version	8.0.42
+-- Server version	8.0.39
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -39,7 +39,7 @@ CREATE TABLE `perfil_categoria` (
 
 LOCK TABLES `perfil_categoria` WRITE;
 /*!40000 ALTER TABLE `perfil_categoria` DISABLE KEYS */;
-INSERT INTO `perfil_categoria` VALUES (1,1,'2025-05-25 14:30:23'),(2,15,'2025-05-25 14:34:47'),(3,14,'2025-05-25 14:43:17'),(4,15,'2025-05-25 14:35:46'),(5,16,'2025-05-25 14:41:51'),(6,12,'2025-05-25 14:37:21'),(7,6,'2025-05-25 14:38:44'),(8,17,'2025-05-25 14:42:35'),(9,18,'2025-05-25 14:48:55'),(10,16,'2025-05-25 14:53:29');
+INSERT INTO `perfil_categoria` VALUES (1,1,'2025-05-25 14:30:23'),(2,15,'2025-05-25 14:34:47'),(3,14,'2025-05-25 14:43:17'),(4,15,'2025-05-26 19:24:58'),(5,16,'2025-05-25 14:41:51'),(6,12,'2025-05-25 14:37:21'),(7,6,'2025-05-25 14:38:44'),(8,17,'2025-05-25 14:42:35'),(9,18,'2025-05-25 14:48:55'),(10,16,'2025-05-25 14:53:29');
 /*!40000 ALTER TABLE `perfil_categoria` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +52,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-25 21:26:45
+-- Dump completed on 2025-05-26 20:14:11
