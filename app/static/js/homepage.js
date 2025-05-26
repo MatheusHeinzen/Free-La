@@ -90,7 +90,7 @@ async function exibirTodosFreelancers() {
                         <div class="card-body">
                             <h5 class="card-title">${freelancer.Nome}</h5>
                             <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
-                            <div>${estrelasHtml}</div>
+                            <div style="margin-bottom:17px">${estrelasHtml}</div>
                             <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                         </div>
                     </div>
@@ -182,7 +182,7 @@ async function pesquisar() {
                     estrelasHtml += ` <span class="ml-2">${media.toFixed(2)}/5.0</span>`;
                     estrelasHtml += ` <span class="text-muted" style="font-size:0.95em">(${total} ${total === 1 ? 'avaliação' : 'avaliações'})</span>`;
                 } else {
-                    estrelasHtml = '<span class="text-muted" style="font-size:0.95em">Sem avaliações</span>';
+                    estrelasHtml = '<span class="text-muted" style="font-size:0.95em;">Sem avaliações</span>';
                 }
 
                 container.innerHTML += `
@@ -191,7 +191,7 @@ async function pesquisar() {
                         <div class="card-body">
                             <h5 class="card-title">${freelancer.Nome}</h5>
                             <p class="card-text">${freelancer.Bio || 'Sem descrição disponível.'}</p>
-                            <div>${estrelasHtml}</div>
+                            <div style="margin-bottom:17px">${estrelasHtml}</div>
                             <a href="/perfilPublico/${freelancer.ID_User}" class="btn btn-primary">Ver Perfil</a>
                         </div>
                     </div>

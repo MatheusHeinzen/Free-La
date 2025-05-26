@@ -6,6 +6,7 @@ body {
     margin: 0;
     padding: 0;
 }
+
 .lead {
     text-align: justify;
     padding: 5px;
@@ -22,12 +23,13 @@ a {
     text-decoration: none;
     transition: color 0.3s;
 }
+
 a:hover {
     color: #15153f;
 }
 
 /* Nav */
-#toggleSidebar{
+#toggleSidebar {
     background-color: #ffffff;
     color: #212529;
 }
@@ -96,7 +98,7 @@ a:hover {
 
 .pesquisa:focus {
     outline: none;
-    border-color:  #8440d6;
+    border-color: #8440d6;
     box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.2);
 }
 
@@ -301,59 +303,150 @@ img {
     .jumbotron {
         padding: 2rem 1rem;
     }
-    
+
     .logo {
-        max-width: 500px;
+        max-width: 600px;
     }
-    
+
     #grid {
         flex-direction: column;
     }
-        
+
     .perfil-lista {
         grid-template-columns: 1fr;
     }
-    
+
     .navbar-nav {
         padding-top: 10px;
     }
 
-    .pesquisa, #categoriaDropdown {
+    .pesquisa,
+    #categoriaDropdown {
         width: 100%;
         max-width: none;
     }
+
     .lead {
         font-size: 1.0rem;
         font-weight: 100;
         text-align: justify;
     }
-
-}
-
-@media (max-width: 576px) {
-    .pop-up-deletar {
+      .pop-up-deletar {
         width: 95%;
         padding: 20px;
     }
-    
+
     .pop-up-deletar button {
         width: 100%;
         margin: 5px 0;
     }
 
-}
-/* Efeitos e Animações */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    ul {
+        position: relative;
+        
+    }
+    .row {
+       margin-left: 10px;
+    }
+
 }
 
-.perfil-card, .jumbotron {
+/* Container do switch - alinhamento */
+.form-switch {
+    margin-top: 25px;
+    margin-bottom: 25px;
+    gap: 10px;
+    padding: 0;
+}
+
+/* Esconde o checkbox original */
+.form-switch .form-check-input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    cursor: pointer;
+    height: 100%;
+    z-index: 1;
+}
+
+.form-check-label {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #2d3748;
+    cursor: pointer;
+}
+
+.form-check-label::before {
+    content: '';
+    display: inline-block;
+    width: 3.5em;
+    height: 1.8em;
+    background-color: #e2e8f0;
+    border-radius: 1em;
+    border: 2px solid #cbd5e0;
+    transition: all 0.3s ease;
+    order: 1;
+    margin-right: 10px;
+}
+
+/* Bolinha do switch */
+.form-check-label::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: -15px;
+    width: 1.4em;
+    height: 1.4em;
+    background-color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.form-check-input:checked+.form-check-label::before {
+    background-color: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.form-check-input:checked+.form-check-label::after {
+    transform: translateX(1.7em);
+}
+
+.form-check-input:not(:checked):hover+.form-check-label::before {
+    border-color: #a0aec0;
+}
+
+.form-check-input:checked:hover+.form-check-label::before {
+    background-color: #4338ca;
+    border-color: #4338ca;
+}
+
+.form-check-input:focus+.form-check-label::before {
+    box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+}
+
+/* Efeitos e Animações */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.perfil-card,
+.jumbotron {
     animation: fadeIn 0.6s ease-out;
 }
 
 /* Ajuste para o container de freelancers */
-#freelancersContainer, #perfis-container {
+#freelancersContainer,
+#perfis-container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 25px;
