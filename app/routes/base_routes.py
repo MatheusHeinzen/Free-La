@@ -33,3 +33,7 @@ def requisitar_servicos(freelancer_id):
 @base_bp.route('/servicos_cliente')
 def servicos_cliente():
     return render_template('servicos_cliente.html')
+
+@base_bp.route('/alterarSenha')
+def alterar_senha():
+    return render_template('alterarSenha.html')

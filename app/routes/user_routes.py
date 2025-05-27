@@ -1,6 +1,6 @@
-from flask import Blueprint, request, jsonify, session, redirect, url_for
+from flask import Blueprint, request, jsonify, session, redirect, url_for, render_template
 from functools import wraps
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.utils.db import get_db_connection
 from app.utils.decorators import login_required
 from flask_cors import CORS
@@ -262,3 +262,36 @@ def obter_endereco(endereco_id):
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@user_bp.route('/alterarSenha', methods=['GET', 'POST'])
+@login_required
+def alterar_senha():
+    if request.method == 'GET':
+        return render_template('alterarSenha.html')
+    # POST
+    data = request.get_json()
+    senha_atual = data.get('senha_atual')
+    nova_senha = data.get('nova_senha')
+    user_id = session.get('user_id')
+
+    if not senha_atual or not nova_senha:
+        return jsonify({'sucesso': False, 'erro': 'Preencha todos os campos.'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT Senha FROM usuario WHERE ID_User = %s", (user_id,))
+        user = cursor.fetchone()
+        if not user or not check_password_hash(user['Senha'], senha_atual):
+            return jsonify({'sucesso': False, 'erro': 'Senha atual incorreta.'}), 400
+
+        nova_hash = generate_password_hash(nova_senha)
+        cursor.execute("UPDATE usuario SET Senha = %s WHERE ID_User = %s", (nova_hash, user_id))
+        conn.commit()
+        return jsonify({'sucesso': True, 'mensagem': 'Senha alterada com sucesso!'})
+    except Exception as e:
+        print(f"[ERRO alterar_senha] {e}")
+        return jsonify({'sucesso': False, 'erro': 'Erro ao alterar senha.'}), 500
+    finally:
+        cursor.close()
+        conn.close()
