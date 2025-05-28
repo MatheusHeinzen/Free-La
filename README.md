@@ -1,6 +1,6 @@
 # Free'la
 
-**Status**: Em desenvolvimento 🚧
+**Status**: Em desenvolvimento 🚧 | Estágio Final - Últimos ajustes
 
 ## Colaboradores:
 - Edmund Soares de Souza
@@ -24,14 +24,23 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 
 ## Funcionalidades
 ### Implementadas
-- **Cadastro de usuário**: CRUD para gestão de usuários e entidades.
-- **Autenticação segura**: Login com sessões protegidas e criptografia de dados sensíveis.
-- **Interface responsiva**: Design intuitivo com HTML, CSS e JavaScript.
-- **Gerenciamento de perfis**: Atualização de dados pessoais e habilidades.
+- **Cadastro e autenticação de usuário**: CRUD completo para usuários, com login seguro (hash de senha).
+- **Gestão de perfis**: Atualização de dados pessoais, endereço, habilidades e preferências de contato.
+- **Integração com API externa**: Consulta automática de endereço por CEP.
+- **Preferências de contato**: Usuário escolhe se exibe email/telefone no perfil público.
+- **CRUD de serviços**: Clientes requisitam, editam e deletam serviços; freelancers aceitam ou recusam.
+- **Avaliação de freelancers**: Clientes avaliam freelancers após conclusão do serviço (média e comentários).
+- **Interface responsiva**: HTML, CSS e JS com navegação adaptada para desktop e mobile.
+- **Página de perfil público**: Exibe dados, contatos (conforme preferências), habilidades e avaliações.
+- **Atualização de senha**: Usuário pode alterar sua senha com confirmação da senha atual.
+- **Deleção de conta**: Usuário pode excluir seu perfil e todos os dados associados.
+- **Validação de dados**: CPF, email, telefone e endereço validados no front e back-end.
+- **Sessão segura**: Controle de sessão e logout.
 
 ### Futuras
-- **Filtros e busca**: Por especialidade e tipo de serviço.
-- **Avaliações**: Sistema de feedback para freelancers e clientes.
+- **JWT no login**: Planejado para substituir sessões por autenticação baseada em token JWT.
+- **CRUD de avaliações**: Transformar avaliações em um CRUD completo (criar, listar, editar, deletar avaliações).
+- **Filtros e busca avançada**: Por especialidade, localização e tipo de serviço.
 
 ---
 
@@ -46,7 +55,7 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 ### Principais diretórios
 - **`/app`**: Lógica principal (models, routes, services).
   - `models/`: Definição de entidades (usuários, categorias, etc.).
-  - `routes/`: Endpoints da API (autenticação, perfis, habilidades).
+  - `routes/`: Endpoints da API (autenticação, perfis, habilidades, serviços, avaliações).
   - `services/`: Regras de negócio e integração com o banco de dados.
   - `/utils`: Auxiliares (validação, sessão, conexão com banco de dados).
 - **`/static`**: Arquivos estáticos (CSS, JS, imagens).
@@ -76,6 +85,12 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 ## Contribuição  
 Acompanhe o progresso e contribua com sugestões:  
 **Trello**: [Link para o board](https://trello.com/invite/b/67be564609ead710a8ad4cd7/ATTI209ac0b23196682f9f6e65f3239080859571DAA2/projeto-ex2).  
+
+---
+
+**Próximos passos:**  
+- Adicionar autenticação JWT no login.
+- Transformar avaliações em um CRUD completo (criar, listar, editar, deletar).
 
 ---  
 *Documentação atualizada em maio de 2025.*
