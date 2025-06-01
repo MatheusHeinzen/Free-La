@@ -15,233 +15,146 @@
 </head>
 
 <body>
-    {% if not session.user_id %}
-    <script>window.location.href = "/";</script>
-    {% endif %}
+    {% extends "base.html" %}
+    {% block content %}
     <header>
-        <div class="container">
-            <!-- Navbar para dispositivos móveis -->
-            <nav class="menu_lateral" id="menu_lateral">
-                <div class="expandir">
-                    <i class=""></i>
-                </div>
-                <ul>
-                    <li class="item_menu">
-                        <a href="/perfil">
-                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar"
-                                alt="Perfil">
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Sobre</span>
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Contato</span>
-                        </a>
-                    </li>
-                    <li class="item_menu has-submenu">
-                        <a href="#" onclick="toggleSubmenu(event)">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Configurações</span>
-                        </a>
-                        <ul class="submenu">
-                            <ul class="submenu">
-                                <li class="item_menu" id="submenu">
-                                    <a href="/alterarDados">
-                                        <span class="icon"><i class="#"></i></span>
-                                        <span class="link">Atualizar Dados</span>
-                                    </a>
-                                </li>
-                                <li class="item_menu" id="submenu">
-                                    <a href="#" onclick="showPopUpDeletar()">
-                                        <span class="icon"><i class="#"></i></span>
-                                        <span class="link">Deletar Perfil</span>
-                                    </a>
-                                </li>
-                                <li class="item_menu" id="submenu">
-                                    {% if session.user_id %}
-                                    <a href="/" onclick="logout()">
-                                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
-                                        <span class="link">Logout</span>
-                                    </a>
-                                    {% else %}
-                                    <a href="/">
-                                        <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
-                                        <span class="link">Login</span>
-                                    </a>
-                                    {% endif %}
-                                </li>
-                            </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-
-        <!-- Par desktops -->
-        <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">
-            <div class="container d-flex justify-content-between">
-                <a href="/homepage" class="navbar-brand">Menu</a>
-                <div class="dropdown">
-                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Configurações</a>
-                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
-                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
-                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
-                        {% if session.user_id %}
-                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
-                        {% else %}
-                        <a class="dropdown-item" href="/">Login</a>
-                        {% endif %}
-                    </div>
-                </div>
-                <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
-            </div>
-        </nav>
+        {% include '_navbar.html' %}
+        {% include '_sidebar.html' %}
     </header>
-
-    <main>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4">
-                    <!-- Parte perfil - contato e foto -->
-                    <div class="profile-card-4 z-depth-3">
-                        <div class="card">
-                            <div class="card-body text-center bg-primary rounded-top">
-                                <div class="user-box">
-                                    <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}"
-                                        alt="Foto de Perfil" width="150" height="150">
-                                </div>
-                                <h5 class="mb-1 text-white" id="nomeUsuario">Nome do Usuário</h5>
-                                <h6 class="text-light" id="profissaoUsuario">Profissão ou Categoria</h6>
-                                <div id="mediaAvaliacoes" class="mb-2"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <!-- Parte perfil - contato e foto -->
+                <div class="profile-card-4 z-depth-3">
+                    <div class="card">
+                        <div class="card-body text-center bg-primary rounded-top">
+                            <div class="user-box">
+                                <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" alt="Foto de Perfil"
+                                    width="150" height="150">
                             </div>
-                            <div class="card">
-                                <div id="contatos card-header">
-                                    <button id="btnAdicionarContatos" class="btn btn-primary">
-                                        <i class="bi bi-plus-circle"></i> Adicionar Meio de Contato
-                                    </button>
-                                    <div class="card-body">
-                                        <ul class="list-group shadow-none" id="listaContatos">
-                                            <!-- Contatos serão preenchidos dinamicamente -->
-                                        </ul>
-                                    </div>
+                            <h5 class="mb-1 text-white" id="nomeUsuario">Nome do Usuário</h5>
+                            <h6 class="text-light" id="profissaoUsuario">Profissão ou Categoria</h6>
+                            <div id="mediaAvaliacoes" class="mb-2"></div>
+                        </div>
+                        <div class="card">
+                            <div id="contatos card-header">
+                                <button id="btnAdicionarContatos" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle"></i> Adicionar Meio de Contato
+                                </button>
+                                <div class="card-body">
+                                    <ul class="list-group shadow-none" id="listaContatos">
+                                        <!-- Contatos serão preenchidos dinamicamente -->
+                                    </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-8">
-                    <!-- Muda o card -->
-                    <div class="card z-depth-3">
-                        <div class="card-body nav-responsive-container">
-                            <ul class="nav nav-pills nav-pills-primary nav-justified flex-nowrap">
-                                <li class="nav-item flex-grow-1">
-                                    <a href="#" data-target="#profile" data-toggle="pill"
-                                        class="nav-link active show py-2"><i class="bi bi-person-fill"></i>
-                                        <span class="d-sm-inline">Profile
-                                        </span>
-                                    </a>
-                                </li>
-                                <li class="nav-item flex-grow-1">
-                                    <a href="#;" data-toggle="pill" class="nav-link py-2" id="editBtn">
-                                        <i class="bi bi-pencil-square"></i>
-                                        <span class="d-sm-inline">Edit</span>
-                                    </a>
-                                </li>
-                            </ul>
-
-                            <!-- Descrição e avaliação -->
-                            <div class="tab-content p-3">
-                                <div class="tab-pane active show" id="profile">
-                                    <br>
-                                    <h5 class="mb-3">Perfil de Usuário</h5>
-
-                                    <div class="col-md-6">
-                                        <h6>Descrição: </h6>
-                                        <p>
-                                            <!-- Categoria e Profissão com uma pequena descrição -->
-                                        </p>
-                                        <!-- pular linhas -->
-                                        <br><br><br>
-                                    </div>
-
-                                    <div class="overlay" id="overlay"></div>
-
-                                    <!-- Avaliações -->
-                                    <hr>
-                                    <span>
-                                        <div class="card mt-3"> <!-- Adicionado card e margem top -->
-                                            <div class="card-body">
-                                                <div class="estrelasHTML">
-                                                    <div id="mediaEstrelas"></div>
-                                                    <div id="qtdAvaliacoes" class="text-muted" style="font-size:0.95em">
-                                                    </div>
-                                                    <ul id="lista-avaliacoes" class="list-group list-group-flush">
-                                                        <!-- Avaliações aparecerão aqui -->
-                                                    </ul>
-                                                    <button onclick="gerarEstrelasHTML()">Ver Avaliações</button>
-                                                </div>
-                                            </div>
-                                        </div>
+            </div>
+            <div class="col-lg-8">
+                <!-- Muda o card -->
+                <div class="card z-depth-3">
+                    <div class="card-body nav-responsive-container">
+                        <ul class="nav nav-pills nav-pills-primary nav-justified flex-nowrap">
+                            <li class="nav-item flex-grow-1">
+                                <a href="#" data-target="#profile" data-toggle="pill"
+                                    class="nav-link active show py-2"><i class="bi bi-person-fill"></i>
+                                    <span class="d-sm-inline">Profile
                                     </span>
+                                </a>
+                            </li>
+                            <li class="nav-item flex-grow-1">
+                                <a href="#;" data-toggle="pill" class="nav-link py-2" id="editBtn">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span class="d-sm-inline">Edit</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <!-- Descrição e avaliação -->
+                        <div class="tab-content p-3">
+                            <div class="tab-pane active show" id="profile">
+                                <br>
+                                <h5 class="mb-3">Perfil de Usuário</h5>
+
+                                <div class="col-md-6">
+                                    <h6>Descrição: </h6>
+                                    <p>
+                                        <!-- Categoria e Profissão com uma pequena descrição -->
+                                    </p>
+                                    <!-- pular linhas -->
+                                    <br><br><br>
                                 </div>
 
-                                <!-- Editar dados -->
+                                <div class="overlay" id="overlay"></div>
 
-                                <div class="editar-dados-perfil" id="editar-dados">
-                                    <div id="editModal" class="modal">
-                                        <div class="modal-content-editar-perfil">
-                                            <span class="close">&times;</span>
-                                            <div class="separador">
-                                                <form id="formUploadImagem" action="/profile/upload" method="POST"
-                                                    enctype="multipart/form-data">
-                                                    <h3 style="justify-content: center;">Editar Perfil</h3>
-                                                    <div id="preview-container" class="mb-3"
-                                                        style="width: 100%; max-width: 250px;">
-                                                        <img id="preview" class="img-fluid rounded-circle border"
-                                                            style="display: none; width: 100%; height: auto; aspect-ratio: 1/1;">
-                                                    </div>
-                                                    <div class="w-100 text-center">
-                                                        <label for="image" class="btn btn-outline-primary w-75">
-                                                            <i class="bi bi-cloud-arrow-up"></i> Escolher Arquivo
-                                                        </label>
-                                                        <input type="file" name="image" id="image" accept="image/*"
-                                                            class="d-none">
-                                                        <div class="small text-muted mt-1" id="file-name">Nenhum arquivo
-                                                            escolhido</div>
-                                                        <button type="submit" class="btn btn-primary mt-3 w-75">
-                                                            <i class="bi bi-check-circle"></i> Alterar Imagem
-                                                        </button>
-                                                </form>
+                                <!-- Avaliações -->
+                                <hr>
+                                <span>
+                                    <div class="card mt-3"> <!-- Adicionado card e margem top -->
+                                        <div class="card-body">
+                                            <div class="estrelasHTML">
+                                                <div id="mediaEstrelas"></div>
+                                                <div id="qtdAvaliacoes" class="text-muted" style="font-size:0.95em">
+                                                </div>
+                                                <ul id="lista-avaliacoes" class="list-group list-group-flush">
+                                                    <!-- Avaliações aparecerão aqui -->
+                                                </ul>
+                                                <button onclick="gerarEstrelasHTML()">Ver Avaliações</button>
                                             </div>
-                                            <div class="separador">
-                                                <form id="editForm">
-                                                    <input type="hidden" name="user_id"
-                                                        value="{{ session['user_id'] }}">
-                                                    <div class="form-group">
-                                                        <label for="categoria">Selecionar Categoria:</label>
-                                                        <select id="categoria" name="categoria" class="form-control"
-                                                            required>
-                                                            <option value="" disabled selected>Selecione uma
-                                                                categoria
-                                                            </option>
-                                                            <!-- As opções serão preenchidas via JavaScript -->
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label for="descricao">Descrição:</label>
-                                                        <textarea id="descricao" class="form-control" name="descricao"
-                                                            rows="3" placeholder="Escreva sua descrição..."></textarea>
-                                                    </div>
-                                                    <button type="submit">Confirmar Alteração</button>
-                                                </form>
-                                            </div>
+                                        </div>
+                                    </div>
+                                </span>
+                            </div>
+
+                            <!-- Editar dados -->
+
+                            <div class="editar-dados-perfil" id="editar-dados">
+                                <div id="editModal" class="modal">
+                                    <div class="modal-content-editar-perfil">
+                                        <span class="close">&times;</span>
+                                        <div class="separador">
+                                            <form id="formUploadImagem" action="/profile/upload" method="POST"
+                                                enctype="multipart/form-data">
+                                                <h3 style="justify-content: center;">Editar Perfil</h3>
+                                                <div id="preview-container" class="mb-3"
+                                                    style="width: 100%; max-width: 250px;">
+                                                    <img id="preview" class="img-fluid rounded-circle border"
+                                                        style="display: none; width: 100%; height: auto; aspect-ratio: 1/1;">
+                                                </div>
+                                                <div class="w-100 text-center">
+                                                    <label for="image" class="btn btn-outline-primary w-75">
+                                                        <i class="bi bi-cloud-arrow-up"></i> Escolher Arquivo
+                                                    </label>
+                                                    <input type="file" name="image" id="image" accept="image/*"
+                                                        class="d-none">
+                                                    <div class="small text-muted mt-1" id="file-name">Nenhum arquivo
+                                                        escolhido</div>
+                                                    <button type="submit" class="btn btn-primary mt-3 w-75">
+                                                        <i class="bi bi-check-circle"></i> Alterar Imagem
+                                                    </button>
+                                            </form>
+                                        </div>
+                                        <div class="separador">
+                                            <form id="editForm">
+                                                <input type="hidden" name="user_id" value="{{ session['user_id'] }}">
+                                                <div class="form-group">
+                                                    <label for="categoria">Selecionar Categoria:</label>
+                                                    <select id="categoria" name="categoria" class="form-control"
+                                                        required>
+                                                        <option value="" disabled selected>Selecione uma
+                                                            categoria
+                                                        </option>
+                                                        <!-- As opções serão preenchidas via JavaScript -->
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="descricao">Descrição:</label>
+                                                    <textarea id="descricao" class="form-control" name="descricao"
+                                                        rows="3" placeholder="Escreva sua descrição..."></textarea>
+                                                </div>
+                                                <button type="submit">Confirmar Alteração</button>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -250,103 +163,103 @@
                     </div>
                 </div>
             </div>
-
         </div>
-        </div>
-        <div class="overlay" id="overlay"></div>
-        <div class="pop-up-deletar" id="pop-up-deletar">
-            <h3>Deletar Perfil?</h3>
-            <p>Tem certeza que deseja excluir seu perfil? Você perderá todos seus dados e não poderá executar todas as
-                funcionalidades do site.</p>
-            <button onclick="fecharPopUpDeletar()"><strong>NÃO,</strong> RETORNAR PARA PERFIL</button>
-            <button onclick="confirmarDelecao()"><strong>SIM,</strong> DESEJO DELETAR O PERFIL</button>
-        </div>
-    </main>
 
-</body>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-    crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-    crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-    crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-<script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
-<script>
-    function toggleSubmenu(event) {
-        event.preventDefault();
-        const item = event.currentTarget.closest('.has-submenu');
-        item.classList.toggle('active');
-    }
+    </div>
+    <div class="overlay" id="overlay"></div>
+    <div class="pop-up-deletar" id="pop-up-deletar">
+        <h3>Deletar Perfil?</h3>
+        <p>Tem certeza que deseja excluir seu perfil? Você perderá todos seus dados e não poderá executar todas as
+            funcionalidades do site.</p>
+        <button onclick="fecharPopUpDeletar()"><strong>NÃO,</strong> RETORNAR PARA PERFIL</button>
+        <button onclick="confirmarDelecao()"><strong>SIM,</strong> DESEJO DELETAR O PERFIL</button>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
+    <script>
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const item = event.currentTarget.closest('.has-submenu');
+            item.classList.toggle('active');
+        }
 
-    // Exibir média de avaliações no perfil (estrelas e quantidade)
-    async function exibirMediaAvaliacoes(userId) {
-        try {
-            const resp = await fetch(`/profile/obter_perfil/${userId}`);
-            if (resp.ok) {
-                const { perfil } = await resp.json();
-                if (perfil && perfil.MediaAvaliacoes !== null && perfil.MediaAvaliacoes !== undefined) {
-                    // Estrelas médias
-                    const media = Number(perfil.MediaAvaliacoes);
-                    const total = perfil.TotalAvaliacoes || 0;
-                    let estrelas = '';
-                    for (let i = 1; i <= 5; i++) {
-                        estrelas += i <= Math.round(media)
-                            ? '<i class="bi bi-star-fill text-warning"></i>'
-                            : '<i class="bi bi-star text-secondary"></i>';
+        // Exibir média de avaliações no perfil (estrelas e quantidade)
+        async function exibirMediaAvaliacoes(userId) {
+            try {
+                const resp = await fetch(`/profile/obter_perfil/${userId}`);
+                if (resp.ok) {
+                    const { perfil } = await resp.json();
+                    if (perfil && perfil.MediaAvaliacoes !== null && perfil.MediaAvaliacoes !== undefined) {
+                        // Estrelas médias
+                        const media = Number(perfil.MediaAvaliacoes);
+                        const total = perfil.TotalAvaliacoes || 0;
+                        let estrelas = '';
+                        for (let i = 1; i <= 5; i++) {
+                            estrelas += i <= Math.round(media)
+                                ? '<i class="bi bi-star-fill text-warning"></i>'
+                                : '<i class="bi bi-star text-secondary"></i>';
+                        }
+                        document.getElementById('mediaEstrelas').innerHTML = estrelas + ` <span class="ml-2">${media.toFixed(2)} / 5.0</span>`;
+                        document.getElementById('qtdAvaliacoes').innerText = total + (total === 1 ? ' avaliação' : ' avaliações');
+                    } else {
+                        document.getElementById('mediaEstrelas').innerHTML = '';
+                        document.getElementById('qtdAvaliacoes').innerText = '';
                     }
-                    document.getElementById('mediaEstrelas').innerHTML = estrelas + ` <span class="ml-2">${media.toFixed(2)} / 5.0</span>`;
-                    document.getElementById('qtdAvaliacoes').innerText = total + (total === 1 ? ' avaliação' : ' avaliações');
-                } else {
-                    document.getElementById('mediaEstrelas').innerHTML = '';
-                    document.getElementById('qtdAvaliacoes').innerText = '';
                 }
+            } catch (e) {
+                document.getElementById('mediaEstrelas').innerHTML = '';
+                document.getElementById('qtdAvaliacoes').innerText = '';
             }
-        } catch (e) {
-            document.getElementById('mediaEstrelas').innerHTML = '';
-            document.getElementById('qtdAvaliacoes').innerText = '';
         }
-    }
-    document.addEventListener('DOMContentLoaded', function () {
-        exibirMediaAvaliacoes({{ session.user_id | tojson }});
-    });
+        document.addEventListener('DOMContentLoaded', function () {
+            exibirMediaAvaliacoes({{ session.user_id | tojson }});
+        });
 
-    // Lista de avaliações detalhadas (ao clicar no botão)
-    async function gerarEstrelasHTML() {
-        const userId = {{ session.user_id| tojson }};
-    const lista = document.getElementById('lista-avaliacoes');
-    if (!lista) return;
-    lista.innerHTML = '<li class="list-group-item">Carregando avaliações...</li>';
-    try {
-        const resp = await fetch(`/servicos/avaliacoes/freelancer/${userId}`);
-        const result = await resp.json();
-        if (result.sucesso && Array.isArray(result.avaliacoes) && result.avaliacoes.length > 0) {
-            lista.innerHTML = '';
-            result.avaliacoes.forEach(av => {
-                lista.innerHTML += `
-                        <li class="list-group-item">
-                            <div>
-                                <span class="text-warning">${'★'.repeat(av.Nota)}${'☆'.repeat(5 - av.Nota)}</span>
-                                <b>${av.NomeService || 'Serviço'}</b>
-                                <small class="text-muted">por ${av.Nome} em ${new Date(av.DataAvaliacao).toLocaleDateString()}</small>
-                            </div>
-                            <div>${av.Comentario ? av.Comentario : ''}</div>
-                        </li>
-                    `;
-            });
-        } else {
-            lista.innerHTML = '<li class="list-group-item">Nenhuma avaliação de cliente encontrada.</li>';
+        // Lista de avaliações detalhadas (ao clicar no botão)
+        async function gerarEstrelasHTML() {
+            const userId = {{ session.user_id| tojson
+        }};
+        const lista = document.getElementById('lista-avaliacoes');
+        if (!lista) return;
+        lista.innerHTML = '<li class="list-group-item">Carregando avaliações...</li>';
+        try {
+            const resp = await fetch(`/servicos/avaliacoes/freelancer/${userId}`);
+            const result = await resp.json();
+            if (result.sucesso && Array.isArray(result.avaliacoes) && result.avaliacoes.length > 0) {
+                lista.innerHTML = '';
+                result.avaliacoes.forEach(av => {
+                    lista.innerHTML += `
+                            <li class="list-group-item">
+                                <div>
+                                    <span class="text-warning">${'★'.repeat(av.Nota)}${'☆'.repeat(5 - av.Nota)}</span>
+                                    <b>${av.NomeService || 'Serviço'}</b>
+                                    <small class="text-muted">por ${av.Nome} em ${new Date(av.DataAvaliacao).toLocaleDateString()}</small>
+                                </div>
+                                <div>${av.Comentario ? av.Comentario : ''}</div>
+                            </li>
+                        `;
+                });
+            } else {
+                lista.innerHTML = '<li class="list-group-item">Nenhuma avaliação de cliente encontrada.</li>';
+            }
+            // Exibe o título se estiver oculto
+            const h3 = lista.closest('.estrelasHTML').querySelector('h2');
+            if (h3) h3.style.display = 'block';
+        } catch {
+            lista.innerHTML = '<li class="list-group-item text-danger">Erro ao carregar avaliações.</li>';
         }
-        // Exibe o título se estiver oculto
-        const h3 = lista.closest('.estrelasHTML').querySelector('h2');
-        if (h3) h3.style.display = 'block';
-    } catch {
-        lista.innerHTML = '<li class="list-group-item text-danger">Erro ao carregar avaliações.</li>';
-    }
-    }
-</script>
+        }
+    </script>
+    {% endblock %}
+</body>
 
 </html>

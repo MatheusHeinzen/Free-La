@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" href="../static/imgs/icon.png">
-    <title>Meus Serviços Requisitados</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços Cliente</title>
+    <link rel="shortcut icon" href="../static/imgs/icon.png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/complementos.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <style>
@@ -29,9 +29,6 @@
 
         /* Ajustes para mobile */
         @media (max-width: 767.98px) {
-            ul{
-                position: relative;
-            }
             #toggleSidebar {
                 background-color: rgb(255, 255, 255);
                 color: black;
@@ -134,105 +131,13 @@
 
 </head>
 
+<header>
+    {% include '_navbar.html' %}
+    {% include '_sidebar.html' %}
+</header>
+
 <body>
-    {% if not session.user_id %}
-    <script>window.location.href = "/";</script>
-    {% endif %}
-    <header>
-        <div class="container">
-            <!-- Navbar para dispositivos móveis -->
-            <nav class="menu_lateral" id="menu_lateral">
-                <div class="expandir">
-                    <i class=""></i>
-                </div>
-                <ul>
-                    <li class="item_menu">
-                        <a href="/perfil">
-                            <img id="fotoPerfil" src="/profile/imagem/{{ session.user_id }}" class="img_sidebar"
-                                alt="Perfil" width="140px">
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Sobre</span>
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Contato</span>
-                        </a>
-                    </li>
-                    <li class="item_menu has-submenu">
-                        <a href="#" onclick="toggleSubmenu(event)">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Configurações</span>
-                        </a>
-                        <ul class="submenu">
-                            <ul class="submenu">
-                                <li class="item_menu" id="submenu">
-                                    <a href="/alterarDados">
-                                        <span class="icon"><i class="#"></i></span>
-                                        <span class="link">Atualizar Dados</span>
-                                    </a>
-                                </li>
-                                <li class="item_menu" id="submenu">
-                                    <a href="#" onclick="showPopUpDeletar()">
-                                        <span class="icon"><i class="#"></i></span>
-                                        <span class="link">Deletar Perfil</span>
-                                    </a>
-                                </li>
-                                <li class="item_menu" id="submenu">
-                                    {% if session.user_id %}
-                                    <a href="/" onclick="logout()">
-                                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
-                                        <span class="link">Logout</span>
-                                    </a>
-                                    {% else %}
-                                    <a href="/">
-                                        <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
-                                        <span class="link">Login</span>
-                                    </a>
-                                    {% endif %}
-                                </li>
-                            </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-        <div class="overlay" id="overlay"></div>
-        <div class="pop-up-deletar" id="pop-up-deletar">
-          <h3>Deletar Perfil?</h3>
-          <p>Tem certeza que deseja excluir seu perfil? <br>
-            Você perderá todos seus dados e não poderá executar todas as funcionalidades do Site</p>
-          <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
-          <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
-        </div>
-    
-
-        <!-- Par desktops -->
-        <nav class="desktop-version navbar navbar-dark bg-dark shadow-sm">
-            <div class="container d-flex justify-content-between">
-                <a href="/homepage" class="navbar-brand">Menu</a>
-                <div class="dropdown">
-                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Configurações</a>
-                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
-                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
-                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
-                        {% if session.user_id %}
-                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
-                        {% else %}
-                        <a class="dropdown-item" href="/">Login</a>
-                        {% endif %}
-                    </div>
-                </div>
-                <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
-            </div>
-        </nav>
-    </header>
+    <!-- ...navbar/sidebar HTML aqui... -->
     <main>
         <div class="container mt-4 px-3">
             <div class="card shadow-sm mb-4">
@@ -258,22 +163,7 @@
             </div>
         </div>
     </main>
-    <script>//SideBar (Entra e sai da tela)
-        document.addEventListener("DOMContentLoaded", function () {
-            const sidebar = document.querySelector(".menu_lateral");
-            const toggleButton = document.getElementById("toggleSidebar");
-
-            toggleButton.addEventListener("click", function (event) {
-                sidebar.classList.toggle("ativo");
-                event.stopPropagation();
-            });
-
-            document.addEventListener("click", function (event) {
-                if (!sidebar.contains(event.target) && !toggleButton.contains(event.target)) {
-                    sidebar.classList.remove("ativo");
-                }
-            });
-        });
+    <script>
         function toggleSubmenu(event) {
             event.preventDefault();
             const item = event.currentTarget.closest('.has-submenu');
@@ -283,6 +173,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ url_for('static', filename='js/avaliar_servico.js')}}"></script>
     <script src="{{ url_for('static', filename='js/servicos_cliente.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
 </body>
 
 </html>

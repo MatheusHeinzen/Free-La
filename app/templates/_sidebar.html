@@ -1,0 +1,60 @@
+<!-- Sidebar e menu lateral reutilizável -->
+<nav class="menu_lateral" id="menu_lateral">
+    <div class="expandir">
+        <i class="bi bi-list"></i>
+    </div>
+    <ul>
+        <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar" style="margin-left: 1rem;">
+        <li class="item_menu">
+            <a href="/perfil">
+                <span class="icon"></span>
+                <span class="link">Perfil</span>
+            </a>
+        </li>
+        <li class="item_menu">
+            <a href="#">
+                <span class="icon"><i class="#"></i></span>
+                <span class="link">Sobre</span>
+            </a>
+        </li>
+        <li class="item_menu">
+            <a href="#">
+                <span class="icon"><i class="#"></i></span>
+                <span class="link">Contato</span>
+            </a>
+        </li>
+        <li class="item_menu has-submenu">
+            <a href="#" onclick="toggleSubmenu(event)">
+                <span class="icon"><i class="#"></i></span>
+                <span class="link">Configurações</span>
+            </a>
+            <ul class="submenu">
+                <li class="item_menu" id="submenu">
+                    <a href="/alterarDados">
+                        <span class="icon"><i class="#"></i></span>
+                        <span class="link">Atualizar Dados</span>
+                    </a>
+                </li>
+                <li class="item_menu" id="submenu">
+                    <a href="#" onclick="showPopUpDeletar()">
+                        <span class="icon"><i class="#"></i></span>
+                        <span class="link">Deletar Perfil</span>
+                    </a>
+                </li>
+                <li class="item_menu" id="submenu">
+                    {% if session.user_id %}
+                    <a href="/" onclick="logout()">
+                        <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+                        <span class="link">Logout</span>
+                    </a>
+                    {% else %}
+                    <a href="/">
+                        <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                        <span class="link">Login</span>
+                    </a>
+                    {% endif %}
+                </li>
+            </ul>
+        </li>
+    </ul>
+</nav>

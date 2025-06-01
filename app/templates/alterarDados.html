@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,110 +62,13 @@
         }
     </style>
 </head>
-
 <body>
-    {% if not session.user_id %}
-    <script>window.location.href = "/";</script>
-    {% endif %}
     <header>
-        <div class="container">
-            <!-- Para celulares -->
-            <nav class="menu_lateral" id="menu_lateral">
-                <div class="expandir">
-                    <i class="bi bi-list"></i>
-                </div>
-                <ul>
-                    <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar"
-                        style="margin-left: 1rem;">
-                    <li class="item_menu">
-                        <a href="/perfil">
-                            <span class="icon"></span>
-                            <span class="link">Perfil</span>
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Sobre</span>
-                        </a>
-                    </li>
-                    <li class="item_menu">
-                        <a href="#">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Contato</span>
-                        </a>
-                    </li>
-                    <li class="item_menu has-submenu">
-                        <a href="#" onclick="toggleSubmenu(event)">
-                            <span class="icon"><i class="#"></i></span>
-                            <span class="link">Configurações</span>
-                        </a>
-
-                        <ul class="submenu">
-                            <li class="item_menu" id="submenu">
-                                <a href="/alterarDados">
-                                    <span class="icon"><i class="#"></i></span>
-                                    <span class="link">Atualizar Dados</span>
-                                </a>
-                            </li>
-                            <li class="item_menu" id="submenu">
-                                <a href="#" onclick="showPopUpDeletar()">
-                                    <span class="icon"><i class="#"></i></span>
-                                    <span class="link">Deletar Perfil</span>
-                                </a>
-                            </li>
-                            <li class="item_menu" id="submenu">
-                                {% if session.user_id %}
-                                <a href="/" onclick="logout()">
-                                    <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
-                                    <span class="link">Logout</span>
-                                </a>
-                                {% else %}
-                                <a href="/">
-                                    <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
-                                    <span class="link">Login</span>
-                                </a>
-                                {% endif %}
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-        <div class="overlay" id="overlay"></div>
-        <div class="pop-up-deletar" id="pop-up-deletar">
-            <h3>Deletar Perfil?</h3>
-            <p>Tem certeza que deseja excluir seu perfil? <br>
-                Você perderá todos seus dados e não poderá executar todas as funcionalidades do Site</p>
-            <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
-            <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
-        </div>
-
-
-        <!-- Par desktops -->
-        <nav class="desktop-version">
-            <div class="navbar navbar-dark bg-dark shadow-sm">
-                <div class="container d-flex justify-content-between">
-                    <a href="/homepage" class="navbar-brand d-flex align-items-center">Home</a>
-                    <a href="#" class="phone-hidden dropdown-toggle" id="desktopConfigDropdown" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Configurações</a>
-                    <div class="dropdown-menu" aria-labelledby="desktopConfigDropdown">
-                        <a class="dropdown-item" href="/alterarDados">Atualizar Dados</a>
-                        <a class="dropdown-item" href="#" onclick="showPopUpDeletar()">Deletar Perfil</a>
-                        {% if session.user_id %}
-                        <a class="dropdown-item" href="/" onclick="logout()">Logout</a>
-                        {% else %}
-                        <a class="dropdown-item" href="/">Login</a>
-                        {% endif %}
-                    </div>
-                    <button id="toggleSidebar" style="font-size: 20px;">☰</button> <!-- Some na versão desktop -->
-                </div>
-            </div>
-        </nav>
-    </header>
-    <main>
-        <div class="tab-pane container" id="edit">
+    {% include '_navbar.html' %}
+    {% include '_sidebar.html' %}
+  </header>
+    <!-- ...navbar/sidebar HTML aqui... -->
+    <div class="tab-pane container" id="edit">
             
             {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else
             (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
@@ -275,29 +177,28 @@
                 </div>
             </form>
         </div>
-    </main>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
-    <script src="{{ url_for('static', filename='js/dados.js') }}"></script>
-    <script>
-        $(document).ready(function () {
-            $('#telefone').mask('(00) 00000-0000');
-            $('#cpf').mask('000.000.000-00');
-            $('#cep').mask('00000-000');
-        });
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            const item = event.currentTarget.closest('.has-submenu');
-            item.classList.toggle('active');
-        }
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
-        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
-        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
-        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+<script src="{{ url_for('static', filename='js/dados.js') }}"></script>
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script>
+    $(document).ready(function () {
+        $('#telefone').mask('(00) 00000-0000');
+        $('#cpf').mask('000.000.000-00');
+        $('#cep').mask('00000-000');
+    });
+    function toggleSubmenu(event) {
+        event.preventDefault();
+        const item = event.currentTarget.closest('.has-submenu');
+        item.classList.toggle('active');
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+    integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+    integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+    crossorigin="anonymous"></script>
 </body>
-
 </html>

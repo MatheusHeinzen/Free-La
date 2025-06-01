@@ -24,18 +24,19 @@
                 <span>Se já possui cadastro <a onclick="alternarModo('login')" href="#">Clique Aqui!</a></span>
 
                 <div class="input-container">
-                    <input id="nome" type="text" placeholder="Nome*" autocomplete="off"/>
+                    <input id="nome" type="text" placeholder="Nome*" autocomplete="off" />
                     <i data-tooltip="Digite seu nome completo." class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
-                    <input id="email" type="email" placeholder="Email*" autocomplete="off"/>
+                    <input id="email" type="email" placeholder="Email*" autocomplete="off" />
                     <i data-tooltip="Digite seu melhor e-mail." class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
                     <input id="dataNascimento" type="date" placeholder="Data de Nascimento*" />
-                    <i data-tooltip="Informe sua data de nascimento. Apenas maiores de 18 anos podem se cadastrar." class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="Informe sua data de nascimento. Apenas maiores de 18 anos podem se cadastrar."
+                        class="bi bi-question-circle-fill"></i>
                 </div>
 
                 <div class="input-container">
@@ -44,7 +45,8 @@
                 </div>
 
                 <div class="input-container">
-                    <i data-tooltip="A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial." class="bi bi-question-circle-fill"></i>
+                    <i data-tooltip="A senha deve ter 8+ caracteres, uma letra maiúscula, um número e um caractere especial."
+                        class="bi bi-question-circle-fill"></i>
                     <div class="senha-container">
                         <input type="password" id="senha" placeholder="Senha*" />
                         <i class="bi bi-eye-fill" id="btn-senha1" onclick="toggleSenha('senha','btn-senha1')"></i>
@@ -52,13 +54,15 @@
 
                     <div class="senha-container">
                         <input type="password" id="confirma-senha" placeholder="Confirmar Senha*" />
-                        <i class="bi bi-eye-fill" id="btn-senha2" onclick="toggleSenha('confirma-senha','btn-senha2')"></i>
+                        <i class="bi bi-eye-fill" id="btn-senha2"
+                            onclick="toggleSenha('confirma-senha','btn-senha2')"></i>
                     </div>
                 </div>
 
                 <div id="termosDeServico">
                     <input type="checkbox" id="checkbox" />
-                    <span>Li e aceito os <a href="/termos" target="_blank">termos de uso e a política de privacidade</a>.</span>
+                    <span>Li e aceito os <a href="/termos" target="_blank">termos de uso e a política de
+                            privacidade</a>.</span>
                 </div>
 
                 <span id="senha-erro" class="erro"></span>
@@ -72,8 +76,8 @@
                 <h1>Realize seu Login</h1>
                 <div class="social-container">
                     <!-- <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/facebook.png') }}" alt="Facebook"></a>
-                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/google.png') }}" alt="Google"></a>
-                    <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/linkedin.png') }}" alt="LinkedIn"></a> -->
+                <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/google.png') }}" alt="Google"></a>
+                <a href="#" class="social"><img src="{{ url_for('static', filename='imgs/linkedin.png') }}" alt="LinkedIn"></a> -->
                 </div>
                 <span>Ou se não possui uma conta <a href="#" onclick="alternarModo('cadastro')">Clique Aqui!</a></span>
                 <input id="login-email" type="email" placeholder="Email" autocomplete="off" />
