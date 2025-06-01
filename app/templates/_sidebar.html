@@ -1,10 +1,14 @@
+<head>
+
+</head>
 <!-- Sidebar e menu lateral reutilizável -->
 <nav class="menu_lateral" id="menu_lateral">
     <div class="expandir">
         <i class="bi bi-list"></i>
     </div>
     <ul>
-        <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar" style="margin-left: 1rem;">
+        <img src="/profile/imagem/{{ session.user_id }}" alt="Perfil" width="140px" class="img_sidebar"
+            style="margin-left: 1rem;">
         <li class="item_menu">
             <a href="/perfil">
                 <span class="icon"></span>
@@ -58,3 +62,14 @@
         </li>
     </ul>
 </nav>
+
+<div class="overlay" id="overlay"></div>
+<div class="pop-up-deletar" id="pop-up-deletar">
+    <h3>Deletar Perfil?</h3>
+    <p>Tem certeza que deseja excluir seu perfil? <br>
+        Você perderá todos seus dados e não poderá executar todas as funcionalidades do Site</p>
+    <button onclick="fecharPopUpDeletar()">NÃO, RETORNAR PARA A HOMEPAGE</button>
+    <button onclick="confirmarDelecao()">SIM, DESEJO DELETAR OS MEUS DADOS</button>
+</div>
+
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
