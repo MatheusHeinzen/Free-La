@@ -47,11 +47,10 @@
 </header>
 
 <body>
-    <!-- ...navbar/sidebar HTML aqui... -->
     <div class="container mt-4 px-3">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-white">
-                <h2 class="mb-0">Serviços Requisitados para Mim</h2>
+                <h2 class="mb-0">Serviços Requisitados para {{ obter_nome_usuario() }}</h2>
             </div>
             <div class="card-body p-0">
                 <ul id="servicosRecebidos" class="list-group">

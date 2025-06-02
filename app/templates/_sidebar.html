@@ -16,15 +16,24 @@
             </a>
         </li>
         <li class="item_menu">
-            <a href="#">
+            {% set tipo_usuario = session['TipoUsuario'] if session and 'TipoUsuario' in session else
+            (session['tipo_usuario'] if session and 'tipo_usuario' in session else None) %}
+            {% if tipo_usuario == 'freelancer' %}
+            <a href="/servicosFreelancer">
                 <span class="icon"><i class="#"></i></span>
-                <span class="link">Sobre</span>
+                <span class="link">Meus Serviços</span>
             </a>
+            {% else %}
+            <a href="/alterarDados">
+                <span class="icon"><i class="#"></i></span>
+                <span class="link">Torne-se Freelancer</span>
+            </a>
+            {% endif %}
         </li>
         <li class="item_menu">
-            <a href="#">
+            <a href="/servicosCliente">
                 <span class="icon"><i class="#"></i></span>
-                <span class="link">Contato</span>
+                <span class="link">Serviços Pedidos</span>
             </a>
         </li>
         <li class="item_menu has-submenu">
