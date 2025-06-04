@@ -72,15 +72,13 @@ body {
     box-shadow: 0 5px 15px rgba(106, 13, 173, 0.3);
 }
 
-
-
 /* para celular */
 @media screen and (max-width: 768px) {
     #toggleSidebar{
         display: absolute;
         right: 0px;
-        background-color: rgb(161 59 188);
-        color: white;
+        background-color: rgb(255, 255, 255);
+        color: rgb(0, 0, 0);
         border: none;
         padding: 8px 15px;
         cursor: pointer;
@@ -139,7 +137,7 @@ body {
         font-size: 34px;
     }
 
-    ul {
+    .menu {
         height: 100%;
         width: 100%;
         list-style-type: none;
@@ -162,6 +160,7 @@ body {
         margin-bottom: 12px;
         position: static;
         line-height: 25px;
+        list-style-type: none;
     }
 
     ul li.item_menu a .link {

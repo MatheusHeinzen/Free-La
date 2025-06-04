@@ -166,14 +166,7 @@
         </div>
 
     </div>
-    <div class="overlay" id="overlay"></div>
-    <div class="pop-up-deletar" id="pop-up-deletar">
-        <h3>Deletar Perfil?</h3>
-        <p>Tem certeza que deseja excluir seu perfil? Você perderá todos seus dados e não poderá executar todas as
-            funcionalidades do site.</p>
-        <button onclick="fecharPopUpDeletar()"><strong>NÃO,</strong> RETORNAR PARA PERFIL</button>
-        <button onclick="confirmarDelecao()"><strong>SIM,</strong> DESEJO DELETAR O PERFIL</button>
-    </div>
+
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
@@ -185,12 +178,8 @@
         crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script src="{{ url_for('static', filename='js/perfil.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
     <script>
-        function toggleSubmenu(event) {
-            event.preventDefault();
-            const item = event.currentTarget.closest('.has-submenu');
-            item.classList.toggle('active');
-        }
 
         // Exibir média de avaliações no perfil (estrelas e quantidade)
         async function exibirMediaAvaliacoes(userId) {
