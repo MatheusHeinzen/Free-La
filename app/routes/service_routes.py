@@ -118,18 +118,33 @@ def listar_servicos():
         """, (user_id,))
         servicos_recebidos_concluidos = cursor.fetchall()
 
+        # Serviços recebidos concluídos avaliados
+        cursor.execute("""
+            SELECT s.ID_Service, s.NomeService AS Nome, s.Descricao, 
+                   (SELECT c.NomeCategoria FROM service_categoria sc 
+                    JOIN categoria c ON sc.ID_Categoria = c.ID_Categoria 
+                    WHERE sc.ID_Service = s.ID_Service LIMIT 1) AS Categoria,
+                   s.Status, a.Nota, a.Comentario
+            FROM service , avaliacao a  
+            WHERE s.ID_Freelancer = %s AND s.Status = 'concluido'
+        """, (user_id,))
+        servicos_recebidos_concluidos_avaliados = cursor.fetchall()
+
         print(f"[DEBUG] servicosPedidos: {servicos_pedidos}")
         print(f"[DEBUG] servicosPedidosConcluidos: {servicos_pedidos_concluidos}")
         print(f"[DEBUG] servicosRecebidos: {servicos_recebidos}")
         print(f"[DEBUG] servicosRecebidosConcluidos: {servicos_recebidos_concluidos}")
+        print(f"[DEBUG] servicosRecebidosConcluidosAvaliados: {servicos_recebidos_concluidos_avaliados}")
 
         return jsonify({
             "sucesso": True,
             "servicosPedidos": servicos_pedidos,
             "servicosPedidosConcluidos": servicos_pedidos_concluidos,
             "servicosRecebidos": servicos_recebidos,
-            "servicosRecebidosConcluidos": servicos_recebidos_concluidos
+            "servicosRecebidosConcluidos": servicos_recebidos_concluidos,
+            "servicosRecebidosConcluidosAvaliados": servicos_recebidos_concluidos_avaliados
         }), 200
+    
     except Exception as e:
         print(f"[ERROR] Erro ao listar serviços: {e}")
         return jsonify({"sucesso": False, "erro": "Erro ao listar serviços"}), 500

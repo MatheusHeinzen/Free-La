@@ -6,11 +6,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const recebidos = document.getElementById('servicosRecebidos');
         const recebidosConcluidos = document.getElementById('servicosRecebidosConcluidos');
+        const recebidosConcluidosAvaliados = document.getElementById('servicosRecebidosConcluidosAvaliados');
+
         recebidos.innerHTML = '';
+
         if (recebidosConcluidos) recebidosConcluidos.innerHTML = '';
 
         function renderCategoria(servico) {
             return servico.Categoria && servico.Categoria !== 'null' ? servico.Categoria : '<span class="text-danger">Sem categoria</span>';
+        }
+
+        function servicoJaAvaliado(servico) {
+            if (recebidosConcluidosAvaliados && Array.isArray(data.servicosRecebidosConcluidosAvaliados) && data.servicosRecebidosConcluidosAvaliados.length > 0) {
+                data.servicosRecebidosConcluidos.forEach(servico => {
+                    recebidosConcluidos.innerHTML += `
+                        <li class="list-group-item">
+                            <strong>${servico.Nome}</strong>
+                            <p class="mb-2" style="word-break: break-word">${servico.Descricao}</p>
+                            <small class="d-block">Categoria: ${renderCategoria(servico)}</small>
+                            <small class="d-block mb-2">Status: ${servico.Status}</small>
+                            <div class="mt-2">
+                            
+                                <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                            </div>
+                        </li>`;
+                });
+            } else if (recebidosConcluidos) {
+                recebidosConcluidos.innerHTML = `
+                <li class="list-group-item"> 
+                    <i class="bi bi-check-circle text-muted mb-2" style="font-size: 2rem;"></i>
+                    Nenhum serviço concluído encontrado.
+                </li>`;
+            }
         }
 
         if (Array.isArray(data.servicosRecebidos) && data.servicosRecebidos.length > 0) {
@@ -48,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <small class="d-block">Categoria: ${renderCategoria(servico)}</small>
                         <small class="d-block mb-2">Status: ${servico.Status}</small>
                         <div class="mt-2">
+                        
                             <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
                         </div>
                     </li>`;
