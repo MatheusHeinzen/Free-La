@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, session
-from auth_routes import jwt_required
+from app.routes.auth_routes import jwt_required
 
 base_bp = Blueprint('base', __name__)
 
