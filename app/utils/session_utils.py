@@ -9,7 +9,7 @@ def login_required(func):
         if not session.get('user_id'):
             if request.is_json:
                 return jsonify({"sucesso": False, "mensagem": "Não autenticado"}), 401
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('/homepage'))
         return func(*args, **kwargs)
     return decorated_function
 

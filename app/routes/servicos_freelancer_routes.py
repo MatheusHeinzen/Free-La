@@ -6,7 +6,7 @@ servicos_freelancer_bp = Blueprint('servicos_freelancer', __name__)
 def servicos_freelancer():
     if 'user_id' not in session:
         flash('Você precisa fazer login primeiro', 'warning')
-        return redirect('/')  # Melhor redirecionar para a rota de login
+        return redirect('/homepage')  # Redireciona para homepage
     
     # Comparação mais robusta do tipo de usuário
     if session.get('TipoUsuario', '').lower() != 'freelancer':

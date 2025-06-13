@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('/servicos/listar', { credentials: 'include' });
-        if (!response.ok) throw new Error('Erro ao carregar serviços');
+        if (!response.ok) {
+            // Se não autenticado, redireciona para homepage
+            window.location.href = "/homepage";
+            return;
+        }
         const data = await response.json();
 
         const recebidos = document.getElementById('servicosRecebidos');
@@ -38,9 +42,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             </li>`;
         }
 
-        // Serviços concluídos
+        // Serviços concluídos - checa se já foi avaliado
+        let avaliacoesUsuario = {};
         if (recebidosConcluidos && Array.isArray(data.servicosRecebidosConcluidos) && data.servicosRecebidosConcluidos.length > 0) {
+            // Busca avaliações do usuário logado para os serviços concluídos
+            const userId = window.session?.user_id || (window.sessionStorage && sessionStorage.getItem('user_id'));
+            let ids = data.servicosRecebidosConcluidos.map(s => s.ID_Service);
+            let avaliacoes = {};
+            try {
+                // Busca avaliações do usuário logado para esses serviços
+                const resp = await fetch(`/servicos/avaliacoes/usuario?ids=${ids.join(',')}`, { credentials: 'include' });
+                if (resp.ok) {
+                    const result = await resp.json();
+                    if (result.sucesso && result.avaliacoes) {
+                        // Map: ID_Service -> true
+                        result.avaliacoes.forEach(av => { avaliacoes[av.ID_Service] = true; });
+                    }
+                }
+            } catch {}
             data.servicosRecebidosConcluidos.forEach(servico => {
+                const jaAvaliado = avaliacoes[servico.ID_Service];
                 recebidosConcluidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
@@ -48,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <small class="d-block">Categoria: ${renderCategoria(servico)}</small>
                         <small class="d-block mb-2">Status: ${servico.Status}</small>
                         <div class="mt-2">
-                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">${jaAvaliado ? 'Reavaliar' : 'Avaliar'}</button>
                         </div>
                     </li>`;
             });

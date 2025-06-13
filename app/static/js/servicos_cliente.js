@@ -1,7 +1,10 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('/servicos/listar', { credentials: 'include' });
-        if (!response.ok) throw new Error('Erro ao carregar serviços');
+        if (!response.ok) {
+            window.location.href = "/homepage";
+            return;
+        }
         const data = await response.json();
 
         const pedidos = document.getElementById('servicosPedidos');
@@ -40,9 +43,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             </li>`;
         }
 
-        // Serviços concluídos
+        // Serviços concluídos - checa se já foi avaliado
         if (pedidosConcluidos && data.servicosPedidosConcluidos && data.servicosPedidosConcluidos.length > 0) {
+            let ids = data.servicosPedidosConcluidos.map(s => s.ID_Service);
+            let avaliacoes = {};
+            try {
+                const resp = await fetch(`/servicos/avaliacoes/usuario?ids=${ids.join(',')}`, { credentials: 'include' });
+                if (resp.ok) {
+                    const result = await resp.json();
+                    if (result.sucesso && result.avaliacoes) {
+                        result.avaliacoes.forEach(av => { avaliacoes[av.ID_Service] = true; });
+                    }
+                }
+            } catch {}
             data.servicosPedidosConcluidos.forEach(servico => {
+                const jaAvaliado = avaliacoes[servico.ID_Service];
                 pedidosConcluidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
@@ -50,7 +65,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <small class="d-block">Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small>
                         <small class="d-block mb-2">Status: ${servico.Status}</small>
                         <div class="mt-2">
-                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">${jaAvaliado ? 'Reavaliar' : 'Avaliar'}</button>
                         </div>
                     </li>`;
             });

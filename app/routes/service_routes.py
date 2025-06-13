@@ -327,3 +327,38 @@ def listar_avaliacoes_freelancer(freelancer_id):
             cursor.close()
         if conn:
             conn.close()
+
+@service_bp.route('/avaliacoes/usuario', methods=['GET'])
+@login_required
+def avaliacoes_usuario_para_servicos():
+    """
+    Retorna lista de avaliações do usuário logado para os serviços informados (por ID).
+    Query param: ids=1,2,3
+    """
+    user_id = session.get('user_id')
+    ids = request.args.get('ids', '')
+    if not ids:
+        return jsonify({"sucesso": True, "avaliacoes": []})
+    id_list = [int(i) for i in ids.split(',') if i.isdigit()]
+    if not id_list:
+        return jsonify({"sucesso": True, "avaliacoes": []})
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        # Busca avaliações do usuário logado para esses serviços
+        cursor.execute("""
+            SELECT ID_Service FROM avaliacao
+            WHERE ID_Avaliador = %s AND ID_Service IN ({})
+        """.format(','.join(['%s'] * len(id_list))), tuple([user_id] + id_list))
+        avaliacoes = cursor.fetchall()
+        return jsonify({"sucesso": True, "avaliacoes": avaliacoes})
+    except Exception as e:
+        print(f"[ERROR] Erro ao buscar avaliações do usuário: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao buscar avaliações"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
