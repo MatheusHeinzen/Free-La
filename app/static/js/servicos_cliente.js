@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch {}
             data.servicosPedidosConcluidos.forEach(servico => {
                 const jaAvaliado = avaliacoes[servico.ID_Service];
+                const avaliacaoId = jaAvaliado && jaAvaliado.ID_Avaliacao;
                 pedidosConcluidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
@@ -65,7 +66,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <small class="d-block">Categoria: ${servico.Categoria || '<span class="text-danger">Sem categoria</span>'}</small>
                         <small class="d-block mb-2">Status: ${servico.Status}</small>
                         <div class="mt-2">
-                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">${jaAvaliado ? 'Reavaliar' : 'Avaliar'}</button>
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service}, ${jaAvaliado ? JSON.stringify(jaAvaliado) : 'null'})">${jaAvaliado ? 'Reavaliar' : 'Avaliar'}</button>
+                            ${jaAvaliado ? `<button class="btn btn-danger btn-sm ml-2" onclick="deletarAvaliacao(${servico.ID_Service})">Deletar Avaliação</button>` : ''}
                         </div>
                     </li>`;
             });
@@ -128,27 +130,27 @@ window.editarServico = function (servicoId, nome, descricao, categoria) {
     });
 };
 
-window.avaliarServico = async function (servicoId) {
+window.avaliarServico = async function (servicoId, avaliacaoExistente = null) {
+    let notaAtual = '';
+    let comentarioAtual = '';
+    if (avaliacaoExistente) {
+        notaAtual = avaliacaoExistente.Nota;
+        comentarioAtual = avaliacaoExistente.Comentario || '';
+    }
     const { value: formValues } = await Swal.fire({
-        title: 'Avaliar Serviço',
+        title: avaliacaoExistente ? 'Reavaliar Serviço' : 'Avaliar Serviço',
         html: `
         <div class="mb-3">
             <label class="form-label">Nota:</label><br>
             <div class="rating">
-            <input type="radio" id="estrela5" name="rating" value="5">
-            <label for="estrela5"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela4" name="rating" value="4">
-            <label for="estrela4"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela3" name="rating" value="3">
-            <label for="estrela3"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela2" name="rating" value="2">
-            <label for="estrela2"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela1" name="rating" value="1">
-            <label for="estrela1"><i class="bi bi-star-fill"></i></label>
+            ${[5,4,3,2,1].map(i => `
+                <input type="radio" id="estrela${i}" name="rating" value="${i}" ${notaAtual == i ? 'checked' : ''}>
+                <label for="estrela${i}"><i class="bi bi-star-fill"></i></label>
+            `).join('')}
             </div>
         </div>
         <label for="comentarioServico">Comentário:</label>
-        <textarea id="comentarioServico" class="form-control" rows="3"></textarea>
+        <textarea id="comentarioServico" class="form-control" rows="3">${comentarioAtual}</textarea>
         `,
         focusConfirm: false,
         preConfirm: () => {
@@ -188,6 +190,37 @@ window.avaliarServico = async function (servicoId) {
                 icon: 'error',
                 title: 'Erro!',
                 text: error.message || 'Erro ao avaliar serviço.'
+            });
+        }
+    }
+};
+
+window.deletarAvaliacao = async function(servicoId) {
+    const confirm = await Swal.fire({
+        title: 'Deletar avaliação?',
+        text: 'Tem certeza que deseja deletar sua avaliação deste serviço?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, deletar',
+        cancelButtonText: 'Cancelar'
+    });
+    if (confirm.isConfirmed) {
+        try {
+            const response = await fetch(`/servicos/avaliar/${servicoId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Erro ao deletar avaliação');
+            Swal.fire({
+                icon: 'success',
+                title: 'Avaliação deletada!',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => location.reload());
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro!',
+                text: error.message || 'Erro ao deletar avaliação.'
             });
         }
     }
