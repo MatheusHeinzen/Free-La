@@ -9,7 +9,7 @@
 - Vinicius Lima Teider
 
 ## Sobre o projeto
-Free'la é uma plataforma para freelancers, dedicada à divulgação de trabalhadores informais e seus serviços. O projeto foi criado para a matéria de "Experiência Criativa: Implementação de Sistemas de Informação" e será escalonado para outros semestres, sendo usado como TCC da equipe.
+Free'la é uma plataforma para freelancers, dedicada à divulgação de trabalhadores informais e seus serviços. O projeto foi criado para a matéria de "Experiência Criativa: Implementação de Sistemas de Informação".
 
 A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas, mas não é um marketplace (não inclui chat interno, gateway de pagamento ou publicações no primeiro momento).
 
@@ -36,10 +36,10 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 - **Deleção de conta**: Usuário pode excluir seu perfil e todos os dados associados.
 - **Validação de dados**: CPF, email, telefone e endereço validados no front e back-end.
 - **Sessão segura**: Controle de sessão e logout.
-
-### Futuras
 - **JWT no login**: Planejado para substituir sessões por autenticação baseada em token JWT.
 - **CRUD de avaliações**: Transformar avaliações em um CRUD completo (criar, listar, editar, deletar avaliações).
+
+### Futuras
 - **Filtros e busca avançada**: Por especialidade, localização e tipo de serviço.
 
 ---
