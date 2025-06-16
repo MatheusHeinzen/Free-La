@@ -143,10 +143,16 @@ window.avaliarServico = async function (servicoId, avaliacaoExistente = null) {
         <div class="mb-3">
             <label class="form-label">Nota:</label><br>
             <div class="rating">
-            ${[5,4,3,2,1].map(i => `
-                <input type="radio" id="estrela${i}" name="rating" value="${i}" ${notaAtual == i ? 'checked' : ''}>
-                <label for="estrela${i}"><i class="bi bi-star-fill"></i></label>
-            `).join('')}
+                <input type="radio" id="estrela5" name="rating" value="5">
+                <label for="estrela5"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="estrela4" name="rating" value="4">
+                <label for="estrela4"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="estrela3" name="rating" value="3">
+                <label for="estrela3"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="estrela2" name="rating" value="2">
+                <label for="estrela2"><i class="bi bi-star-fill"></i></label>
+                <input type="radio" id="estrela1" name="rating" value="1">
+                <label for="estrela1"><i class="bi bi-star-fill"></i></label>
             </div>
         </div>
         <label for="comentarioServico">Comentário:</label>
