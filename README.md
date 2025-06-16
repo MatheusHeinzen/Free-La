@@ -36,8 +36,8 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 - **Deleção de conta**: Usuário pode excluir seu perfil e todos os dados associados.
 - **Validação de dados**: CPF, email, telefone e endereço validados no front e back-end.
 - **Sessão segura**: Controle de sessão e logout.
-- **JWT no login**: Planejado para substituir sessões por autenticação baseada em token JWT.
-- **CRUD de avaliações**: Transformar avaliações em um CRUD completo (criar, listar, editar, deletar avaliações).
+- **JWT no login**: Sessões autenticadas a base de JWT.
+- **CRUD de avaliações**: É possível avaliar os serviços completos, além de editar a avaliação ou a apagar.
 
 ### Futuras
 - **Filtros e busca avançada**: Por especialidade, localização e tipo de serviço.
