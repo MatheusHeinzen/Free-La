@@ -16,8 +16,8 @@ def login_required(func):
             # Se for uma requisição API, retorne JSON
             if request.is_json:
                 return jsonify({"sucesso": False, "mensagem": "Não autenticado"}), 401
-            # Caso contrário, redirecione para login
-            return redirect(url_for('/login'))  # Ajuste a rota conforme necessário
+            # Caso contrário, redirecione para homepage
+            return redirect(url_for('homepage.exibir_homepage'))
         return func(*args, **kwargs)
     return decorated_function
 

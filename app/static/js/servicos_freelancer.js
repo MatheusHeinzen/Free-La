@@ -1,7 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         const response = await fetch('/servicos/listar', { credentials: 'include' });
-        if (!response.ok) throw new Error('Erro ao carregar serviços');
+        if (!response.ok) {
+            // Se não autenticado, redireciona para homepage
+            window.location.href = "/homepage";
+            return;
+        }
         const data = await response.json();
 
         const recebidos = document.getElementById('servicosRecebidos');
@@ -38,9 +42,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             </li>`;
         }
 
-        // Serviços concluídos
+        // Serviços concluídos - checa se já foi avaliado
+        let avaliacoesUsuario = {};
         if (recebidosConcluidos && Array.isArray(data.servicosRecebidosConcluidos) && data.servicosRecebidosConcluidos.length > 0) {
+            // Busca avaliações do usuário logado para os serviços concluídos
+            const userId = window.session?.user_id || (window.sessionStorage && sessionStorage.getItem('user_id'));
+            let ids = data.servicosRecebidosConcluidos.map(s => s.ID_Service);
+            let avaliacoes = {};
+            try {
+                // Busca avaliações do usuário logado para esses serviços
+                const resp = await fetch(`/servicos/avaliacoes/usuario?ids=${ids.join(',')}`, { credentials: 'include' });
+                if (resp.ok) {
+                    const result = await resp.json();
+                    if (result.sucesso && result.avaliacoes) {
+                        // Map: ID_Service -> true
+                        result.avaliacoes.forEach(av => { avaliacoes[av.ID_Service] = true; });
+                    }
+                }
+            } catch {}
             data.servicosRecebidosConcluidos.forEach(servico => {
+                const jaAvaliado = avaliacoes[servico.ID_Service];
                 recebidosConcluidos.innerHTML += `
                     <li class="list-group-item">
                         <strong>${servico.Nome}</strong>
@@ -48,7 +69,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <small class="d-block">Categoria: ${renderCategoria(servico)}</small>
                         <small class="d-block mb-2">Status: ${servico.Status}</small>
                         <div class="mt-2">
-                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service})">Avaliar</button>
+                            <button class="btn btn-warning btn-sm" onclick="avaliarServico(${servico.ID_Service}, ${jaAvaliado ? JSON.stringify(jaAvaliado) : 'null'})">${jaAvaliado ? 'Reavaliar' : 'Avaliar'}</button>
+                            ${jaAvaliado ? `<button class="btn btn-danger btn-sm ml-2" onclick="deletarAvaliacao(${servico.ID_Service})">Deletar Avaliação</button>` : ''}
                         </div>
                     </li>`;
             });
@@ -99,28 +121,33 @@ window.concluirServico = async function (servicoId) {
     }
 };
 
-window.avaliarServico = async function (servicoId) {
-    console.log("Serviço ID:", servicoId);
+window.avaliarServico = async function (servicoId, avaliacaoExistente = null) {
+    let notaAtual = '';
+    let comentarioAtual = '';
+    if (avaliacaoExistente) {
+        notaAtual = avaliacaoExistente.Nota;
+        comentarioAtual = avaliacaoExistente.Comentario || '';
+    }
     const { value: formValues } = await Swal.fire({
-        title: 'Avaliar Serviço',
+        title: avaliacaoExistente ? 'Reavaliar Serviço' : 'Avaliar Serviço',
         html: `
-           <div class="mb-3">
-            <label class="form-label">Nota:</label><br>
-            <div class="rating">
-            <input type="radio" id="estrela5" name="rating" value="5">
-            <label for="estrela5"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela4" name="rating" value="4">
-            <label for="estrela4"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela3" name="rating" value="3">
-            <label for="estrela3"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela2" name="rating" value="2">
-            <label for="estrela2"><i class="bi bi-star-fill"></i></label>
-            <input type="radio" id="estrela1" name="rating" value="1">
-            <label for="estrela1"><i class="bi bi-star-fill"></i></label>
+            <div class="mb-3">
+                <label class="form-label">Nota:</label><br>
+                <div class="rating">
+                    <input type="radio" id="estrela5" name="rating" value="5">
+                    <label for="estrela5"><i class="bi bi-star-fill"></i></label>
+                    <input type="radio" id="estrela4" name="rating" value="4">
+                    <label for="estrela4"><i class="bi bi-star-fill"></i></label>
+                    <input type="radio" id="estrela3" name="rating" value="3">
+                    <label for="estrela3"><i class="bi bi-star-fill"></i></label>
+                    <input type="radio" id="estrela2" name="rating" value="2">
+                    <label for="estrela2"><i class="bi bi-star-fill"></i></label>
+                    <input type="radio" id="estrela1" name="rating" value="1">
+                    <label for="estrela1"><i class="bi bi-star-fill"></i></label>
+                </div>
             </div>
-        </div>
         <label for="comentarioServico">Comentário:</label>
-        <textarea id="comentarioServico" class="form-control" rows="3"></textarea>
+        <textarea id="comentarioServico" class="form-control" rows="3">${comentarioAtual}</textarea>
         `,
         focusConfirm: false,
         preConfirm: () => {
@@ -144,7 +171,7 @@ window.avaliarServico = async function (servicoId) {
             });
 
             if (!response.ok) {
-                const text = await response.text(); // pega como string
+                const text = await response.text();
                 throw new Error(`Erro do servidor: ${text}`);
             }
 
@@ -164,44 +191,36 @@ window.avaliarServico = async function (servicoId) {
     }
 };
 
-async function logout() {
-    try {
-        const response = await fetch('/auth/logout', { // Rota de logout no backend
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
-        });
-
-        const data = await response.json();
-        if (data.sucesso) {
+window.deletarAvaliacao = async function(servicoId) {
+    const confirm = await Swal.fire({
+        title: 'Deletar avaliação?',
+        text: 'Tem certeza que deseja deletar sua avaliação deste serviço?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sim, deletar',
+        cancelButtonText: 'Cancelar'
+    });
+    if (confirm.isConfirmed) {
+        try {
+            const response = await fetch(`/servicos/avaliar/${servicoId}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Erro ao deletar avaliação');
             Swal.fire({
                 icon: 'success',
-                title: 'Logout realizado!',
-                text: data.mensagem,
+                title: 'Avaliação deletada!',
                 timer: 2000,
                 showConfirmButton: false
-            }).then(() => {
-                // Redireciona para a página de login
-                window.location.href = "/";
-            });
-        } else {
+            }).then(() => location.reload());
+        } catch (error) {
             Swal.fire({
                 icon: 'error',
                 title: 'Erro!',
-                text: 'Não foi possível encerrar a sessão. Tente novamente.'
+                text: error.message || 'Erro ao deletar avaliação.'
             });
         }
-    } catch (error) {
-        console.error("Erro ao realizar logout:", error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Erro!',
-            text: 'Erro ao realizar logout. Tente novamente.'
-        });
     }
-}
-
-
-
+};
 
 // Para deletar Usuario:
 

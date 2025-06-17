@@ -209,7 +209,7 @@ a:hover {
 .dropdown-menu {
     position: absolute;
     top: 100%;
-    left: 76%;
+    left: 82%;
     z-index: 1000;
     display: none;
     float: left;

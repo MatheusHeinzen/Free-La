@@ -198,7 +198,7 @@ def concluir_servico(servico_id):
         if conn:
             conn.close()
 
-@service_bp.route('/avaliar/<int:servico_id>', methods=['POST'])
+@service_bp.route('/avaliar/<int:servico_id>', methods=['POST', 'PUT'])
 @login_required
 def avaliar_servico(servico_id):
     data = request.get_json()
@@ -231,19 +231,39 @@ def avaliar_servico(servico_id):
 
         # Verifica se já existe avaliação desse usuário para esse serviço
         cursor.execute("""
-            SELECT 1 FROM avaliacao 
+            SELECT ID_Avaliacao FROM avaliacao 
             WHERE ID_Service = %s AND ID_Avaliador = %s AND TipoAvaliador = %s
         """, (servico_id, id_avaliador, tipo_avaliador))
-        if cursor.fetchone():
-            return jsonify({"sucesso": False, "erro": "Você já avaliou este serviço."}), 400
+        avaliacao_existente = cursor.fetchone()
 
-        cursor.execute("""
-            INSERT INTO avaliacao (ID_Service, ID_Avaliador, TipoAvaliador, Nota, Comentario)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (servico_id, id_avaliador, tipo_avaliador, nota, comentario))
+        if request.method == 'POST':
+            if avaliacao_existente:
+                # Se já existe, faz update (reavaliar)
+                cursor.execute("""
+                    UPDATE avaliacao SET Nota = %s, Comentario = %s, DataAvaliacao = NOW()
+                    WHERE ID_Avaliacao = %s
+                """, (nota, comentario, avaliacao_existente['ID_Avaliacao']))
+                conn.commit()
+                return jsonify({"sucesso": True, "mensagem": "Avaliação atualizada com sucesso!"}), 200
+            else:
+                # Cria nova avaliação
+                cursor.execute("""
+                    INSERT INTO avaliacao (ID_Service, ID_Avaliador, TipoAvaliador, Nota, Comentario)
+                    VALUES (%s, %s, %s, %s, %s)
+                """, (servico_id, id_avaliador, tipo_avaliador, nota, comentario))
+                conn.commit()
+                return jsonify({"sucesso": True, "mensagem": "Serviço avaliado com sucesso!"}), 201
 
-        conn.commit()
-        return jsonify({"sucesso": True, "mensagem": "Serviço avaliado com sucesso!"}), 201
+        elif request.method == 'PUT':
+            if not avaliacao_existente:
+                return jsonify({"sucesso": False, "erro": "Avaliação não encontrada para atualizar."}), 404
+            cursor.execute("""
+                UPDATE avaliacao SET Nota = %s, Comentario = %s, DataAvaliacao = NOW()
+                WHERE ID_Avaliacao = %s
+            """, (nota, comentario, avaliacao_existente['ID_Avaliacao']))
+            conn.commit()
+            return jsonify({"sucesso": True, "mensagem": "Avaliação atualizada com sucesso!"}), 200
+
     except Exception as e:
         print(f"Erro ao avaliar serviço: {e}")
         return jsonify({"sucesso": False, "erro": "Erro ao avaliar serviço"}), 500
@@ -253,49 +273,48 @@ def avaliar_servico(servico_id):
         if conn:
             conn.close()
 
-@service_bp.route('/editar/<int:servico_id>', methods=['PUT'])
+@service_bp.route('/avaliar/<int:servico_id>', methods=['DELETE'])
 @login_required
-def editar_servico(servico_id):
+def deletar_avaliacao(servico_id):
     user_id = session.get('user_id')
-    data = request.get_json()
-    nome = data.get('nome')
-    descricao = data.get('descricao')
-    categoria = data.get('categoria')
-
-    if not (nome and descricao and categoria):
-        return jsonify({"sucesso": False, "erro": "Dados incompletos para editar o serviço"}), 400
-
     conn = None
     cursor = None
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
-        # Só o cliente pode editar o serviço
-        cursor.execute("SELECT ID_Cliente FROM service WHERE ID_Service = %s", (servico_id,))
+        cursor = conn.cursor(dictionary=True)
+        # Descobre se o usuário é cliente ou freelancer do serviço
+        cursor.execute("SELECT ID_Cliente, ID_Freelancer FROM service WHERE ID_Service = %s", (servico_id,))
         result = cursor.fetchone()
-        if not result or str(result[0]) != str(user_id):
-            return jsonify({"sucesso": False, "erro": "Não autorizado a editar este serviço."}), 403
+        if not result:
+            return jsonify({"sucesso": False, "erro": "Serviço não encontrado."}), 404
 
+        id_cliente = result['ID_Cliente']
+        id_freelancer = result['ID_Freelancer']
+
+        if str(user_id) == str(id_cliente):
+            tipo_avaliador = 'cliente'
+            id_avaliador = user_id
+        elif str(user_id) == str(id_freelancer):
+            tipo_avaliador = 'freelancer'
+            id_avaliador = user_id
+        else:
+            return jsonify({"sucesso": False, "erro": "Não autorizado a deletar esta avaliação."}), 403
+
+        # Verifica se existe avaliação
         cursor.execute("""
-            UPDATE service SET NomeService = %s, Descricao = %s WHERE ID_Service = %s
-        """, (nome, descricao, servico_id))
-        # Atualiza categoria na tabela de ligação
-        cursor.execute("""
-            SELECT ID_Categoria FROM categoria WHERE NomeCategoria = %s
-        """, (categoria,))
-        cat = cursor.fetchone()
-        if cat:
-            cursor.execute("""
-                DELETE FROM service_categoria WHERE ID_Service = %s
-            """, (servico_id,))
-            cursor.execute("""
-                INSERT INTO service_categoria (ID_Service, ID_Categoria) VALUES (%s, %s)
-            """, (servico_id, cat[0]))
+            SELECT ID_Avaliacao FROM avaliacao 
+            WHERE ID_Service = %s AND ID_Avaliador = %s AND TipoAvaliador = %s
+        """, (servico_id, id_avaliador, tipo_avaliador))
+        avaliacao = cursor.fetchone()
+        if not avaliacao:
+            return jsonify({"sucesso": False, "erro": "Avaliação não encontrada."}), 404
+
+        cursor.execute("DELETE FROM avaliacao WHERE ID_Avaliacao = %s", (avaliacao['ID_Avaliacao'],))
         conn.commit()
-        return jsonify({"sucesso": True, "mensagem": "Serviço editado com sucesso!"}), 200
+        return jsonify({"sucesso": True, "mensagem": "Avaliação deletada com sucesso!"}), 200
     except Exception as e:
-        print(f"[ERROR] Erro ao editar serviço: {e}")
-        return jsonify({"sucesso": False, "erro": "Erro ao editar serviço"}), 500
+        print(f"Erro ao deletar avaliação: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao deletar avaliação"}), 500
     finally:
         if cursor:
             cursor.close()
@@ -322,6 +341,41 @@ def listar_avaliacoes_freelancer(freelancer_id):
     except Exception as e:
         print(f"[ERROR] Erro ao listar avaliações do freelancer: {e}")
         return jsonify({"sucesso": False, "erro": "Erro ao listar avaliações"}), 500
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+@service_bp.route('/avaliacoes/usuario', methods=['GET'])
+@login_required
+def avaliacoes_usuario_para_servicos():
+    """
+    Retorna lista de avaliações do usuário logado para os serviços informados (por ID).
+    Query param: ids=1,2,3
+    """
+    user_id = session.get('user_id')
+    ids = request.args.get('ids', '')
+    if not ids:
+        return jsonify({"sucesso": True, "avaliacoes": []})
+    id_list = [int(i) for i in ids.split(',') if i.isdigit()]
+    if not id_list:
+        return jsonify({"sucesso": True, "avaliacoes": []})
+    conn = None
+    cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        # Busca avaliações do usuário logado para esses serviços
+        cursor.execute("""
+            SELECT ID_Service, ID_Avaliacao, Nota, Comentario FROM avaliacao
+            WHERE ID_Avaliador = %s AND ID_Service IN ({})
+        """.format(','.join(['%s'] * len(id_list))), tuple([user_id] + id_list))
+        avaliacoes = cursor.fetchall()
+        return jsonify({"sucesso": True, "avaliacoes": avaliacoes})
+    except Exception as e:
+        print(f"[ERROR] Erro ao buscar avaliações do usuário: {e}")
+        return jsonify({"sucesso": False, "erro": "Erro ao buscar avaliações"}), 500
     finally:
         if cursor:
             cursor.close()
