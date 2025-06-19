@@ -1,10 +1,10 @@
 # Free'la
 
-**Status**: Em desenvolvimento 🚧 | Estágio Final - Últimos ajustes
+**Status**: Projeto Finalizado
 
 ## Colaboradores:
-- Edmund Soares de Souza
 - Bruna da Silva Carnelossi
+- Edmund Soares de Souza
 - Matheus Henrique Heinzen
 - Vinicius Lima Teider
 
@@ -23,7 +23,6 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 ---
 
 ## Funcionalidades
-### Implementadas
 - **Cadastro e autenticação de usuário**: CRUD completo para usuários, com login seguro (hash de senha).
 - **Gestão de perfis**: Atualização de dados pessoais, endereço, habilidades e preferências de contato.
 - **Integração com API externa**: Consulta automática de endereço por CEP.
@@ -38,9 +37,6 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 - **Sessão segura**: Controle de sessão e logout.
 - **JWT no login**: Sessões autenticadas a base de JWT.
 - **CRUD de avaliações**: É possível avaliar os serviços completos, além de editar a avaliação ou a apagar.
-
-### Futuras
-- **Filtros e busca avançada**: Por especialidade, localização e tipo de serviço.
 
 ---
 
@@ -71,7 +67,7 @@ A plataforma conecta freelancers e consumidores, permitindo avaliações mútuas
 ## Pré-requisitos e Execução
 1. Instale as dependências:
    ```bash
-   pip install flask flask-cors mysql-connector-python bcrypt
+   pip install flask flask-cors mysql-connector-python bcrypt jwtify
    ```
 2. Configure o banco de dados MySQL usando `sql_freela.sql`.
 3. Execute o projeto:
